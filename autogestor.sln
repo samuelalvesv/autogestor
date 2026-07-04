@@ -1,23 +1,23 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.0.0
 MinimumVisualStudioVersion = 17.8.0.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autogestor.AppHost", "autogestor.AppHost\autogestor.AppHost.csproj", "{F36B5F40-0C16-4FC1-914D-D9BB8CD2D61B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autogestor.AppHost", "src\autogestor.AppHost\autogestor.AppHost.csproj", "{F36B5F40-0C16-4FC1-914D-D9BB8CD2D61B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autogestor.ServiceDefaults", "autogestor.ServiceDefaults\autogestor.ServiceDefaults.csproj", "{1A216C7B-A0CD-43CF-9827-D3DA2EFCE47F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autogestor.ServiceDefaults", "src\autogestor.ServiceDefaults\autogestor.ServiceDefaults.csproj", "{1A216C7B-A0CD-43CF-9827-D3DA2EFCE47F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.core", "autogestor.core\autogestor.core.csproj", "{86FD3BEB-8CB4-4AE3-8FB7-70079019588F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.core", "src\autogestor.core\autogestor.core.csproj", "{86FD3BEB-8CB4-4AE3-8FB7-70079019588F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.infra", "autogestor.infra\autogestor.infra.csproj", "{B5030782-75DD-409B-92CF-4C50E10370A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.infra", "src\autogestor.infra\autogestor.infra.csproj", "{B5030782-75DD-409B-92CF-4C50E10370A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.app", "autogestor.app\autogestor.app.csproj", "{BB8070A6-A1A6-459B-AA3C-E31D3ED1ECE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.app", "src\autogestor.app\autogestor.app.csproj", "{BB8070A6-A1A6-459B-AA3C-E31D3ED1ECE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.api", "autogestor.api\autogestor.api.csproj", "{1E40E7CA-B339-4CD5-B05F-80668CBD5467}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.api", "src\autogestor.api\autogestor.api.csproj", "{1E40E7CA-B339-4CD5-B05F-80668CBD5467}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.web", "autogestor.web\autogestor.web.csproj", "{74F9B1CC-B273-4AB2-BD39-DD22A99AA625}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.web", "src\autogestor.web\autogestor.web.csproj", "{74F9B1CC-B273-4AB2-BD39-DD22A99AA625}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.test", "autogestor.test\autogestor.test.csproj", "{D7C30781-EC54-4CC8-9A7E-A1E5E94900CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autogestor.test", "test\autogestor.test\autogestor.test.csproj", "{D7C30781-EC54-4CC8-9A7E-A1E5E94900CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
