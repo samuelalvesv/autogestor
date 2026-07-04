@@ -1,14 +1,14 @@
-# autogestor.test
+# Autogestor.Tests
 
 Projeto de testes da solução. Ver [architecture.md](../../.agents/architecture.md) para o mapa completo.
 
 ## Estrutura de Pastas Esperada
 ```
-autogestor.test/
+Autogestor.Tests/
 ├── Unit/
-│   ├── Core/          # Testes de entidades e value objects
-│   ├── App/           # Testes de casos de uso (com mocks)
-│   └── Api/           # Testes de endpoints
+│   ├── Domain/       # Testes de entidades e value objects
+│   ├── Application/  # Testes de casos de uso (com mocks)
+│   └── Api/          # Testes de endpoints
 ├── Integration/       # Testes com banco de dados real ou em memória
 └── Architecture/      # Testes de regras arquiteturais (dependências entre camadas)
 ```

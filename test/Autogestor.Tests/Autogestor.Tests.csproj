@@ -25,11 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\autogestor.core\autogestor.core.csproj" />
-    <ProjectReference Include="..\..\src\autogestor.infra\autogestor.infra.csproj" />
-    <ProjectReference Include="..\..\src\autogestor.app\autogestor.app.csproj" />
-    <ProjectReference Include="..\..\src\autogestor.api\autogestor.api.csproj" />
-    <ProjectReference Include="..\..\src\autogestor.web\autogestor.web.csproj" />
+    <ProjectReference Include="..\..\src\Autogestor.Domain\Autogestor.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Autogestor.Infrastructure\Autogestor.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Autogestor.Application\Autogestor.Application.csproj" />
+    <ProjectReference Include="..\..\src\Autogestor.Api\Autogestor.Api.csproj" />
+    <ProjectReference Include="..\..\src\Autogestor.Web\Autogestor.Web.csproj" />
   </ItemGroup>
 
 </Project>

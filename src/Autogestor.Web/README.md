@@ -1,10 +1,10 @@
-# autogestor.web (Frontend)
+# Autogestor.Web (Frontend)
 
 Frontend Blazor WebAssembly (roda no navegador do usuário). Ver [architecture.md](../../.agents/architecture.md) para o mapa completo.
 
 ## Estrutura de Pastas Esperada
 ```
-autogestor.web/
+Autogestor.Web/
 ├── Pages/             # Páginas roteáveis (@page)
 ├── Components/        # Componentes UI reutilizáveis e customizados
 ├── Layout/            # Layout principal e navegação
@@ -14,9 +14,9 @@ autogestor.web/
 ```
 
 ## Regras Específicas
-- Referencia apenas `autogestor.core` (para DTOs/modelos compartilhados).
+- Referencia apenas `Autogestor.Domain` (para DTOs/modelos compartilhados).
 - Não referencia `ServiceDefaults` (incompatível com o runtime `browser-wasm`).
-- Toda comunicação com o backend é feita via HTTP (`HttpClient`) apontando para a `api`.
+- Toda comunicação com o backend é feita via HTTP (`HttpClient`) apontando para a `Autogestor.Api`.
 
 ## Diretrizes de Interface e Design
 - **Biblioteca de Componentes**: Usar **MudBlazor** para a construção da interface do usuário (UI).

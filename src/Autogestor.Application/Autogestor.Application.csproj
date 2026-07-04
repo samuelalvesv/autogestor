@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\autogestor.core\autogestor.core.csproj" />
+    <ProjectReference Include="..\Autogestor.Domain\Autogestor.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,16 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Autogestor.ServiceDefaults\Autogestor.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Autogestor.Domain\Autogestor.Domain.csproj" />
-    <ProjectReference Include="..\Autogestor.Infrastructure\Autogestor.Infrastructure.csproj" />
     <ProjectReference Include="..\Autogestor.Application\Autogestor.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
 </Project>

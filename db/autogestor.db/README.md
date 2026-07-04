@@ -1,4 +1,4 @@
-# db/autogestor.db
+# db/Autogestor.Db
 
 Diretório destinado para armazenar scripts SQL (.sql) de migração e estruturação do banco de dados.
 

@@ -1,10 +1,10 @@
-# autogestor.infra (Infrastructure)
+# Autogestor.Infrastructure
 
 Camada de implementações concretas e integração com tecnologias externas. Ver [architecture.md](../../.agents/architecture.md) para o mapa completo.
 
 ## Estrutura de Pastas Esperada
 ```
-autogestor.infra/
+Autogestor.Infrastructure/
 ├── Persistence/
 │   ├── AppDbContext.cs         # DbContext do Entity Framework Core
 │   ├── Configurations/        # Fluent API (IEntityTypeConfiguration)
@@ -14,7 +14,7 @@ autogestor.infra/
 ```
 
 ## Regras Específicas
-- Referencia `autogestor.core` e `autogestor.app`.
-- As classes de repositório implementam interfaces do `core` (ex: `IOrderRepository`).
-- As classes de serviço implementam interfaces do `app` (ex: `IEmailService`).
+- Referencia `Autogestor.Domain` e `Autogestor.Application`.
+- As classes de repositório implementam interfaces do `Domain` (ex: `IOrderRepository`).
+- As classes de serviço implementam interfaces do `Application` (ex: `IEmailService`).
 - Expor um único método de extensão `AddInfrastructure(this IServiceCollection)` para registrar tudo.

@@ -13,17 +13,17 @@ Sistema de autogestão corporativa construído com Clean Architecture, DDD e .NE
 ```
 autogestor/
 ├── src/                              # Código-fonte de produção
-│   ├── autogestor.core/              # Domain — Entidades, Value Objects, Interfaces
-│   ├── autogestor.app/               # Application — Casos de uso, DTOs, Mediator
-│   ├── autogestor.infra/             # Infrastructure — EF Core, Repositórios, Serviços
-│   ├── autogestor.api/               # Presentation — Minimal API endpoints
-│   ├── autogestor.web/               # Frontend — Blazor WASM + MudBlazor
-│   ├── autogestor.AppHost/           # Aspire — Orquestrador de serviços
-│   └── autogestor.ServiceDefaults/   # Aspire — Telemetria, Health Checks, Resiliência
+│   ├── Autogestor.Domain/            # Domain — Entidades, Value Objects, Interfaces
+│   ├── Autogestor.Application/       # Application — Casos de uso, DTOs, Mediator
+│   ├── Autogestor.Infrastructure/    # Infrastructure — EF Core, Repositórios, Serviços
+│   ├── Autogestor.Api/               # Presentation — Minimal API endpoints
+│   ├── Autogestor.Web/               # Frontend — Blazor WASM + MudBlazor
+│   ├── Autogestor.AppHost/           # Aspire — Orquestrador de serviços
+│   └── Autogestor.ServiceDefaults/   # Aspire — Telemetria, Health Checks, Resiliência
 ├── test/                             # Código de testes
-│   └── autogestor.test/              # xUnit — Unitários, Integração, Arquitetura
+│   └── Autogestor.Tests/             # xUnit — Unitários, Integração, Arquitetura
 ├── db/                               # Banco de dados
-│   └── autogestor.db/                # Scripts SQL (PostgreSQL 18)
+│   └── Autogestor.Db/                # Scripts SQL (PostgreSQL 18)
 ├── .agents/                          # Regras e documentação técnica para agentes
 │   ├── AGENTS.md                     # Convenções de código e commit
 │   └── architecture.md               # Mapa de dependências e camadas
@@ -36,7 +36,7 @@ autogestor/
 | Objetivo | Comando |
 |---|---|
 | Compilar a Solução | `dotnet build` |
-| Executar o Aspire (Ambiente Dev) | `dotnet run --project src/autogestor.AppHost` |
+| Executar o Aspire (Ambiente Dev) | `dotnet run --project src/Autogestor.AppHost` |
 | Rodar a Suíte de Testes | `dotnet test` |
 | Verificar/Atualizar Pacotes NuGet | `dotnet outdated -u` |
 

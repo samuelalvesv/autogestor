@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\autogestor.api\autogestor.api.csproj" />
-    <ProjectReference Include="..\autogestor.web\autogestor.web.csproj" />
+    <ProjectReference Include="..\Autogestor.Api\Autogestor.Api.csproj" />
+    <ProjectReference Include="..\Autogestor.Web\Autogestor.Web.csproj" />
   </ItemGroup>
 
 </Project>

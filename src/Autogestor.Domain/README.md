@@ -1,10 +1,10 @@
-# autogestor.core (Domain)
+# Autogestor.Domain
 
 Camada mais interna da arquitetura. Ver [architecture.md](../../.agents/architecture.md) para o mapa completo.
 
 ## Estrutura de Pastas Esperada
 ```
-autogestor.core/
+Autogestor.Domain/
 ├── Entities/          # Entidades com identidade (Id)
 ├── ValueObjects/      # Objetos imutáveis sem identidade
 ├── Enums/             # Enumerações de domínio

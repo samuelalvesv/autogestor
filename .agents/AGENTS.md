@@ -14,12 +14,13 @@
 - **Design Distribuído**: Projetar toda a lógica do sistema visando alta performance e capacidade de escala em ambientes distribuídos, aproveitando a resiliência e a descoberta de serviços nativas do .NET Aspire.
 - **Desacoplamento e Reuso (Wrappers)**:
   - Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
+- **Qualidade de Código e Roslyn**: Forçar padrões rígidos de qualidade, estilo de escrita e formatação de código C# utilizando analisadores do Roslyn configurados via arquivo `.editorconfig` na raiz da solução.
 
 ## Testes e TDD (Test-Driven Development)
-- Aplicar TDD para regras de negócio (`core`) e casos de uso (`app`).
+- Aplicar TDD para regras de negócio (`Domain`) e casos de uso (`Application`).
 - Ciclo obrigatório: Escrever o teste (Red) ➜ Implementar o mínimo (Green) ➜ Refatorar (Refactor).
-- Usar mocks (NSubstitute/Moq) para isolar as dependências do `app`.
-- Evitar TDD para UI (Blazor/web) e configurações de infraestrutura.
+- Usar mocks (NSubstitute/Moq) para isolar as dependências do `Application`.
+- Evitar TDD para UI (Blazor/Web) e configurações de infraestrutura.
 
 ## Estrutura de Pastas e Documentação
 - Consultar `.agents/architecture.md` para o mapa completo de camadas e dependências.
