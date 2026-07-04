@@ -1,0 +1,29 @@
+## [Core]
+# Descarta arquivos de compilação do .NET
+bin/
+obj/
+
+## [User Secrets]
+# Arquivo local de segredos do usuário do ASP.NET Core
+secrets.json
+.microsoft/usersecrets/
+
+## [Visual Studio / VS Code / Rider]
+# Configurações locais de IDEs
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+## [OS Specific]
+# Arquivos de sistema do macOS e Windows
+.DS_Store
+Thumbs.db
+
+## [Logs]
+# Arquivos de log gerados em tempo de execução
+*.log
