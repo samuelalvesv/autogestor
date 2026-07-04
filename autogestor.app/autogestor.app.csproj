@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\autogestor.core\autogestor.core.csproj" />
-    <ProjectReference Include="..\autogestor.app\autogestor.app.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
