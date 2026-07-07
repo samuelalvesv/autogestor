@@ -3,6 +3,7 @@
 Sistema de autogestão corporativa construído com Clean Architecture, DDD e .NET Aspire.
 
 ## Stack Tecnológica
+
 - **Backend**: .NET 10 (C#)
 - **Frontend**: Blazor WebAssembly (WASM) com MudBlazor
 - **Orquestração & Resiliência**: .NET Aspire
@@ -10,7 +11,8 @@ Sistema de autogestão corporativa construído com Clean Architecture, DDD e .NE
 - **Testes**: xUnit
 
 ## Estrutura do Projeto
-```
+
+```text
 autogestor/
 ├── src/                              # Código-fonte de produção
 │   ├── Autogestor.Domain/            # Domain — Entidades, Value Objects, Interfaces
@@ -30,18 +32,19 @@ autogestor/
 ├── autogestor.sln                    # Arquivo de solução .NET
 ├── .gitignore
 └── README.md
-```
+```text
 
 ## Como Iniciar e Desenvolver
+
 | Objetivo | Comando |
-|---|---|
+| --- | --- |
 | Compilar a Solução | `dotnet build` |
 | Executar o Aspire (Ambiente Dev) | `dotnet run --project src/Autogestor.AppHost` |
 | Rodar a Suíte de Testes | `dotnet test` |
 | Verificar/Atualizar Pacotes NuGet | `dotnet outdated -u` |
 
 ## Documentação Adicional
+
 Para garantir consistência e evitar retrabalho, consulte os guias de design e regras do projeto:
 - **Diretrizes para Desenvolvedores e IAs**: Convenções de código, regras de commit e TDD em [.agents/AGENTS.md](.agents/AGENTS.md).
 - **Mapa da Arquitetura**: Fluxo de dependências e responsabilidades de cada camada em [.agents/architecture.md](.agents/architecture.md).
-
