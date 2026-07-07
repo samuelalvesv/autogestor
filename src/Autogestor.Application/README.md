@@ -3,7 +3,8 @@
 Camada de casos de uso e orquestração de fluxo. Ver [architecture.md](../../.agents/architecture.md) para o mapa completo.
 
 ## Estrutura de Pastas Esperada
-```
+
+```text
 Autogestor.Application/
 ├── UseCases/
 │   └── [Feature]/
@@ -12,9 +13,10 @@ Autogestor.Application/
 │       └── DTOs/          # Objetos de transferência de dados
 ├── Interfaces/            # Contratos de serviços externos (IEmailService, IStorageService)
 └── Validators/            # Validações de entrada (FluentValidation)
-```
+```text
 
 ## Regras Específicas
+
 - Referencia apenas `Autogestor.Domain`.
 - Nunca importar namespaces de infraestrutura (`System.Data`, `EntityFramework`).
 - Cada caso de uso deve ser uma classe isolada com um único método público.
