@@ -33,7 +33,9 @@ Autogestor.UI/
 ## Consumo pelos Hosts
 
 ### Blazor WASM (`Autogestor.Web`)
+
 O host referencia este projeto e configura o `Router` com `AdditionalAssemblies` para descobrir as rotas. Assets estáticos são acessados via `_content/Autogestor.UI/`.
 
 ### MAUI Hybrid (`Autogestor.Hybrid` — futuro)
+
 O host MAUI referencia este projeto e renderiza os componentes dentro de um `BlazorWebView`. Implementações nativas de interfaces (ex: `INotificationService`) são registradas no DI do MAUI.

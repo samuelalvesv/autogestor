@@ -48,5 +48,6 @@ autogestor/
 ## Documentação Adicional
 
 Para garantir consistência e evitar retrabalho, consulte os guias de design e regras do projeto:
+
 - **Diretrizes para Desenvolvedores e IAs**: Convenções de código, regras de commit e TDD em [.agents/AGENTS.md](.agents/AGENTS.md).
 - **Mapa da Arquitetura**: Fluxo de dependências e responsabilidades de cada camada em [.agents/architecture.md](.agents/architecture.md).
