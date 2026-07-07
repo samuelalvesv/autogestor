@@ -5,7 +5,8 @@ Sistema de autogestão corporativa construído com Clean Architecture, DDD e .NE
 ## Stack Tecnológica
 
 - **Backend**: .NET 10 (C#)
-- **Frontend**: Blazor WebAssembly (WASM) com MudBlazor
+- **UI Compartilhada**: Razor Class Library (RCL) com MudBlazor
+- **Frontend Host**: Blazor WebAssembly (WASM) com PWA
 - **Orquestração & Resiliência**: .NET Aspire
 - **Banco de Dados**: PostgreSQL 18
 - **Testes**: xUnit
@@ -19,7 +20,8 @@ autogestor/
 │   ├── Autogestor.Application/       # Application — Casos de uso, DTOs, Mediator
 │   ├── Autogestor.Infrastructure/    # Infrastructure — EF Core, Repositórios, Serviços
 │   ├── Autogestor.Api/               # Presentation — Minimal API endpoints
-│   ├── Autogestor.Web/               # Frontend — Blazor WASM + MudBlazor
+│   ├── Autogestor.UI/                # UI (RCL) — Componentes Razor compartilhados
+│   ├── Autogestor.Web/               # Frontend Host — Blazor WASM + PWA (shell fino)
 │   ├── Autogestor.AppHost/           # Aspire — Orquestrador de serviços
 │   └── Autogestor.ServiceDefaults/   # Aspire — Telemetria, Health Checks, Resiliência
 ├── test/                             # Código de testes
@@ -32,7 +34,7 @@ autogestor/
 ├── autogestor.sln                    # Arquivo de solução .NET
 ├── .gitignore
 └── README.md
-```text
+```
 
 ## Como Iniciar e Desenvolver
 

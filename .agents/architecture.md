@@ -14,11 +14,14 @@ Autogestor.Application     ← Domain
 Autogestor.Infrastructure  ← Domain, Application
   ↑
 Autogestor.Api             ← Domain, Application, Infrastructure, ServiceDefaults
-Autogestor.Web             ← Domain (Blazor WebAssembly — roda no navegador)
-Autogestor.Tests           ← Domain, Application, Infrastructure, Api, Web
+Autogestor.UI              ← Domain (RCL — componentes Razor compartilhados)
+  ↑
+Autogestor.Web             ← UI (host WASM + PWA — shell fino)
+[Autogestor.Hybrid]        ← UI (futuro host MAUI — apps nativos)
+Autogestor.Tests           ← Domain, Application, Infrastructure, Api, UI, Web
 Autogestor.AppHost         ← Api, Web (orquestrador Aspire)
-Autogestor.ServiceDefaults  ← Nenhuma (biblioteca compartilhada de telemetria)
-```text
+Autogestor.ServiceDefaults ← Nenhuma (biblioteca compartilhada de telemetria)
+```
 
 ## Camadas e Responsabilidades
 
@@ -28,7 +31,8 @@ Autogestor.ServiceDefaults  ← Nenhuma (biblioteca compartilhada de telemetria)
 | **Application** | `src/Autogestor.Application` | Use Cases / Handlers (Commands, Queries), DTOs, interfaces de serviços externos (`IEmailService`), validações de entrada | Acesso a banco, HTTP, Entity Framework |
 | **Infrastructure** | `src/Autogestor.Infrastructure` | Implementações de repositórios, DbContext (EF Core), clients HTTP, serviços de e-mail/SMS | Lógica de negócio, Controllers |
 | **Presentation** | `src/Autogestor.Api` | Minimal API endpoints, injeção de dependência, middlewares | Lógica de negócio, acesso direto a banco |
-| **Frontend** | `src/Autogestor.Web` | Componentes Blazor WebAssembly, páginas, chamadas HTTP à API | Acesso a banco, ServiceDefaults, injeção direta de `IXxxRepository` |
+| **UI (RCL)** | `src/Autogestor.UI` | Componentes Razor compartilhados, páginas, layouts, CSS, interfaces de serviços de UI, tema MudBlazor | Pacotes de hosting (WASM/MAUI), ServiceDefaults, acesso a banco |
+| **Frontend Host** | `src/Autogestor.Web` | Bootstrap WASM, PWA (Service Worker, manifest), `App.razor`, `index.html`, implementações web-specific de interfaces | Componentes Razor, páginas, layouts (esses vivem na UI) |
 | **Orchestration** | `src/Autogestor.AppHost` | Registro de projetos e recursos no Aspire | Lógica de negócio |
 | **Shared** | `src/Autogestor.ServiceDefaults` | OpenTelemetry, Health Checks, Resiliência HTTP | Lógica de negócio |
 | **Tests** | `test/Autogestor.Tests` | Testes unitários, de integração e testes de arquitetura automatizados (com `NetArchTest`) para validar as dependências das camadas | Código de produção |
@@ -39,7 +43,20 @@ Autogestor.ServiceDefaults  ← Nenhuma (biblioteca compartilhada de telemetria)
 [Usuário] → Api (endpoint) → Application (use case) → Domain (regra de negócio)
                                   ↓
                               Infrastructure (persiste no banco / chama serviço externo)
+```
+
+## Estratégia de Frontend Multi-Plataforma
+
+A UI é construída como uma Razor Class Library (`Autogestor.UI`) host-agnostic. Os componentes são consumidos por hosts diferentes conforme a necessidade:
+
 ```text
+Autogestor.UI (RCL)          ← Componentes, páginas, layouts, CSS compartilhados
+    ↑              ↑
+Autogestor.Web     [Autogestor.Hybrid]
+(Host WASM+PWA)    (Futuro Host MAUI — apps nativos iOS/Android/Windows/macOS)
+```
+
+Serviços que dependem de plataforma (ex: notificações, storage) são definidos como **interfaces** na RCL e implementados em cada host via DI.
 
 ## Regra de Ouro
 >

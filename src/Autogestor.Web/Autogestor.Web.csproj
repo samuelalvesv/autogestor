@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Autogestor.Domain\Autogestor.Domain.csproj" />
+    <ProjectReference Include="..\Autogestor.UI\Autogestor.UI.csproj" />
   </ItemGroup>
 
 </Project>
