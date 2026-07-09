@@ -31,7 +31,7 @@ autogestor/
 ├── .agents/                          # Regras e documentação técnica para agentes
 │   ├── AGENTS.md                     # Convenções de código e commit
 │   └── architecture.md               # Mapa de dependências e camadas
-├── autogestor.sln                    # Arquivo de solução .NET
+├── Autogestor.sln                    # Arquivo de solução .NET
 ├── .gitignore
 └── README.md
 ```
