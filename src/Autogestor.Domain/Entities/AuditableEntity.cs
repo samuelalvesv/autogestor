@@ -1,6 +1,4 @@
-using Autogestor.Domain.Entities;
-
-namespace Autogestor.Domain.Models;
+namespace Autogestor.Domain.Entities;
 
 public abstract class AuditableEntity : Entity
 {

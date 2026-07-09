@@ -1,5 +1,3 @@
-using Autogestor.Domain.Models;
-
 namespace Autogestor.Domain.Entities;
 
 public sealed class Category : AuditableEntity
