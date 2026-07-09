@@ -1,3 +1,5 @@
+using Autogestor.Domain.Enums;
+
 namespace Autogestor.Domain.Entities;
 
 public sealed class Transaction : AuditableEntity

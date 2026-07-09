@@ -1,4 +1,4 @@
-namespace Autogestor.Domain.Entities;
+namespace Autogestor.Domain.Enums;
 
 public enum ETransactionType
 {
