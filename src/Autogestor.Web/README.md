@@ -1,26 +1,26 @@
-# Autogestor.Web (Frontend)
+# Autogestor.Web (Host WASM + PWA)
 
-Frontend Blazor WebAssembly (roda no navegador do usuário). Ver [architecture.md](../../.agents/architecture.md) para o mapa completo.
+Host Blazor WebAssembly que serve a aplicação no browser com suporte a PWA. Consome os componentes da RCL `Autogestor.UI`. Ver [architecture.md](../../.agents/architecture.md) para o mapa completo.
 
 ## Estrutura de Pastas Esperada
-```
+
+```text
 Autogestor.Web/
-├── Pages/             # Páginas roteáveis (@page)
-├── Components/        # Componentes UI reutilizáveis e customizados
-├── Layout/            # Layout principal e navegação
-├── Services/          # Clientes HTTP para consumir a API
-├── Theme/             # Definição e configuração de cores e fontes do MudBlazor
-└── wwwroot/           # Assets estáticos (CSS, imagens, manifest)
+├── App.razor          # Router com referência às assemblies da RCL
+├── Program.cs         # Bootstrap WASM + registro de serviços
+├── _Imports.razor     # Imports globais (inclui namespaces da RCL)
+└── wwwroot/           # Assets exclusivos do host web
+    ├── index.html     # HTML host do WASM
+    ├── manifest.webmanifest  # Manifest PWA
+    ├── service-worker.js     # Service Worker (dev)
+    ├── service-worker.published.js  # Service Worker (produção)
+    ├── favicon.png, icon-*.png      # Ícones PWA
+    └── lib/           # Bibliotecas CSS de terceiros (Bootstrap)
 ```
 
 ## Regras Específicas
-- Referencia apenas `Autogestor.Domain` (para DTOs/modelos compartilhados).
-- Não referencia `ServiceDefaults` (incompatível com o runtime `browser-wasm`).
-- Toda comunicação com o backend é feita via HTTP (`HttpClient`) apontando para a `Autogestor.Api`.
 
-## Diretrizes de Interface e Design
-- **Biblioteca de Componentes**: Usar **MudBlazor** para a construção da interface do usuário (UI).
-- **Componentes Reutilizáveis**: Todo elemento visual comum (botões estilizados, diálogos, tabelas de listagem, cartões de métricas) deve ser extraído como um componente em `Components/` para evitar duplicação de marcação.
-- **Cores e Estilos Centralizados**:
-  - A paleta de cores (primária, secundária, fundos), tipografia e bordas deve ser definida exclusivamente via `MudTheme` centralizado.
-  - Proibido o uso de estilos inline (`style="..."`) ou cores hardcoded no CSS/HTML. Toda customização visual deve referenciar os tokens do tema do MudBlazor.
+- Referencia apenas `Autogestor.UI` (a RCL). O `Autogestor.Domain` chega transitivamente.
+- **Não contém** páginas, componentes ou layouts — esses vivem na `Autogestor.UI`.
+- Responsável pelo bootstrap WASM (`Program.cs`), PWA (Service Worker, manifest) e configuração de `HttpClient`.
+- Registra no DI as implementações web-specific de interfaces definidas na `Autogestor.UI`.

@@ -6,24 +6,26 @@ Autenticação e autorização baseadas em **ASP.NET Identity + isolamento multi
 
 ## Hierarquia de Acesso
 
-```
+```text
 Tenant (empresa que contratou o SaaS)
 ├── Branch (loja/filial)  — 0, 1 ou N por tenant
 │   ├── Dados operacionais (produtos, vendas, estoque...)
 │   └── Funcionários vinculados via UserBranchAccess
 └── User (funcionário)    — 0, 1 ou N por tenant
     └── Acesso a 0, 1 ou N branches (controlado pelo admin)
-```
+```text
 
 ### Cardinalidades
 
 | Relação | Cardinalidade |
-|---|---|
+| --- | --- |
 | Tenant → Branch | `1:N` (um tenant possui zero ou muitas lojas) |
 | Tenant → User | `1:N` (um tenant possui zero ou muitos funcionários) |
 | User ↔ Branch | `N:N` (um funcionário acessa zero ou muitas lojas; uma loja tem zero ou muitos funcionários) |
 
 ## Modelo de Entidades
+
+> **Regra de Domain-Driven Design (DDD)**: Evitar modelos anêmicos. As propriedades das entidades devem possuir setters privados (`private set`), e qualquer alteração de estado (ex: ativar/desativar um Tenant ou alterar o nome de uma Branch) deve ser exposta obrigatoriamente por **métodos de domínio expressivos** (ex: `Activate()`, `Deactivate()`, `Rename(string newName)`) contendo as validações necessárias para proteger as invariantes de negócio.
 
 ### Tenant
 
@@ -37,7 +39,7 @@ public sealed class Tenant
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; init; }
 }
-```
+```text
 
 ### Branch (Loja/Filial)
 
@@ -51,7 +53,7 @@ public sealed class Branch
     public string Name { get; private set; }
     public bool IsActive { get; private set; }
 }
-```
+```text
 
 ### ApplicationUser
 
@@ -64,7 +66,7 @@ public sealed class ApplicationUser : IdentityUser<Guid>
     public string FullName { get; private set; }
     public bool IsActive { get; private set; }
 }
-```
+```text
 
 ### UserBranchAccess (tabela associativa N:N)
 
@@ -77,7 +79,7 @@ public sealed class UserBranchAccess
     public Guid BranchId { get; init; }
     public BranchRole Role { get; init; }
 }
-```
+```text
 
 ### BranchRole (enum de perfis)
 
@@ -89,7 +91,7 @@ public enum BranchRole
     Administrative,
     Logistics
 }
-```
+```text
 
 ## Dois Níveis de Isolamento
 
@@ -118,7 +120,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 
     // Aplicar para TODA entidade que herda de TenantEntity
 }
-```
+```text
 
 > **Regra inviolável**: nenhuma query no sistema opera sem o filtro de `TenantId`. Mesmo queries administrativas internas respeitam o escopo do tenant autenticado.
 
@@ -134,11 +136,11 @@ public interface IBranchAuthorizationService
     Task<bool> HasRoleAsync(Guid userId, Guid branchId, BranchRole role, CancellationToken ct);
     Task<IReadOnlyList<Guid>> GetAccessibleBranchIdsAsync(Guid userId, CancellationToken ct);
 }
-```
+```text
 
 ## Fluxo de Autenticação e Autorização
 
-```
+```text
 [Funcionário] → POST /api/auth/login { email, password }
       ↓
 ASP.NET Identity valida credenciais
@@ -157,20 +159,20 @@ Nível 2: IBranchAuthorizationService verifica acesso à branch xxx
       ↓
 ✅ Autorizado → retorna dados
 ❌ Sem acesso à branch → 403 Forbidden
-```
+```text
 
 ## Fluxo do Admin Gerenciando Acessos
 
 ### Criar uma nova loja
 
-```
+```text
 [Admin] → POST /api/branches { name: "Filial Shopping" }
         → Branch criada com TenantId do admin autenticado
-```
+```text
 
 ### Criar um funcionário e conceder acesso
 
-```
+```text
 [Admin] → POST /api/users {
            fullName: "Maria Silva",
            email: "maria@...",
@@ -181,21 +183,21 @@ Nível 2: IBranchAuthorizationService verifica acesso à branch xxx
          }
         → Usuário criado no mesmo TenantId do admin
         → Registros de UserBranchAccess criados
-```
+```text
 
 ### Alterar acessos de um funcionário
 
-```
+```text
 [Admin] → PUT /api/users/{userId}/branch-accesses {
            grant:  [{ branchId: "filial-online-id", role: "Logistics" }],
            revoke: [{ branchId: "filial-centro-id" }]
          }
         → Adiciona/remove registros de UserBranchAccess
-```
+```text
 
 ## Exemplo Prático de Isolamento
 
-```
+```text
 Tenant "Moda Brasil" (tenant-a)
 ├── Filial Centro
 │   ├── João (Admin)        → vê Filial Centro ✅
@@ -218,12 +220,12 @@ Tenant "Tech Store" (tenant-b)
 
 Lucas NÃO vê nada da "Moda Brasil"  ❌ (Global Query Filter por TenantId)
 João NÃO vê nada da "Tech Store"    ❌ (Global Query Filter por TenantId)
-```
+```text
 
 ## Distribuição nas Camadas
 
 | Camada | Artefatos |
-|---|---|
+| --- | --- |
 | **Domain** | `Tenant`, `Branch`, `UserBranchAccess`, `BranchRole`, `TenantEntity` (base), `ITenantProvider`, `IBranchAccessRepository` |
 | **Application** | `IBranchAuthorizationService`, use cases (`CreateBranchCommand`, `GrantBranchAccessCommand`, `RevokeBranchAccessCommand`), DTOs |
 | **Infrastructure** | `ApplicationUser : IdentityUser<Guid>`, `TenantProvider` (lê `TenantId` do JWT), Global Query Filters no `DbContext`, implementação de `IBranchAuthorizationService` |
@@ -232,7 +234,7 @@ João NÃO vê nada da "Tech Store"    ❌ (Global Query Filter por TenantId)
 ## Tecnologias Utilizadas
 
 | Componente | Tecnologia |
-|---|---|
+| --- | --- |
 | Autenticação | ASP.NET Identity (.NET 10) |
 | Tokens | JWT Bearer |
 | ORM | EF Core com Global Query Filters |

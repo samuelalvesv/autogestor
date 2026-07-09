@@ -27,3 +27,4 @@ Thumbs.db
 ## [Logs]
 # Arquivos de log gerados em tempo de execução
 *.log
+temp/
