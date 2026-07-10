@@ -24,7 +24,6 @@ public sealed class Category : AuditableEntity
         if (userId == Guid.Empty)
             throw new ArgumentException("User ID must be a valid GUID.", nameof(userId));
 
-
         return new Category(name, description, userId);
     }
 }
