@@ -19,6 +19,11 @@
 - **Desacoplamento e Reuso (Wrappers)**:
   - Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
 - **Qualidade de Código e Roslyn**: Forçar padrões rígidos de qualidade, estilo de escrita e formatação de código C# utilizando analisadores do Roslyn configurados via arquivo `.editorconfig` na raiz da solução.
+- **gRPC Code-First & Protobuf**:
+  - As interfaces de contratos de serviço gRPC devem viver na camada `Autogestor.Contracts` e ser decoradas com o atributo `[ServiceContract]`.
+  - Os DTOs de Request/Response gRPC devem ser declarados como `record` ou classes imutáveis decorados com `[DataContract]`, e cada propriedade exposta deve conter o atributo `[DataMember(Order = N)]` com numeração de ordem explícita.
+  - **Versionamento de Contratos**: Para preservar a compatibilidade retroativa com clientes nativos em produção (como futuras versões do app MAUI instalados em dispositivos de usuários), **nunca** altere a numeração `Order` de propriedades existentes nos DTOs, e evite deletá-las. Campos novos devem sempre ser adicionados de forma incremental com numerações novas e do tipo anulável (`nullable`).
+
 
 ## Testes e TDD (Test-Driven Development)
 

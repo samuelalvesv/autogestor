@@ -141,9 +141,9 @@ public interface IBranchAuthorizationService
 ## Fluxo de Autenticação e Autorização
 
 ```text
-[Funcionário] → POST /api/auth/login { email, password }
+[Funcionário] → Chamada gRPC: IAuthGrpcService.LoginAsync(LoginRequest)
       ↓
-ASP.NET Identity valida credenciais
+ASP.NET Identity valida credenciais no Servidor
       ↓
 JWT gerado com claims:
 {
@@ -152,13 +152,13 @@ JWT gerado com claims:
   "role": "Collaborator"
 }
       ↓
-[Funcionário] → GET /api/products?branchId=xxx
+[Funcionário] → Chamada gRPC: IProductGrpcService.GetProductsAsync(GetProductsRequest) { BranchId: xxx }
       ↓
 Nível 1: Global Query Filter garante que só dados do tenant aparecem
 Nível 2: IBranchAuthorizationService verifica acesso à branch xxx
       ↓
-✅ Autorizado → retorna dados
-❌ Sem acesso à branch → 403 Forbidden
+✅ Autorizado → retorna dados (ProductResponse)
+❌ Sem acesso à branch → lança RpcException (StatusCode.PermissionDenied)
 ```text
 
 ## Fluxo do Admin Gerenciando Acessos
@@ -166,31 +166,32 @@ Nível 2: IBranchAuthorizationService verifica acesso à branch xxx
 ### Criar uma nova loja
 
 ```text
-[Admin] → POST /api/branches { name: "Filial Shopping" }
+[Admin] → Chamada gRPC: IBranchGrpcService.CreateBranchAsync(CreateBranchRequest) { Name: "Filial Shopping" }
         → Branch criada com TenantId do admin autenticado
-```text
+```
 
 ### Criar um funcionário e conceder acesso
 
 ```text
-[Admin] → POST /api/users {
-           fullName: "Maria Silva",
-           email: "maria@...",
-           branchAccesses: [
-             { branchId: "filial-centro-id", role: "Seller" },
-             { branchId: "filial-shopping-id", role: "Administrative" }
+[Admin] → Chamada gRPC: IUserGrpcService.CreateUserWithAccessAsync(CreateUserWithAccessRequest) {
+           FullName: "Maria Silva",
+           Email: "maria@...",
+           BranchAccesses: [
+             { BranchId: "filial-centro-id", Role: BranchRole.Seller },
+             { BranchId: "filial-shopping-id", Role: BranchRole.Administrative }
            ]
          }
         → Usuário criado no mesmo TenantId do admin
         → Registros de UserBranchAccess criados
-```text
+```
 
 ### Alterar acessos de um funcionário
 
 ```text
-[Admin] → PUT /api/users/{userId}/branch-accesses {
-           grant:  [{ branchId: "filial-online-id", role: "Logistics" }],
-           revoke: [{ branchId: "filial-centro-id" }]
+[Admin] → Chamada gRPC: IUserGrpcService.UpdateBranchAccessesAsync(UpdateBranchAccessesRequest) {
+           UserId: "user-id",
+           Grant:  [{ BranchId: "filial-online-id", Role: BranchRole.Logistics }],
+           Revoke: [{ BranchId: "filial-centro-id" }]
          }
         → Adiciona/remove registros de UserBranchAccess
 ```text
@@ -226,10 +227,11 @@ João NÃO vê nada da "Tech Store"    ❌ (Global Query Filter por TenantId)
 
 | Camada | Artefatos |
 | --- | --- |
+| **Contracts** | Interfaces gRPC decoradas (`IAuthGrpcService`, `IBranchGrpcService`), mensagens de Request/Response (`LoginRequest`, `LoginResponse`, `CreateBranchRequest`) |
 | **Domain** | `Tenant`, `Branch`, `UserBranchAccess`, `BranchRole`, `TenantEntity` (base), `ITenantProvider`, `IBranchAccessRepository` |
-| **Application** | `IBranchAuthorizationService`, use cases (`CreateBranchCommand`, `GrantBranchAccessCommand`, `RevokeBranchAccessCommand`), DTOs |
-| **Infrastructure** | `ApplicationUser : IdentityUser<Guid>`, `TenantProvider` (lê `TenantId` do JWT), Global Query Filters no `DbContext`, implementação de `IBranchAuthorizationService` |
-| **Api** | Configuração do ASP.NET Identity, JWT Bearer, middleware de resolução de tenant, Authorization Policies |
+| **Application** | `IBranchAuthorizationService`, use cases (`CreateBranchCommand`, `GrantBranchAccessCommand`, `RevokeBranchAccessCommand`), DTOs internos |
+| **Infrastructure** | `ApplicationUser : IdentityUser<Guid>`, `TenantProvider` (lê `TenantId` do cabeçalho JWT no contexto do gRPC), Global Query Filters no `DbContext`, implementação de `IBranchAuthorizationService` |
+| **Api** | Configuração do ASP.NET Identity, JWT Bearer, interceptador de resolução de tenant gRPC, Authorization Policies, mapeamento de serviços gRPC |
 
 ## Tecnologias Utilizadas
 
@@ -237,6 +239,7 @@ João NÃO vê nada da "Tech Store"    ❌ (Global Query Filter por TenantId)
 | --- | --- |
 | Autenticação | ASP.NET Identity (.NET 10) |
 | Tokens | JWT Bearer |
+| Transporte de APIs | gRPC / gRPC-Web (Code-First) |
 | ORM | EF Core com Global Query Filters |
-| Isolamento de Tenant | Claim `TenantId` + filtro automático no `DbContext` |
+| Isolamento de Tenant | Claim `TenantId` (injetada no cabeçalho gRPC) + filtro no `DbContext` |
 | Autorização por Branch | `UserBranchAccess` + `IBranchAuthorizationService` |

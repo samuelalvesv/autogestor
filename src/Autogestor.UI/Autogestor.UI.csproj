@@ -14,8 +14,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.9" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Autogestor.Domain\Autogestor.Domain.csproj" />
-  </ItemGroup>
+
 
 </Project>

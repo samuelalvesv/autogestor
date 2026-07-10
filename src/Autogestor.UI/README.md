@@ -16,11 +16,12 @@ Autogestor.UI/
 
 ## Regras Específicas
 
-- Referencia apenas `Autogestor.Domain` (para DTOs/modelos compartilhados).
+- Referencia apenas `Autogestor.Contracts` (para assinaturas de serviços gRPC e DTOs de exibição). Não possui dependência direta do `Autogestor.Domain`.
 - **Não referencia** pacotes de hosting (`Microsoft.AspNetCore.Components.WebAssembly` ou `Microsoft.Maui`).
 - **Não referencia** `Autogestor.ServiceDefaults` (incompatível com o runtime `browser-wasm`).
-- Todo acesso a APIs do browser ou do device nativo deve ser feito via **interfaces** (definidas aqui) com implementações injetadas pelo host via DI.
+- Todo acesso a APIs externas (serviços gRPC), APIs do browser ou do device nativo deve ser feito via **interfaces** (definidas no `Autogestor.Contracts` ou na própria RCL) com implementações injetadas pelos hosts via DI.
 - Componentes devem ser **host-agnostic**: não usar APIs exclusivas do browser (ex: `IJSRuntime` para localStorage) diretamente. Criar abstrações.
+
 
 ## Diretrizes de Interface e Design
 
