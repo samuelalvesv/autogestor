@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Autogestor.ServiceDefaults/Autogestor.ServiceDefaults.csproj" />
+    <Project Path="src/Autogestor.AppHost/Autogestor.AppHost.csproj" />
+    <Project Path="src/Autogestor.Infrastructure/Autogestor.Infrastructure.csproj" />
+    <Project Path="src/Autogestor.Api/Autogestor.Api.csproj" />
+    <Project Path="src/Autogestor.Application/Autogestor.Application.csproj" />
+    <Project Path="src/Autogestor.Contracts/Autogestor.Contracts.csproj" />
+    <Project Path="src/Autogestor.Domain/Autogestor.Domain.csproj" />
+    <Project Path="src/Autogestor.UI/Autogestor.UI.csproj" />
+    <Project Path="src/Autogestor.Web/Autogestor.Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Autogestor.ArchitectureTests/Autogestor.ArchitectureTests.csproj" />
+    <Project Path="test/Autogestor.IntegrationTests/Autogestor.IntegrationTests.csproj" />
+    <Project Path="test/Autogestor.UnitTests/Autogestor.UnitTests.csproj" />
+  </Folder>
+</Solution>
