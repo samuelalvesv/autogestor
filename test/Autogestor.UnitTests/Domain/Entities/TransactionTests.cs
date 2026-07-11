@@ -1,12 +1,12 @@
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Enums;
 
-namespace Autogestor.UnitTests.Entities;
+namespace Autogestor.UnitTests.Domain.Entities;
 
 public class TransactionTests
 {
     [Fact]
-    public void Create_ReturnsValidTransaction()
+    public void Create_WithValidParameters_ReturnsValidTransaction()
     {
         // Arrange
         string name = "Test Transaction";
@@ -22,36 +22,44 @@ public class TransactionTests
         Assert.Equal(type, transaction.Type);
         Assert.Equal(amount, transaction.Amount);
         Assert.Equal(categoryId, transaction.CategoryId);
+        Assert.True(transaction.Active); // Verify default state inherited from AuditableEntity
     }
 
-    [Fact]
-    public void Create_ThrowsArgumentException_WhenNameIsEmpty()
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData(null)]
+    public void Create_WithInvalidName_ThrowsArgumentException(string? invalidName)
     {
         // Arrange
-        string name = "";
         ETransactionType type = ETransactionType.Withdraw;
         decimal amount = 100.00m;
         Guid categoryId = Guid.NewGuid();
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, amount, categoryId));
+        var exception = Assert.Throws<ArgumentException>(() => Transaction.Create(invalidName!, type, amount, categoryId));
+        Assert.Equal("name", exception.ParamName);
     }
 
-    [Fact]
-    public void Create_ThrowsArgumentException_WhenAmountIsZeroOrLess()
+    [Theory]
+    [InlineData(0.00)]
+    [InlineData(-1.00)]
+    [InlineData(-99.99)]
+    public void Create_WithZeroOrNegativeAmount_ThrowsArgumentException(double invalidAmountDouble)
     {
         // Arrange
         string name = "Test Transaction";
         ETransactionType type = ETransactionType.Withdraw;
-        decimal amount = 0.00m;
+        decimal invalidAmount = (decimal)invalidAmountDouble;
         Guid categoryId = Guid.NewGuid();
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, amount, categoryId));
+        var exception = Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, invalidAmount, categoryId));
+        Assert.Equal("amount", exception.ParamName);
     }
 
     [Fact]
-    public void Create_ThrowsArgumentException_WhenCategoryIdIsEmpty()
+    public void Create_WithEmptyCategoryId_ThrowsArgumentException()
     {
         // Arrange
         string name = "Test Transaction";
@@ -60,6 +68,7 @@ public class TransactionTests
         Guid categoryId = Guid.Empty;
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, amount, categoryId));
+        var exception = Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, amount, categoryId));
+        Assert.Equal("categoryId", exception.ParamName);
     }
 }
