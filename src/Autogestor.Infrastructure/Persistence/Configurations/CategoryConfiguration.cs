@@ -10,14 +10,14 @@ public class CategoryConfiguration : AuditableEntityConfiguration<Category>
     {
         base.Configure(builder);
 
-        builder.ToTable("categories");
-
         builder.Property(c => c.Name)
             .IsRequired()
             .HasColumnType("text");
+        
         builder.Property(c => c.Description)
             .IsRequired()
             .HasColumnType("text");
+        
         builder.Property(c => c.UserId)
             .IsRequired()
             .HasColumnType("uuid");
