@@ -22,8 +22,19 @@
 - **gRPC Code-First & Protobuf**:
   - As interfaces de contratos de serviço gRPC devem viver na camada `Autogestor.Contracts` e ser decoradas com o atributo `[ServiceContract]`.
   - Os DTOs de Request/Response gRPC devem ser declarados como `record` ou classes imutáveis decorados com `[DataContract]`, e cada propriedade exposta deve conter o atributo `[DataMember(Order = N)]` com numeração de ordem explícita.
-  - **Versionamento de Contratos**: Para preservar a compatibilidade retroativa com clientes nativos em produção (como futuras versões do app MAUI instalados em dispositivos de usuários), **nunca** altere a numeração `Order` de propriedades existentes nos DTOs, e evite deletá-las. Campos novos devem sempre ser adicionados de forma incremental com numerações novas e do tipo anulável (`nullable`).
+  - **Versionamento de Contratos**: Para preservar a compatibilidade retroativa com clientes nativos em produção (como futuras versões do app MAUI instalados em dispositivos de usuários), **nunca** altere a numeração `Order` de propriedades existentes nos DTOs e **nunca** as delete. Adicione campos novos de forma incremental com numerações novas e do tipo anulável (`nullable`).
 
+## Diretrizes de Otimização e Performance
+
+- **Source Generators (Geração de Código no Build)**: É proibido o uso de reflexão em tempo de execução (`System.Reflection`).
+  - Para serialização/desserialização JSON, utilizar obrigatoriamente **System.Text.Json Source Generation** configurando uma classe parcial que estende `JsonSerializerContext` com os atributos `[JsonSourceGenerationOptions]` e `[JsonSerializable]`.
+  - Usar o atributo `[JsonConstructor]` para instruir explicitamente o compilador sobre qual construtor de record/classe imutável utilizar durante a desserialização.
+  - Para expressões regulares estáticas, utilizar obrigatoriamente o atributo `[GeneratedRegex]` em métodos parciais.
+- **Estruturas de Dados e Passagem por Referência**:
+  - Utilizar `readonly struct` para criar tipos de valor imutáveis que não necessitam de alocações na Heap.
+  - Ao passar structs grandes como argumentos de método para evitar a cópia de seus dados na Stack, utilizar o modificador de parâmetro `in` (passagem por referência somente leitura).
+- **Desvirtualização e Inlining**:
+  - Utilizar `sealed class` por padrão para permitir que o compilador JIT realize desvirtualização de chamadas e otimizações de *inlining* agressivas.
 
 ## Testes e TDD (Test-Driven Development)
 
