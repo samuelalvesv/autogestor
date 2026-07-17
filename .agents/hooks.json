@@ -1,0 +1,10 @@
+{
+  "compile-gate": {
+    "Stop": [
+      {
+        "command": "./.agents/scripts/verify-build.sh",
+        "timeout": 60
+      }
+    ]
+  }
+}

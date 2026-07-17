@@ -12,7 +12,7 @@ public class TransactionTests
         string name = "Test Transaction";
         ETransactionType type = ETransactionType.Withdraw;
         decimal amount = 100.00m;
-        Guid categoryId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
 
         // Act
         var transaction = Transaction.Create(name, type, amount, categoryId);
@@ -34,10 +34,10 @@ public class TransactionTests
         // Arrange
         ETransactionType type = ETransactionType.Withdraw;
         decimal amount = 100.00m;
-        Guid categoryId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => Transaction.Create(invalidName!, type, amount, categoryId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Transaction.Create(invalidName!, type, amount, categoryId));
         Assert.Equal("name", exception.ParamName);
     }
 
@@ -51,10 +51,10 @@ public class TransactionTests
         string name = "Test Transaction";
         ETransactionType type = ETransactionType.Withdraw;
         decimal invalidAmount = (decimal)invalidAmountDouble;
-        Guid categoryId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, invalidAmount, categoryId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, invalidAmount, categoryId));
         Assert.Equal("amount", exception.ParamName);
     }
 
@@ -68,7 +68,7 @@ public class TransactionTests
         Guid categoryId = Guid.Empty;
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, amount, categoryId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Transaction.Create(name, type, amount, categoryId));
         Assert.Equal("categoryId", exception.ParamName);
     }
 }

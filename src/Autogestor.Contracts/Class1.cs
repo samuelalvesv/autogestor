@@ -1,4 +1,4 @@
-﻿namespace Autogestor.Contracts;
+namespace Autogestor.Contracts;
 
 public class Class1
 {

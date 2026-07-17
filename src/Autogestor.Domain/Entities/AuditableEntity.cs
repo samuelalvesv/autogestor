@@ -8,13 +8,7 @@ public abstract class AuditableEntity : Entity
     public Guid? UpdatedBy { get; protected set; }
     public DateTime? UpdatedAt { get; protected set; }
 
-    public void Activate()
-    {
-        Active = true;
-    }
+    public void Activate() => Active = true;
 
-    public void Deactivate()
-    {
-        Active = false;
-    }
+    public void Deactivate() => Active = false;
 }

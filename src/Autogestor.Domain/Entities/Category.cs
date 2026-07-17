@@ -18,12 +18,14 @@ public sealed class Category : AuditableEntity
     public static Category Create(string name, string description, Guid userId)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             throw new ArgumentException("Category name cannot be empty.", nameof(name));
-        if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("Category description cannot be empty.", nameof(description));
-        if (userId == Guid.Empty)
-            throw new ArgumentException("User ID must be a valid GUID.", nameof(userId));
+        }
 
-        return new Category(name, description, userId);
+        return string.IsNullOrWhiteSpace(description)
+            ? throw new ArgumentException("Category description cannot be empty.", nameof(description))
+            : userId == Guid.Empty
+            ? throw new ArgumentException("User ID must be a valid GUID.", nameof(userId))
+            : new Category(name, description, userId);
     }
 }

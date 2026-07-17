@@ -1,4 +1,4 @@
-﻿namespace Autogestor.IntegrationTests;
+namespace Autogestor.IntegrationTests;
 
 public class UnitTest1
 {

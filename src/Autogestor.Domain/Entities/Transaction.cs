@@ -23,12 +23,14 @@ public sealed class Transaction : AuditableEntity
     public static Transaction Create(string name, ETransactionType type, decimal amount, Guid categoryId)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             throw new ArgumentException("Transaction name cannot be empty.", nameof(name));
-        if (amount <= 0)
-            throw new ArgumentException("Transaction amount must be greater than zero.", nameof(amount));
-        if (categoryId == Guid.Empty)
-            throw new ArgumentException("Category ID must be a valid GUID.", nameof(categoryId));
+        }
 
-        return new Transaction(name, type, amount, categoryId);
+        return amount <= 0
+            ? throw new ArgumentException("Transaction amount must be greater than zero.", nameof(amount))
+            : categoryId == Guid.Empty
+            ? throw new ArgumentException("Category ID must be a valid GUID.", nameof(categoryId))
+            : new Transaction(name, type, amount, categoryId);
     }
 }

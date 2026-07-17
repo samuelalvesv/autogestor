@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Autogestor.Infrastructure.Persistence.Configurations;
 
-public abstract class AuditableEntityConfiguration<TEntity> : IEntityTypeConfiguration<TEntity> 
+public abstract class AuditableEntityConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
     where TEntity : AuditableEntity
 {
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)

@@ -10,7 +10,7 @@ public class CategoryTests
         // Arrange
         string name = "Test Category";
         string description = "Test Description";
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         // Act
         var category = Category.Create(name, description, userId);
@@ -30,10 +30,10 @@ public class CategoryTests
     {
         // Arrange
         string description = "Test Description";
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => Category.Create(invalidName!, description, userId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(invalidName!, description, userId));
         Assert.Equal("name", exception.ParamName);
     }
 
@@ -45,10 +45,10 @@ public class CategoryTests
     {
         // Arrange
         string name = "Test Category";
-        Guid userId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => Category.Create(name, invalidDescription!, userId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(name, invalidDescription!, userId));
         Assert.Equal("description", exception.ParamName);
     }
 
@@ -61,7 +61,7 @@ public class CategoryTests
         Guid userId = Guid.Empty;
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() => Category.Create(name, description, userId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(name, description, userId));
         Assert.Equal("userId", exception.ParamName);
     }
 }

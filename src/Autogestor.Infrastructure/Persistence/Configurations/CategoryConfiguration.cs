@@ -13,11 +13,11 @@ public class CategoryConfiguration : AuditableEntityConfiguration<Category>
         builder.Property(c => c.Name)
             .IsRequired()
             .HasColumnType("text");
-        
+
         builder.Property(c => c.Description)
             .IsRequired()
             .HasColumnType("text");
-        
+
         builder.Property(c => c.UserId)
             .IsRequired()
             .HasColumnType("uuid");
