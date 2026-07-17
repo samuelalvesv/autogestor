@@ -21,3 +21,4 @@ Autogestor.Application/
 - Nunca importar namespaces de infraestrutura (`System.Data`, `EntityFramework`).
 - Cada caso de uso deve ser uma classe isolada com um único método público.
 - Adotar o padrão **Mediator** (via `MediatR`) para separar a recepção de requisições (API) da execução dos casos de uso (Handlers).
+- **Autorização por Branch**: Consultar [identity-multitenancy.md](../../.agents/identity-multitenancy.md) para as regras de validação de acessos operacionais usando `IBranchAuthorizationService`.

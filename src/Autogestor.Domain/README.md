@@ -18,3 +18,4 @@ Autogestor.Domain/
 - Zero pacotes NuGet externos.
 - Zero referências a outros projetos.
 - Entidades devem ter construtores privados e métodos de fábrica (`Create`, `From`).
+- **Isolamento de Tenants**: Consultar [identity-multitenancy.md](../../.agents/identity-multitenancy.md) para as regras de domínio envolvendo a hierarquia Tenant/Branch/User e a entidade base `TenantEntity`.

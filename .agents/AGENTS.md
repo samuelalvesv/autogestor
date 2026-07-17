@@ -15,7 +15,7 @@
 - **Propagação de Cancelamento**: Todos os métodos assíncronos (Endpoints da API, Request Handlers e chamadas de I/O no banco/HTTP) devem obrigatoriamente aceitar e propagar um `CancellationToken` para evitar retenção de recursos no servidor.
 - **Tratamento de Exceções Nativo**: O handler de exceções globais mencionado nos wrappers deve ser implementado utilizando a interface nativa `IExceptionHandler` (disponível a partir do .NET 8), evitando middlewares customizados pesados.
 - **Performance de Alocação**: Em métodos assíncronos que possuem caminhos de execução síncronos frequentes (como checagem de cache ou validações em memória rápidos), preferir `ValueTask` ou `ValueTask<T>` ao invés de `Task` para reduzir alocações na Heap.
-- **Tratamento de Data/Hora (UTC)**: É obrigatório instanciar e manipular valores de data e hora sempre em formato UTC na aplicação (ex: utilizando `DateTime.UtcNow`). Nos mapeamentos de banco de dados do EF Core, todas as propriedades do tipo `DateTime` devem ser configuradas de forma explícita com o tipo de coluna `"timestamptz"`.
+- **Tratamento de Data/Hora (UTC)**: É obrigatório instanciar e manipular valores de data e hora sempre em formato UTC na aplicação (ex: utilizando `DateTime.UtcNow`). Para regras de mapeamento de persistência, consultar o README da infraestrutura.
 - **Ferramentas e Bibliotecas**: Adotar exclusivamente tecnologias open source consolidadas e amplamente validadas pela comunidade do .NET.
 - **Desacoplamento e Reuso (Wrappers)**:
   - Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
@@ -46,10 +46,26 @@
 
 ## Estrutura de Pastas e Documentação
 
-- **READMEs Locais**: Cada projeto/camada dentro de `src/` e `test/` possui seu próprio arquivo `README.md` contendo as regras de desenvolvimento específicas e a estrutura esperada do projeto. O agente deve consultar o `README.md` correspondente à pasta/projeto onde as alterações serão efetuadas antes de realizar qualquer modificação.
-- Consultar `.agents/architecture.md` para o mapa completo de camadas e dependências.
-- Consultar `src/Autogestor.Infrastructure/README.md` para regras específicas de persistência e Entity Framework Core.
-- Consultar `src/Autogestor.ServiceDefaults/README.md` para regras específicas de observabilidade e resiliência com .NET Aspire.
+- **READMEs Locais**: Cada projeto dentro de `src/` e `test/` possui seu próprio arquivo `README.md` contendo as regras de desenvolvimento específicas e a estrutura esperada do projeto. O agente deve consultar o `README.md` correspondente à pasta/projeto onde as alterações serão efetuadas antes de realizar qualquer modificação.
+- **Índice de Documentação e Regras**:
+  * **Global & Processos**:
+    * [AGENTS.md](file:///Users/samuelalvesv/dev/autogestor/.agents/AGENTS.md): Convenções de código globais, diretrizes de performance e regras de commit.
+    * [architecture.md](file:///Users/samuelalvesv/dev/autogestor/.agents/architecture.md): Mapa completo de camadas, fluxo de dependências e organização arquitetural.
+    * [identity-multitenancy.md](file:///Users/samuelalvesv/dev/autogestor/.agents/identity-multitenancy.md): Estratégia de autenticação (ASP.NET Identity), autorização de filiais e isolamento de tenants.
+  * **Projetos da Solução (`src/`)**:
+    * [Domain](file:///Users/samuelalvesv/dev/autogestor/src/Autogestor.Domain/README.md): Convenções de entidades de domínio, value objects e interfaces de repositórios.
+    * [Application](file:///Users/samuelalvesv/dev/autogestor/src/Autogestor.Application/README.md): Regras de casos de uso (Commands/Queries), validações (FluentValidation) e orquestração.
+    * [Infrastructure](file:///Users/samuelalvesv/dev/autogestor/src/Autogestor.Infrastructure/README.md): Regras de persistência (EF Core, Dapper), banco de dados (PostgreSQL) e repositórios.
+    * [Api](file:///Users/samuelalvesv/dev/autogestor/src/Autogestor.Api/README.md): Apresentação HTTP, endpoints gRPC/gRPC-Web, middlewares de exceção e injeção de dependência raiz.
+    * [UI](file:///Users/samuelalvesv/dev/autogestor/src/Autogestor.UI/README.md): Biblioteca de componentes compartilhados (Razor Class Library), temas (MudBlazor) e diretrizes visuais.
+    * [Web](file:///Users/samuelalvesv/dev/autogestor/src/Autogestor.Web/README.md): Bootstrap do Blazor WebAssembly, suporte a PWA e compilação AOT.
+    * [ServiceDefaults](file:///Users/samuelalvesv/dev/autogestor/src/Autogestor.ServiceDefaults/README.md): Regras de observabilidade, telemetria (OpenTelemetry) e resiliência com .NET Aspire.
+  * **Banco de Dados & Scripts**:
+    * [db](file:///Users/samuelalvesv/dev/autogestor/db/README.md): Convenções de SQL nativo no PostgreSQL (procedures, functions, triggers, views, scripts de carga).
+  * **Testes Automatizados (`test/`)**:
+    * [UnitTests](file:///Users/samuelalvesv/dev/autogestor/test/Autogestor.UnitTests/README.md): Diretrizes de testes de unidade e TDD para domínio e aplicação.
+    * [IntegrationTests](file:///Users/samuelalvesv/dev/autogestor/test/Autogestor.IntegrationTests/README.md): Diretrizes de testes de integração e cenários de banco.
+    * [ArchitectureTests](file:///Users/samuelalvesv/dev/autogestor/test/Autogestor.ArchitectureTests/README.md): Regras de validação de dependências de arquitetura e convenções automáticas.
 - **Evitar duplicação**: Não repetir informações entre os arquivos `README.md` ou nos arquivos `.md` na pasta `.agents/`. A informação deve ser escrita em um único local centralizado e apenas referenciada nos outros locais.
 - **Definições Assertivas**: Ao redigir documentações, nunca apresente opções ou caminhos alternativos. Defina sempre uma única abordagem padrão, escolhendo a solução mais moderna e aplicável ao projeto.
 - **Evolução das Regras**: Os arquivos `.md` do projeto definem regras, mas há flexibilidade para sugerir alterações nelas durante o desenvolvimento, desde que a mudança traga benefícios para o projeto.

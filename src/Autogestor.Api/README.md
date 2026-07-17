@@ -20,3 +20,4 @@ Autogestor.Api/
 - Os serviços gRPC apenas recebem a requisição fortemente tipada, chamam o caso de uso correspondente (Command/Query) na camada `Autogestor.Application` (via MediatR) e retornam o DTO de resposta do `Autogestor.Contracts`.
 - Nenhuma lógica de negócio deve existir aqui.
 - O `Program.cs` é o único local que conhece todas as camadas para montar a injeção de dependência.
+- **Segurança e Multitenancy**: Consultar [identity-multitenancy.md](../../.agents/identity-multitenancy.md) para regras de autenticação (Identity), geração de JWT e interceptadores gRPC de resolução de tenant.
