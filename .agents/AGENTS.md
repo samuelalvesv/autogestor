@@ -19,6 +19,7 @@
 - **Ferramentas e Bibliotecas**: Adotar exclusivamente tecnologias open source consolidadas e amplamente validadas pela comunidade do .NET.
 - **Desacoplamento e Reuso (Wrappers)**:
   - Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
+- **Validação Estática em Tempo de Compilação**: Preferir sempre que possível a validação estática de código, detectando erros em tempo de compilação ao invés de em tempo de execução. Isso inclui: uso de tipos fortes ao invés de `string`/`object` genéricos, atributos de análise estática (`[NotNullWhen]`, `[MemberNotNull]`, `[StringSyntax]`), `const` e `readonly` para imutabilidade verificável pelo compilador, nullable reference types habilitados (`<Nullable>enable</Nullable>`), e warnings tratados como erros (`<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`) para impedir que avisos de análise sejam ignorados.
 - **Qualidade de Código e Roslyn**: Forçar padrões rígidos de qualidade, estilo de escrita e formatação de código C# utilizando analisadores do Roslyn configurados via arquivo `.editorconfig` na raiz da solução.
 - **gRPC Code-First & Protobuf**:
   - As interfaces de contratos de serviço gRPC devem viver na camada `Autogestor.Contracts` e ser decoradas com o atributo `[ServiceContract]`.

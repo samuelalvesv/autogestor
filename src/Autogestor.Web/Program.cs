@@ -8,4 +8,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+#pragma warning disable CA2007 // ConfigureAwait is irrelevant in Blazor WebAssembly top-level statements
 await builder.Build().RunAsync();
+#pragma warning restore CA2007
