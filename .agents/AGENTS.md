@@ -18,7 +18,9 @@ Este projeto utiliza regras de ativação dinâmica pelo Antigravity baseadas no
 - **Host Web (Web)**: [.agents/rules/web-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/web-rules.md) (WASM PWA).
 - **ServiceDefaults**: [.agents/rules/service-defaults-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/service-defaults-rules.md) (Resiliência e OTel).
 - **Banco de Dados Nativo**: [.agents/rules/database-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/database-rules.md) (db/).
-- **Testes**: [.agents/rules/testing-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/testing-rules.md) (Unit, Integration, Arch).
+- **Testes Unitários**: [.agents/rules/unit-testing-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/unit-testing-rules.md) (UnitTests).
+- **Testes de Integração**: [.agents/rules/integration-testing-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/integration-testing-rules.md) (IntegrationTests).
+- **Testes de Arquitetura**: [.agents/rules/architecture-testing-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/architecture-testing-rules.md) (ArchitectureTests).
 
 ## Regras Sob Demanda (Model Decision / Invocação Manual)
 
