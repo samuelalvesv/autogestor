@@ -1,3 +1,8 @@
+---
+name: git-flow
+description: Git branching model, tower git-flow-next helper, release management guidelines, semantic versioning, and commit types. Use this rule when asked about the git strategy, creating features/releases/hotfixes, or checking commit rules.
+---
+
 # Git Flow — autogestor
 
 ## Ferramenta
@@ -37,27 +42,12 @@ Configuração padrão adotada:
 ```text
 main              ← código em produção, sempre estável
   │
-develop           ← integração contínua de features finalizadas
-  │
   ├── feature/*   ← desenvolvimento de funcionalidades (nasce de develop)
   │
   ├── release/*   ← preparação para produção (nasce de develop)
   │
   └── hotfix/*    ← correção urgente em produção (nasce de main)
-```text
-
-### Ciclo de vida visual
-
-```text
-main:     ●───────────────────●──────────●──────────────●
-          │                   ↑          ↑              ↑
-          │              release/1.0  hotfix/1.0.1  release/1.1
-          │                   ↑          │              ↑
-develop:  ●───●───●───●───●───●──────●───●───●───●──────●
-              ↑       ↑       ↑          ↑       ↑
-           feature/ feature/ feature/ feature/ feature/
-           tenant    branch   access   fix-ui   reports
-```text
+```
 
 ## Workflows
 
@@ -79,11 +69,10 @@ git flow feature publish tenant-isolation
 
 # Finalizar: merge em develop e remoção da branch
 git flow feature finish tenant-isolation
-```text
+```
 
 **Regras:**
-
-- Nomear com descrição curta em kebab-case: `tenant-isolation`, `branch-access`, `jwt-auth`
+- Nomear com descrição curta em kebab-case: `tenant-isolation`, `branch-access`
 - Manter o escopo pequeno — uma feature por funcionalidade
 - Fazer commits frequentes seguindo o padrão do projeto (`tipo: descrição`)
 
@@ -101,14 +90,10 @@ git commit -m "docs: atualizar changelog para v1.0.0"
 
 # Finalizar: merge em main + develop, cria tag v1.0.0
 git flow release finish 1.0.0
-```text
+```
 
 **Regras:**
-
 - Seguir Semantic Versioning: `MAJOR.MINOR.PATCH`
-  - `MAJOR` → breaking changes
-  - `MINOR` → novas funcionalidades retrocompatíveis
-  - `PATCH` → correções de bugs
 - Na branch de release, apenas bug fixes e ajustes de documentação — nunca features novas
 
 ### 3. Corrigir Bug Urgente em Produção (Hotfix)
@@ -124,10 +109,9 @@ git commit -m "fix: corrigir query filter ignorando TenantId em relatórios"
 
 # Finalizar: merge em main + develop, cria tag v1.0.1
 git flow hotfix finish 1.0.1
-```text
+```
 
 **Regras:**
-
 - Usar apenas para correções urgentes que afetam produção
 - Incrementar o `PATCH` da versão atual
 
@@ -137,7 +121,7 @@ Padrão já definido no [AGENTS.md](file:///Users/samuelalvesv/dev/autogestor/.a
 
 ```text
 tipo: descrição curta em português
-```text
+```
 
 | Tipo | Quando usar |
 | --- | --- |
@@ -147,27 +131,6 @@ tipo: descrição curta em português
 | `docs` | Alteração em documentação |
 | `test` | Adição ou alteração de testes |
 | `chore` | Tarefas de manutenção (configs, dependências) |
-
-## Fluxo Completo — Exemplo Prático
-
-```text
-1. git flow feature start tenant-isolation
-2. (desenvolve, faz commits, escreve testes)
-3. git flow feature finish tenant-isolation       → merge em develop
-
-4. git flow feature start branch-access
-5. (desenvolve, faz commits, escreve testes)
-6. git flow feature finish branch-access           → merge em develop
-
-7. git flow release start 1.0.0
-8. (testes finais, ajustes, atualiza changelog)
-9. git flow release finish 1.0.0                   → merge em main + develop, tag v1.0.0
-
-10. (bug encontrado em produção!)
-11. git flow hotfix start 1.0.1
-12. (corrige o bug)
-13. git flow hotfix finish 1.0.1                   → merge em main + develop, tag v1.0.1
-```text
 
 ## Regras do Projeto
 
