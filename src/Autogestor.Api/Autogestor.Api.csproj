@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\Autogestor.ServiceDefaults\Autogestor.ServiceDefaults.csproj" />
@@ -19,6 +19,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>b5a2f7e9-bdb8-4c70-925b-ec0cf6c3da13</UserSecretsId>
   </PropertyGroup>
 
 </Project>

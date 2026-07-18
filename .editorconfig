@@ -28,6 +28,7 @@ trim_trailing_whitespace = false
 # C# FILES
 # ==========================================================================
 [*.cs]
+max_line_length = 120
 
 # --------------------------------------------------------------------------
 # 1. ANÁLISE DE CÓDIGO — Habilitar análise de estilo no build
@@ -664,3 +665,12 @@ dotnet_diagnostic.CA1311.severity = warning    # Especificar cultura ou usar ver
 # CA2007 (ConfigureAwait) é relevante apenas para libraries.
 # Pode ser desabilitado individualmente em projetos de aplicação via .editorconfig
 # local ou via <NoWarn> no .csproj. Mantido como warning aqui para libraries.
+
+# ==========================================================================
+# 23. MIGRATIONS (EF CORE)
+# ==========================================================================
+# Desabilita a análise de estilo, formatação e verificação de charset
+# para os arquivos de migrations gerados pelo Entity Framework Core.
+[**/Migrations/**.cs]
+generated_code = true
+charset = unset
