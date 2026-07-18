@@ -14,6 +14,8 @@ applyTo: "src/Autogestor.Infrastructure/**/*.cs"
 - `DependencyInjection.cs`: Registro unificado dos serviços de infra.
 
 ## Diretrizes de EF Core e Persistência
+- **Auditoria Automatizada (Abordagem B)**: As propriedades de auditoria (`CreatedBy`, `CreatedAt`, `UpdatedBy`, `UpdatedAt`) de `AuditableEntity` e `TenantEntity` são preenchidas de forma 100% automatizada na infraestrutura através de interceptadores do EF Core no `AppDbContext` obtendo o usuário logado do contexto. Construtores e factory methods do Domínio **não** devem receber ou inicializar essas propriedades em suas assinaturas.
+- **Configurações da Fluent API**: Toda classe de configuração de entidade em `Persistence/Configurations/` deve herdar da respectiva classe base de configuração de acordo com a entidade: `AuditableEntityConfiguration<TEntity>` (para `AuditableEntity`), `TenantEntityConfiguration<TEntity>` (para `TenantEntity`) ou `EntityConfiguration<TEntity>` (para entidades simples herdadas diretamente de `Entity`).
 - **Consultas Eficientes**:
   - Usar `.AsNoTracking()` em todas as consultas que sejam estritamente para leitura.
   - Repositórios **nunca** devem retornar `IQueryable`. Toda consulta deve ser materializada na camada de infraestrutura (retornando `IReadOnlyList<T>`, `IEnumerable<T>` ou `T?`) para evitar vazamento de complexidade de banco (como N+1 queries) para a camada de Application.

@@ -15,5 +15,6 @@ applyTo: "src/Autogestor.Domain/**/*.cs"
 
 ## Diretrizes e Restrições
 - **Isolamento de Infraestrutura**: Zero pacotes NuGet externos e zero referências a outros projetos da Solution.
+- **Herança de Classes Base**: As entidades de domínio devem herdar de `AuditableEntity` (para dados globais auditados) ou `TenantEntity` (para dados isolados por tenant auditados). Casos especiais que não requerem auditoria de usuário (como a própria entidade de usuário, logs de sistema ou dados estáticos globais) devem herdar diretamente de `Entity`.
 - **Encapsulamento**: As entidades devem possuir construtores privados/protegidos e métodos de fábrica públicos (`Create`, `From`) para garantir que instâncias inválidas nunca sejam criadas.
 - **Isolamento de Tenants**: Entidades que possuem escopo de tenant devem herdar de `TenantEntity` (consultar regra de `identity-multitenancy`).
