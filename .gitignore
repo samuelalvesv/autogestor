@@ -28,3 +28,7 @@ Thumbs.db
 # Arquivos de log gerados em tempo de execução
 *.log
 temp/
+
+## [Agent / MCP]
+.agents/mcp_config.json
+
