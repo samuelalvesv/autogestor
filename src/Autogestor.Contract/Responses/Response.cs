@@ -12,7 +12,7 @@ public class Response<T>
     public bool IsSuccess => _code is >= 200 and <= 299;
 
     [JsonConstructor]
-    private Response() { }
+    protected Response() { }
 
     public Response(T data, int code, string message)
     {
