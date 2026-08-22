@@ -35,7 +35,3 @@ Documentações com YAML Frontmatter carregadas dinamicamente pela IA apenas qua
 - **Arquitetura Geral**: [.agents/rules/architecture.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/architecture.md) (Estrutura de dependências e responsabilidades).
 - **Autenticação & Multi-Tenancy**: [.agents/rules/identity-multitenancy.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/identity-multitenancy.md) (TenantId, acessos e branches).
 - **Git Flow & Commits**: [.agents/rules/git-flow.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/git-flow.md) e [.agents/rules/git-commit.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/git-commit.md).
-
-## Nota sobre READMEs locais
-> [!NOTE]
-> Os arquivos `README.md` locais contidos nos subprojetos são destinados exclusivamente a desenvolvedores humanos. Para a IA, as regras dinâmicas em `.agents/rules/` têm precedência absoluta. A IA **deve ignorar** a leitura manual dos READMEs locais.
