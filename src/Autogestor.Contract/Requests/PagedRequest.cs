@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Autogestor.Contracts.Requests;
+namespace Autogestor.Contract.Requests;
 
 public abstract class PagedRequest : Request
 {

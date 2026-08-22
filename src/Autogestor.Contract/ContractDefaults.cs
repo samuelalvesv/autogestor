@@ -1,4 +1,4 @@
-namespace Autogestor.Contracts;
+namespace Autogestor.Contract;
 
 public static class ContractDefaults
 {

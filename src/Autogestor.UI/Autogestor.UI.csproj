@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Autogestor.Contracts\Autogestor.Contracts.csproj" />
+    <ProjectReference Include="..\Autogestor.Contract\Autogestor.Contract.csproj" />
   </ItemGroup>
 
 

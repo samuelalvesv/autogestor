@@ -1,4 +1,4 @@
-namespace Autogestor.Contracts.Requests;
+namespace Autogestor.Contract.Requests;
 
 public abstract class Request
 {

@@ -4,7 +4,7 @@
     <ProjectReference Include="..\Autogestor.ServiceDefaults\Autogestor.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Autogestor.Infrastructure\Autogestor.Infrastructure.csproj" />
     <ProjectReference Include="..\Autogestor.Application\Autogestor.Application.csproj" />
-    <ProjectReference Include="..\Autogestor.Contracts\Autogestor.Contracts.csproj" />
+    <ProjectReference Include="..\Autogestor.Contract\Autogestor.Contract.csproj" />
     <ProjectReference Include="..\Autogestor.Domain\Autogestor.Domain.csproj" />
   </ItemGroup>
 
