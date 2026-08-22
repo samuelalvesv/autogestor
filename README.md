@@ -38,12 +38,12 @@ autogestor/
 
 ## Como Iniciar e Desenvolver
 
-| Objetivo | Comando |
-| --- | --- |
-| Compilar a Solução | `dotnet build` |
+| Objetivo | Comando                                       |
+| --- |-----------------------------------------------|
+| Compilar a Solução | `dotnet build`                                |
 | Executar o Aspire (Ambiente Dev) | `dotnet run --project src/Autogestor.AppHost` |
-| Rodar a Suíte de Testes | `dotnet test` |
-| Verificar/Atualizar Pacotes NuGet | `dotnet outdated -u` |
+| Rodar a Suíte de Testes | `dotnet test`                                 |
+| Verificar/Atualizar Pacotes NuGet | `dotnet outdated -u --pre-release Never`                         |
 
 ## Documentação Adicional
 
