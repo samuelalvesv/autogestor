@@ -12,7 +12,7 @@ public abstract class EntityConfiguration<TEntity> : IEntityTypeConfiguration<TE
         // Configure standard base primary key inherited from Entity
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
-            .ValueGeneratedNever() // GUID is generated in C# constructor
+            .ValueGeneratedNever() // UUIDv7 is generated in C# constructor
             .HasColumnType("uuid");
     }
 }
