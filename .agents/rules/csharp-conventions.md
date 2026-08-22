@@ -1,7 +1,7 @@
 ---
 name: csharp-conventions
 description: Apply C# coding conventions, async/await guidelines, cancellation token propagation, memory optimizations, and static analysis.
-applyTo: "**/*.cs, **/*.razor"
+applyTo: "**/*.{cs,razor}"
 ---
 
 # Convenções de Código C#

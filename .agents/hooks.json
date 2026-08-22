@@ -2,6 +2,7 @@
   "compile-gate": {
     "Stop": [
       {
+        "type": "command",
         "command": "./.agents/scripts/verify-build.sh",
         "timeout": 60
       }

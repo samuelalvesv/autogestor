@@ -117,7 +117,7 @@ git flow hotfix finish 1.0.1
 
 ## Convenções de Commit
 
-Padrão já definido no [AGENTS.md](file:///Users/samuelalvesv/dev/autogestor/.agents/AGENTS.md):
+Padrão já definido no [AGENTS.md](file:///Users/samuelalvesv/dev/autogestor/AGENTS.md):
 
 ```text
 tipo: descrição curta em português

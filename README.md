@@ -28,10 +28,12 @@ autogestor/
 │   └── Autogestor.Tests/             # xUnit — Unitários, Integração, Arquitetura
 ├── db/                               # Banco de dados
 │   └── Autogestor.Db/                # Scripts SQL (PostgreSQL 18)
-├── .agents/                          # Regras e documentação técnica para agentes
-│   ├── AGENTS.md                     # Convenções de código e commit
-│   └── architecture.md               # Mapa de dependências e camadas
-├── Autogestor.sln                    # Arquivo de solução .NET
+├── .agents/                          # Regras, skills, hooks e documentação técnica para agentes
+│   ├── rules/                        # Regras dinâmicas e sob demanda
+│   ├── skills/                       # Skills do projeto (ex: Neon)
+│   └── workflows/                    # Workflows repetíveis (/propagate-domain, etc.)
+├── AGENTS.md                         # Convenções de código, identidade e regras principais do agente
+├── Autogestor.slnx                   # Arquivo de solução .NET
 ├── .gitignore
 └── README.md
 ```
@@ -49,5 +51,5 @@ autogestor/
 
 Para garantir consistência e evitar retrabalho, consulte os guias de design e regras do projeto:
 
-- **Diretrizes para Desenvolvedores e IAs**: Convenções de código, regras de commit e TDD em [.agents/AGENTS.md](.agents/AGENTS.md).
-- **Mapa da Arquitetura**: Fluxo de dependências e responsabilidades de cada camada em [.agents/architecture.md](.agents/architecture.md).
+- **Diretrizes para Desenvolvedores e IAs**: Convenções de código, regras de commit e TDD em [AGENTS.md](AGENTS.md).
+- **Mapa da Arquitetura**: Fluxo de dependências e responsabilidades de cada camada em [.agents/rules/architecture.md](.agents/rules/architecture.md).
