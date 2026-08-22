@@ -1,8 +1,23 @@
+using System.Text.Json.Serialization;
+
 namespace Autogestor.Contract.Responses;
 
-public class Response(string data, string message, int code)
+public class Response<T>
 {
-    public string? Data { get; set; } = data;
-    public string Message { get; set; } = message;
-    public bool IsSuccess => code is >= 200 and <= 299;
+    private readonly int _code;
+
+    public T? Data { get; set; }
+    public string Message { get; set; }
+    [JsonIgnore]
+    public bool IsSuccess => _code is >= 200 and <= 299;
+
+    [JsonConstructor]
+    private Response() { }
+
+    public Response(T data, int code, string message)
+    {
+        Data = data;
+        Message = message;
+        _code = code;
+    }
 }
