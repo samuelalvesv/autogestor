@@ -15,6 +15,7 @@
 
 Este projeto utiliza regras de ativação dinâmica pelo Antigravity baseadas no arquivo editado. A IA **não precisa ler** estes arquivos manualmente, eles são injetados automaticamente:
 - **Convenções C#**: [.agents/rules/csharp-conventions.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/csharp-conventions.md) (Geral C# e Razor).
+- **Camada de Contratos**: [.agents/rules/contracts-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/contracts-rules.md) (DTOs, Requests, Responses e Services).
 - **Contratos gRPC**: [.agents/rules/grpc-contracts.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/grpc-contracts.md) (gRPC Code-First).
 - **Camada de Domínio**: [.agents/rules/domain-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/domain-rules.md) (Entities, Value Objects).
 - **Camada de Aplicação**: [.agents/rules/application-rules.md](file:///Users/samuelalvesv/dev/autogestor/.agents/rules/application-rules.md) (MediatR, Use Cases).
