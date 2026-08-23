@@ -39,7 +39,7 @@ Agrupar os arquivos identificados por camadas:
 - **Domínio**: `src/Autogestor.Domain/**`
 - **Aplicação**: `src/Autogestor.Application/**`
 - **Infraestrutura**: `src/Autogestor.Infrastructure/**`
-- **Contratos**: `src/Autogestor.Contracts/**`
+- **Contratos**: `src/Autogestor.Contract/**`
 - **API**: `src/Autogestor.Api/**`
 - **UI**: `src/Autogestor.UI/**`
 - **Web**: `src/Autogestor.Web/**`

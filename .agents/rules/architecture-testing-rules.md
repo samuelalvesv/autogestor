@@ -15,4 +15,4 @@ applyTo: "test/Autogestor.ArchitectureTests/**/*.cs"
 - **Padrões de Nomenclatura e Design**:
   - Garantir que todas as interfaces comecem com `I` (ex: `IXxxRepository`).
   - Garantir que classes dentro de Domain e Application sejam marcadas como `sealed` por padrão, a menos que herança seja explicitamente intencional.
-- **Tecnologia**: Usar a biblioteca **`NetArchTest.eNet`** para definir as asserções de arquitetura de forma fluida.
+- **Tecnologia**: Usar a biblioteca **`NetArchTest.eNhancedEdition`** para definir as asserções de arquitetura de forma fluida.

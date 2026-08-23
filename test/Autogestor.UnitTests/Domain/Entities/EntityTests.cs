@@ -29,4 +29,14 @@ public class EntityTests
         // Assert
         Assert.NotEqual(entity1.Id, entity2.Id);
     }
+
+    [Fact]
+    public void Constructor_ShouldGenerateUuidVersion7()
+    {
+        // Act
+        var entity = new TestEntity();
+
+        // Assert
+        Assert.Equal(7, entity.Id.Version);
+    }
 }

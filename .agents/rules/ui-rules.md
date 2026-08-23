@@ -21,7 +21,7 @@ applyTo: "src/Autogestor.UI/**/*.{cs,razor}"
   - Estilos são definidos via `MudTheme` central.
   - Proibido usar estilos inline (`style="..."`) ou cores hardcoded no CSS/HTML. Referenciar sempre os tokens do MudTheme.
 - **Host-Agnostic**:
-  - Referencia apenas `Autogestor.Contracts`. Nenhuma dependência direta com `Autogestor.Domain`.
+  - Referencia apenas `Autogestor.Contract`. Nenhuma dependência direta com `Autogestor.Domain`.
   - Não referencia pacotes específicos de hosts (`Microsoft.AspNetCore.Components.WebAssembly` ou `Microsoft.Maui`).
   - Não referencia `Autogestor.ServiceDefaults`.
   - Acesso a APIs externas/nativas deve ser feito via **interfaces** com implementação registrada via injeção de dependência pelo host final.

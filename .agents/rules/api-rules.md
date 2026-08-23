@@ -14,8 +14,8 @@ applyTo: "src/Autogestor.Api/**/*.cs"
 
 ## Diretrizes gRPC e Configuração
 - **Serviços gRPC**:
-  - Implementam as interfaces do projeto `Autogestor.Contracts`.
-  - Recebem requisições fortemente tipadas, acionam a camada `Application` via MediatR (`_mediator.Send`) e retornam os DTOs do `Contracts`.
+  - Implementam as interfaces do projeto `Autogestor.Contract`.
+  - Recebem requisições fortemente tipadas, acionam a camada `Application` via MediatR (`_mediator.Send`) e retornam os DTOs do `Contract`.
   - Não devem conter lógica de negócios.
 - **Configuração gRPC-Web**:
   - Habilitar suporte a gRPC-Web no `Program.cs` com `app.UseGrpcWeb()`.

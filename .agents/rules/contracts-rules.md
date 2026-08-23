@@ -1,10 +1,10 @@
 ---
 name: contracts-rules
 description: Data transfer objects (DTOs), request/response contracts, gRPC service interfaces, and contract isolation guidelines.
-applyTo: "src/Autogestor.Contracts/**/*.cs"
+applyTo: "src/Autogestor.Contract/**/*.cs"
 ---
 
-# Regras de Contratos (Autogestor.Contracts)
+# Regras de Contratos (Autogestor.Contract)
 
 ## Estrutura de Pastas
 - `[Feature]/`:

@@ -2,12 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace Autogestor.Contract.Responses;
 
-public class Response<T>
+public record Response<T>
 {
     private readonly int _code;
 
-    public T? Data { get; set; }
-    public string Message { get; set; }
+    public T? Data { get; init; }
+    public string Message { get; init; } = string.Empty;
     [JsonIgnore]
     public bool IsSuccess => _code is >= 200 and <= 299;
 

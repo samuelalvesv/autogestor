@@ -2,12 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace Autogestor.Contract.Responses;
 
-public class PagedResponse<T> : Response<T>
+public sealed record PagedResponse<T> : Response<T>
 {
-    public int TotalCount { get; set; }
-    public int CurrentPage { get; set; } = ContractDefaults.DefaultPageNumber;
-    public int PageSize { get; set; } = ContractDefaults.DefaultPageSize;
-    public int TotalPage => (int)Math.Ceiling(TotalCount / (decimal)PageSize);
+    public int TotalCount { get; init; }
+    public int CurrentPage { get; init; } = ContractDefaults.DefaultPageNumber;
+    public int PageSize { get; init; } = ContractDefaults.DefaultPageSize;
+    public int TotalPage => PageSize > 0 ? (int)Math.Ceiling(TotalCount / (decimal)PageSize) : 0;
 
     [JsonConstructor]
     private PagedResponse() { }

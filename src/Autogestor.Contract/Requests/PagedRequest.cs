@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Autogestor.Contract.Requests;
 
-public abstract class PagedRequest : Request
+public abstract record PagedRequest : Request
 {
     [Range(ContractDefaults.MinPageNumber, ContractDefaults.MaxPageNumber)]
-    public int PageNumber { get; set; } = ContractDefaults.DefaultPageNumber;
+    public int PageNumber { get; init; } = ContractDefaults.DefaultPageNumber;
 
     [Range(ContractDefaults.MinPageSize, ContractDefaults.MaxPageSize)]
-    public int PageSize { get; set; } = ContractDefaults.DefaultPageSize;
+    public int PageSize { get; init; } = ContractDefaults.DefaultPageSize;
 }

@@ -13,7 +13,7 @@ applyTo: "src/Autogestor.Web/**/*.{cs,razor}"
 
 ## Diretrizes do Host Web
 - **Bootstrap e Configuração**:
-  - Referencia `Autogestor.UI` e `Autogestor.Contracts`.
+  - Referencia `Autogestor.UI` e `Autogestor.Contract`.
   - Não contém páginas ou componentes (estes residem na RCL).
   - Configura o `GrpcChannel` com `GrpcWebHandler` para viabilizar chamadas gRPC-Web a partir do browser.
   - Registra no DI as implementações web concretas das interfaces exigidas pela RCL.

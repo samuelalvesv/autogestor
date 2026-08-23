@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -13,6 +13,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageReference Include="NetArchTest.eNhancedEdition" Version="1.4.5" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Autogestor.Domain\Autogestor.Domain.csproj" />
     <ProjectReference Include="..\..\src\Autogestor.Application\Autogestor.Application.csproj" />
+    <ProjectReference Include="..\..\src\Autogestor.Contract\Autogestor.Contract.csproj" />
     <ProjectReference Include="..\..\src\Autogestor.Infrastructure\Autogestor.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Autogestor.Api\Autogestor.Api.csproj" />
     <ProjectReference Include="..\..\src\Autogestor.Web\Autogestor.Web.csproj" />
