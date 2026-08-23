@@ -8,10 +8,15 @@ public class PagedRequestTests
     private sealed record TestPagedRequest : PagedRequest;
 
     [Fact]
-    public void PagedRequest_ShouldHaveDefaultValues()
+    public void PagedRequest_ShouldRequireAllPropertiesOnInitialization()
     {
         // Act
-        var request = new TestPagedRequest();
+        var request = new TestPagedRequest
+        {
+            UserId = Guid.Empty,
+            PageNumber = ContractDefaults.DefaultPageNumber,
+            PageSize = ContractDefaults.DefaultPageSize
+        };
 
         // Assert
         Assert.Equal(ContractDefaults.DefaultPageNumber, request.PageNumber);

@@ -168,6 +168,10 @@ csharp_style_prefer_tuple_swap = true:warning
 # IDE0230 — Usar string literal UTF-8
 csharp_style_prefer_utf8_string_literals = true:warning
 
+# IDE0280 / RCS1202 — Preferir argumentos nomeados em chamadas de construtor e métodos
+csharp_style_prefer_named_arguments = always:warning
+dotnet_diagnostic.RCS1202.severity = warning
+
 # --------------------------------------------------------------------------
 # 9. PREFERÊNCIAS DE NULL CHECKING
 # --------------------------------------------------------------------------

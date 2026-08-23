@@ -14,20 +14,62 @@ public class PagedResponseTests
     public void TotalPage_ShouldCalculateCorrectly(int totalCount, int pageSize, int expectedTotalPages)
     {
         // Act
-        var pagedResponse = new PagedResponse<IReadOnlyList<string>>(
-            data: ["item1", "item2"],
-            code: 200,
-            message: "Success",
-            totalCount: totalCount,
-            currentPage: 1,
-            pageSize: pageSize
-        );
+        var pagedResponse = new PagedResponse<IReadOnlyList<string>>
+        {
+            Data = ["item1", "item2"],
+            Message = null,
+            TotalCount = totalCount,
+            CurrentPage = 1,
+            PageSize = pageSize
+        };
 
         // Assert
         Assert.Equal(expectedTotalPages, pagedResponse.TotalPage);
         Assert.Equal(totalCount, pagedResponse.TotalCount);
         Assert.Equal(1, pagedResponse.CurrentPage);
         Assert.Equal(pageSize, pagedResponse.PageSize);
-        Assert.True(pagedResponse.IsSuccess);
+        Assert.NotNull(pagedResponse.Data);
+        Assert.Equal(2, pagedResponse.Data.Count);
+    }
+
+    [Fact]
+    public void PagedResponse_ExplicitInitialization_ShouldHaveCorrectValues()
+    {
+        // Act
+        var pagedResponse = new PagedResponse<object?>
+        {
+            Data = null,
+            Message = null,
+            TotalCount = 0,
+            CurrentPage = 1,
+            PageSize = 25
+        };
+
+        // Assert
+        Assert.Null(pagedResponse.Data);
+        Assert.Null(pagedResponse.Message);
+        Assert.Equal(0, pagedResponse.TotalCount);
+        Assert.Equal(1, pagedResponse.CurrentPage);
+        Assert.Equal(25, pagedResponse.PageSize);
+        Assert.Equal(0, pagedResponse.TotalPage);
+    }
+
+    [Fact]
+    public void PagedResponse_WithMessage_ShouldInheritMessageFromBaseResponse()
+    {
+        // Act
+        var pagedResponse = new PagedResponse<string[]>
+        {
+            Data = ["item"],
+            Message = "List loaded",
+            TotalCount = 1,
+            CurrentPage = 1,
+            PageSize = 25
+        };
+
+        // Assert
+        Assert.Equal("List loaded", pagedResponse.Message);
+        Assert.NotNull(pagedResponse.Data);
+        Assert.Single(pagedResponse.Data);
     }
 }

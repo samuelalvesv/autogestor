@@ -15,7 +15,8 @@ applyTo: "src/Autogestor.Contract/**/*.cs"
 
 ## Diretrizes e Restrições
 - **Isolamento Total**: Zero dependências de projetos internos (`Domain`, `Application`, `Infrastructure`, etc.) e zero dependências de banco de dados ou frameworks pesados.
-- **DTOs Imutáveis**: Todos os DTOs de Request e Response devem ser declarados obrigatoriamente como `sealed record` imutáveis.
+- **DTOs Imutáveis com `required`**: Todos os DTOs de Request e Response devem ser declarados como `sealed record` (ou `record` para classes base) com propriedades `{ get; init; }` marcadas obrigatoriamente como `required`.
+- **Sem Construtores Customizados**: É proibido o uso de construtores parametrizados em DTOs de contratos. Todas as instanciações devem utilizar inicializadores de objeto nomeados (`{ Prop = valor }`), forçando a declaração explícita de todos os campos (mesmo quando o valor for explicitamente `null`).
 - **gRPC Code-First**:
   - As interfaces de contratos de serviço devem ser decoradas com `[ServiceContract]`.
   - As regras de serialização Protobuf e versionamento retrocompatível devem seguir [grpc-contracts.md](grpc-contracts.md).

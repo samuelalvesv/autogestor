@@ -4,36 +4,48 @@ namespace Autogestor.UnitTests.Contract.Responses;
 
 public class ResponseTests
 {
-    [Theory]
-    [InlineData(200, true)]
-    [InlineData(201, true)]
-    [InlineData(204, true)]
-    [InlineData(299, true)]
-    [InlineData(199, false)]
-    [InlineData(300, false)]
-    [InlineData(400, false)]
-    [InlineData(404, false)]
-    [InlineData(500, false)]
-    public void Response_IsSuccess_ShouldEvaluateCorrectlyBasedOnStatusCode(int statusCode, bool expectedSuccess)
+    [Fact]
+    public void Response_ShouldSetDataAndMessageExplicitly()
     {
         // Act
-        var response = new Response<string>("test-data", statusCode, "test message");
+        var response = new Response<string>
+        {
+            Data = "test-data",
+            Message = "Operation successful"
+        };
 
         // Assert
-        Assert.Equal(expectedSuccess, response.IsSuccess);
         Assert.Equal("test-data", response.Data);
-        Assert.Equal("test message", response.Message);
+        Assert.Equal("Operation successful", response.Message);
     }
 
     [Fact]
-    public void Response_DefaultValues_ShouldBeNullDataAndEmptyMessage()
+    public void Response_ShouldAllowExplicitNulls()
     {
         // Act
-        var response = new Response<object?>(null, 200, string.Empty);
+        var response = new Response<string?>
+        {
+            Data = null,
+            Message = null
+        };
 
         // Assert
         Assert.Null(response.Data);
-        Assert.Equal(string.Empty, response.Message);
-        Assert.True(response.IsSuccess);
+        Assert.Null(response.Message);
+    }
+
+    [Fact]
+    public void Response_WithIntegerData_ShouldSetCorrectly()
+    {
+        // Act
+        var response = new Response<int>
+        {
+            Data = 42,
+            Message = "Created"
+        };
+
+        // Assert
+        Assert.Equal(42, response.Data);
+        Assert.Equal("Created", response.Message);
     }
 }
