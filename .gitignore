@@ -28,7 +28,10 @@ Thumbs.db
 # Arquivos de log gerados em tempo de execução
 *.log
 temp/
+.dotnet/*
+.local/*
 
 ## [Agent / MCP]
 .agents/mcp_config.json
+
 
