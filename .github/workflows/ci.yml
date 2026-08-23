@@ -24,10 +24,10 @@ jobs:
       run: dotnet workload install aspire
 
     - name: Restore dependencies
-      run: dotnet restore autogestor.sln
+      run: dotnet restore Autogestor.slnx
 
     - name: Build Solution
-      run: dotnet build autogestor.sln --configuration Release --no-restore
+      run: dotnet build Autogestor.slnx --configuration Release --no-restore
 
     - name: Run Tests
-      run: dotnet test autogestor.sln --configuration Release --no-build
+      run: dotnet test Autogestor.slnx --configuration Release --no-build

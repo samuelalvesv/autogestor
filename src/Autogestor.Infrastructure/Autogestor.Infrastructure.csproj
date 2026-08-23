@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Autogestor.Domain\Autogestor.Domain.csproj" />
-    <ProjectReference Include="..\Autogestor.Application\Autogestor.Application.csproj" />
+    <ProjectReference Include="../Autogestor.Domain/Autogestor.Domain.csproj" />
+    <ProjectReference Include="../Autogestor.Application/Autogestor.Application.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="EFCore.NamingConventions" />
+  </ItemGroup>
 
 </Project>
