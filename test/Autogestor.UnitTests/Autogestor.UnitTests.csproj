@@ -25,9 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Autogestor.Domain\Autogestor.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Autogestor.Application\Autogestor.Application.csproj" />
-    <ProjectReference Include="..\..\src\Autogestor.Contract\Autogestor.Contract.csproj" />
+    <ProjectReference Include="../../src/Autogestor.Domain/Autogestor.Domain.csproj" />
+    <ProjectReference Include="../../src/Autogestor.Application/Autogestor.Application.csproj" />
+    <ProjectReference Include="../../src/Autogestor.Contract/Autogestor.Contract.csproj" />
   </ItemGroup>
 
 </Project>

@@ -14,12 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+    <ServiceWorker Include="wwwroot/service-worker.js" PublishedContent="wwwroot/service-worker.published.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Autogestor.Contract\Autogestor.Contract.csproj" />
-    <ProjectReference Include="..\Autogestor.UI\Autogestor.UI.csproj" />
+    <ProjectReference Include="../Autogestor.Contract/Autogestor.Contract.csproj" />
+    <ProjectReference Include="../Autogestor.UI/Autogestor.UI.csproj" />
   </ItemGroup>
 
 </Project>
