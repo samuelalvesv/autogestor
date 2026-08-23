@@ -4,8 +4,6 @@
     <ProjectReference Include="../Autogestor.ServiceDefaults/Autogestor.ServiceDefaults.csproj" />
     <ProjectReference Include="../Autogestor.Infrastructure/Autogestor.Infrastructure.csproj" />
     <ProjectReference Include="../Autogestor.Application/Autogestor.Application.csproj" />
-    <ProjectReference Include="../Autogestor.Contract/Autogestor.Contract.csproj" />
-    <ProjectReference Include="../Autogestor.Domain/Autogestor.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,9 +14,6 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>b5a2f7e9-bdb8-4c70-925b-ec0cf6c3da13</UserSecretsId>
   </PropertyGroup>
 
