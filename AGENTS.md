@@ -34,4 +34,4 @@ Este projeto utiliza regras de ativação dinâmica pelo Antigravity baseadas no
 Documentações com YAML Frontmatter carregadas dinamicamente pela IA apenas quando o contexto exige:
 - **Arquitetura Geral**: [.agents/rules/architecture.md](.agents/rules/architecture.md) (Estrutura de dependências e responsabilidades).
 - **Autenticação & Multi-Tenancy**: [.agents/rules/identity-multitenancy.md](.agents/rules/identity-multitenancy.md) (TenantId, acessos e branches).
-- **Git Flow & Commits**: [.agents/rules/git-flow.md](.agents/rules/git-flow.md) e [.agents/rules/git-commit.md](.agents/rules/git-commit.md).
+- **Convenções de Commit**: [.agents/rules/git-commit.md](.agents/rules/git-commit.md).

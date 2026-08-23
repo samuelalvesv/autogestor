@@ -155,4 +155,4 @@ Para entender em detalhes os padrões do projeto, consulte a documentação téc
 - **[Arquitetura](.agents/rules/architecture.md)**: Detalhamento de camadas, gRPC-Web Code-First e AOT.
 - **[Identity & Multi-Tenancy](.agents/rules/identity-multitenancy.md)**: Modelo de Tenants, Branches e cardinalidades.
 - **[Convenções C#](.agents/rules/csharp-conventions.md)**: Padrões de escrita em C# moderno.
-- **[Git Flow](.agents/rules/git-flow.md)** e **[Git Commit](.agents/rules/git-commit.md)**: Estratégia de branches e convenções semânticas de commit.
+- **[Git Commit](.agents/rules/git-commit.md)**: Convenções semânticas de commit e boas práticas.
