@@ -53,10 +53,10 @@ Agrupar os arquivos identificados por camadas:
 
 Validar os arquivos alterados contra as regras de [.agents/rules/](../rules/):
 
-1. **Multi-Tenancy e Segurança ([identity-multitenancy.md](../rules/identity-multitenancy.md))**:
-2. **Padrões de Código C# ([csharp-conventions.md](../rules/csharp-conventions.md))**:
-3. **Fronteiras de Dependência ([architecture.md](../rules/architecture.md))**:
-4. **Contratos gRPC ([grpc-contracts.md](../rules/grpc-contracts.md))**:
+1. **Multi-Tenancy e Segurança ([identity-multitenancy.md](../rules/identity-multitenancy.md))**
+2. **Padrões de Código C# ([csharp-conventions.md](../rules/csharp-conventions.md))**
+3. **Fronteiras de Dependência ([architecture.md](../rules/architecture.md))**
+4. **Contratos gRPC ([grpc-contracts.md](../rules/grpc-contracts.md))**
 
 ---
 
