@@ -1,7 +1,7 @@
 ---
 name: ui-rules
 description: Razor Class Library (RCL), MudBlazor styling, reusable components, and host-agnostic frontend guidelines.
-applyTo: "src/Autogestor.UI/**/*.cs, src/Autogestor.UI/**/*.razor"
+applyTo: "src/Autogestor.UI/**/*.{cs,razor}"
 ---
 
 # Regras de UI / Razor Class Library (Autogestor.UI)

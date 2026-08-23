@@ -1,5 +1,5 @@
 ---
-name: project-architecture
+name: architecture
 description: Clean Architecture layers mapping, project references guidelines, and Golden Rule of dependency boundaries. Use this rule when creating new projects, reference assemblies, or checking structural boundary constraints.
 ---
 

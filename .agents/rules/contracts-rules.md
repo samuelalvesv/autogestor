@@ -18,5 +18,5 @@ applyTo: "src/Autogestor.Contracts/**/*.cs"
 - **DTOs Imutáveis**: Todos os DTOs de Request e Response devem ser declarados obrigatoriamente como `sealed record` imutáveis.
 - **gRPC Code-First**:
   - As interfaces de contratos de serviço devem ser decoradas com `[ServiceContract]`.
-  - As regras de serialização Protobuf e versionamento retrocompatível devem seguir [.agents/rules/grpc-contracts.md](grpc-contracts.md).
+  - As regras de serialização Protobuf e versionamento retrocompatível devem seguir [grpc-contracts.md](grpc-contracts.md).
 - **Compartilhamento**: Esta biblioteca é consumida tanto pelo frontend (RCL/WASM) quanto pelo backend (Api/Application), mantendo as definições de transporte únicas e consistentes em toda a solução.

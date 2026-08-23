@@ -1,7 +1,7 @@
 ---
 name: web-rules
 description: Blazor WebAssembly host configuration, PWA assets, service-worker, gRPC-Web channel connection, and AOT compilation.
-applyTo: "src/Autogestor.Web/**/*.cs, src/Autogestor.Web/**/*.razor"
+applyTo: "src/Autogestor.Web/**/*.{cs,razor}"
 ---
 
 # Regras do Host Web (Autogestor.Web)
