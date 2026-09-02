@@ -8,8 +8,8 @@
 
 ## Idioma
 
-- Todo código (classes, variáveis, métodos, comentários) deve ser escrito em **inglês**.
-- Mensagens de commit, documentação de negócio e comunicação com o usuário devem ser em **português brasileiro**.
+- Todo código-fonte estrutural (classes, propriedades, variáveis, métodos e comentários técnicos) deve ser escrito em **inglês**.
+- Mensagens de erro, validações (exceções de domínio/negócio, DataAnnotations, FluentValidation), retornos e mensagens de resposta de API, interface do usuário (UI), mensagens de commit e documentação devem ser em **português brasileiro (pt-BR)** com ortografia e acentuação corretas.
 
 ## Regras Dinâmicas de Desenvolvimento (Injetadas por Glob)
 

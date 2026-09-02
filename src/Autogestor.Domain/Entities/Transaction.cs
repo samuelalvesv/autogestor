@@ -4,7 +4,7 @@ namespace Autogestor.Domain.Entities;
 
 public sealed class Transaction : AuditableEntity
 {
-    public string Name { get; private set; } = string.Empty;
+    public string Title { get; private set; } = string.Empty;
     public ETransactionType Type { get; private set; }
     public decimal Amount { get; private set; }
     public Guid CategoryId { get; private set; }
@@ -12,25 +12,25 @@ public sealed class Transaction : AuditableEntity
 
     private Transaction() { }
 
-    private Transaction(string name, ETransactionType type, decimal amount, Guid categoryId)
+    private Transaction(string title, ETransactionType type, decimal amount, Guid categoryId)
     {
-        Name = name;
+        Title = title;
         Type = type;
         Amount = amount;
         CategoryId = categoryId;
     }
 
-    public static Transaction Create(string name, ETransactionType type, decimal amount, Guid categoryId)
+    public static Transaction Create(string title, ETransactionType type, decimal amount, Guid categoryId)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(title))
         {
-            throw new ArgumentException("Transaction name cannot be empty.", nameof(name));
+            throw new ArgumentException("O título da transação não pode ser vazio.", nameof(title));
         }
 
         return amount <= 0
-            ? throw new ArgumentException("Transaction amount must be greater than zero.", nameof(amount))
+            ? throw new ArgumentException("O valor da transação deve ser maior que zero.", nameof(amount))
             : categoryId == Guid.Empty
-            ? throw new ArgumentException("Category ID must be a valid GUID.", nameof(categoryId))
-            : new Transaction(name, type, amount, categoryId);
+            ? throw new ArgumentException("Categoria inválida.", nameof(categoryId))
+            : new Transaction(title, type, amount, categoryId);
     }
 }
