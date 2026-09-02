@@ -10,7 +10,7 @@ public class CategoryConfiguration : AuditableEntityConfiguration<Category>
     {
         base.Configure(builder);
 
-        builder.Property(c => c.Name)
+        builder.Property(c => c.Title)
             .IsRequired()
             .HasColumnType("text");
 

@@ -21,6 +21,7 @@ secrets.json
 
 ## [OS Specific]
 # Arquivos de sistema do macOS e Windows
+Library/
 .DS_Store
 Thumbs.db
 
@@ -28,8 +29,10 @@ Thumbs.db
 # Arquivos de log gerados em tempo de execução
 *.log
 temp/
-.dotnet/*
-.local/*
+.dotnet/
+.dotnet_home/
+.local/
+.nuget
 
 ## [Agent / MCP]
 .agents/mcp_config.json

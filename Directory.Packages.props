@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <!-- Aspire -->
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.5.2" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.5.3" />
 
     <!-- Entity Framework Core & PostgreSQL -->
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />

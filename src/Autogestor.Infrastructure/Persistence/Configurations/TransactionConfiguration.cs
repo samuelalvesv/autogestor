@@ -10,7 +10,7 @@ public class TransactionConfiguration : AuditableEntityConfiguration<Transaction
     {
         base.Configure(builder);
 
-        builder.Property(t => t.Name)
+        builder.Property(t => t.Title)
             .IsRequired()
             .HasColumnType("text");
 
