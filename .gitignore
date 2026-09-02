@@ -29,6 +29,7 @@ Thumbs.db
 # Arquivos de log gerados em tempo de execução
 *.log
 temp/
+.dotnet/
 .dotnet_home/
 .local/
 .nuget

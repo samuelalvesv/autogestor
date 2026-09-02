@@ -7,11 +7,15 @@ applyTo: "src/Autogestor.Contract/**/*.cs"
 # Regras de Contratos (Autogestor.Contract)
 
 ## Estrutura de Pastas
-- `[Feature]/`:
-  - `Requests/`: DTOs de requisição fortemente tipados (`[DataContract]`).
-  - `Responses/`: DTOs de resposta fortemente tipados (`[DataContract]`).
-  - `Services/`: Interfaces de serviços gRPC (`[ServiceContract]`).
-- `Common/`: DTOs compartilhados globais (ex: paginação, respostas padrão, DTOs utilitários).
+- `Requests/`:
+  - `[Feature]/`: DTOs de requisição fortemente tipados específicos por funcionalidade (ex: `Categories/CreateCategoryRequest.cs`).
+  - `Request.cs`, `PagedRequest.cs`: Contratos base de requisição.
+- `Responses/`:
+  - `[Feature]/`: DTOs de resposta fortemente tipados específicos por funcionalidade.
+  - `Response.cs`, `PagedResponse.cs`: Contratos base e genéricos de resposta.
+- `Services/`:
+  - `I[Feature]GrpcService.cs`: Interfaces de serviços gRPC Code-First (`[ServiceContract]`).
+- `ContractDefaults.cs`: Constantes de paginação e limites de transporte.
 
 ## Diretrizes e Restrições
 - **Isolamento Total**: Zero dependências de projetos internos (`Domain`, `Application`, `Infrastructure`, etc.) e zero dependências de banco de dados ou frameworks pesados.

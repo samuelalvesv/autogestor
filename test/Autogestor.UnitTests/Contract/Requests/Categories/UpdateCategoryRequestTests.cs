@@ -39,9 +39,9 @@ public class UpdateCategoryRequestTests
     }
 
     [Theory]
-    [InlineData("a")]
+    [InlineData("ab")]
     [InlineData("123456789012345678901234567890123456789012345678901234567890123456789012345678901")]
-    public void UpdateCategoryRequest_WithInvalidTitle_FailsValidation(string invalidTitle)
+    public void UpdateCategoryRequest_WithInvalidTitleLength_FailsValidation(string invalidTitle)
     {
         // Arrange
         var request = new UpdateCategoryRequest
@@ -60,7 +60,7 @@ public class UpdateCategoryRequestTests
     }
 
     [Theory]
-    [InlineData("a")]
+    [InlineData("ab")]
     public void UpdateCategoryRequest_WithShortDescription_FailsValidation(string shortDescription)
     {
         // Arrange
