@@ -21,6 +21,7 @@ applyTo: "**/*.{cs,razor}"
 - **Desacoplamento e Reuso (Wrappers)**:
   - Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
 - **Validação Estática em Tempo de Compilação**: Preferir sempre que possível a validação estática de código, detectando erros em tempo de compilação ao invés de em tempo de execução. Isso inclui: uso de tipos fortes ao invés de `string`/`object` genéricos, atributos de análise estática (`[NotNullWhen]`, `[MemberNotNull]`, `[StringSyntax]`), `const` e `readonly` para imutabilidade verificável pelo compilador, nullable reference types habilitados (`<Nullable>enable</Nullable>`), e warnings tratados como erros (`<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`) para impedir que avisos de análise sejam ignorados.
+- **Guard Clauses e Blocos Condicionais**: Utilizar guard clauses explícitas (`if (...) throw ...`) sem chaves para validações de instrução única e fail-fast no início dos métodos/fábricas, evitando encadeamentos aninhados de operadores ternários com `throw`.
 - **Qualidade de Código e Roslyn**: Forçar padrões rígidos de qualidade, estilo de escrita e formatação de código C# utilizando analisadores do Roslyn configurados via arquivo `.editorconfig` na raiz da solução.
 
 ## Diretrizes de Otimização e Performance

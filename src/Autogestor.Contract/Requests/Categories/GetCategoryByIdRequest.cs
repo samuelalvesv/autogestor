@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Autogestor.Contract.Requests.Categories;
 
 [DataContract]
-public sealed record GetByIdCategoryRequest : Request
+public sealed record GetCategoryByIdRequest : Request
 {
     [DataMember(Order = 2)]
     [Required(ErrorMessage = "Categoria inválida")]

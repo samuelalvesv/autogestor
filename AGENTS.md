@@ -35,3 +35,4 @@ Documentações com YAML Frontmatter carregadas dinamicamente pela IA apenas qua
 - **Arquitetura Geral**: [.agents/rules/architecture.md](.agents/rules/architecture.md) (Estrutura de dependências e responsabilidades).
 - **Autenticação & Multi-Tenancy**: [.agents/rules/identity-multitenancy.md](.agents/rules/identity-multitenancy.md) (TenantId, acessos e branches).
 - **Convenções de Commit**: [.agents/rules/git-commit.md](.agents/rules/git-commit.md).
+- **Otimização de CLI (RTK)**: [.agents/rules/antigravity-rtk-rules.md](.agents/rules/antigravity-rtk-rules.md) (Redução de tokens no terminal).

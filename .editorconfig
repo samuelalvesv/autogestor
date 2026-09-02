@@ -236,8 +236,8 @@ csharp_style_prefer_not_pattern = true:warning
 # --------------------------------------------------------------------------
 # 13. BLOCOS DE CÓDIGO
 # --------------------------------------------------------------------------
-# IDE0011 — Usar chaves
-csharp_prefer_braces = true:warning
+# IDE0011 — Exigir chaves apenas para blocos multilinha e omitir em instruções de linha única
+csharp_prefer_braces = when_multiline:warning
 
 # IDE0063 — Usar using simplificado
 csharp_prefer_simple_using_statement = true:warning

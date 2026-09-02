@@ -1,3 +1,8 @@
+---
+name: antigravity-rtk-rules
+description: Token-optimized CLI proxy rules for executing shell commands via rtk.
+---
+
 # RTK - Rust Token Killer (Google Antigravity)
 
 **Usage**: Token-optimized CLI proxy for shell commands.

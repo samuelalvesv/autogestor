@@ -18,14 +18,14 @@ public sealed class Category : AuditableEntity
     public static Category Create(string title, string description, Guid userId)
     {
         if (string.IsNullOrWhiteSpace(title))
-        {
             throw new ArgumentException("O título da categoria não pode ser vazio.", nameof(title));
-        }
 
-        return string.IsNullOrWhiteSpace(description)
-            ? throw new ArgumentException("A descrição da categoria não pode ser vazia.", nameof(description))
-            : userId == Guid.Empty
-            ? throw new ArgumentException("Usuário inválido.", nameof(userId))
-            : new Category(title, description, userId);
+        if (string.IsNullOrWhiteSpace(description))
+            throw new ArgumentException("A descrição da categoria não pode ser vazia.", nameof(description));
+
+        if (userId == Guid.Empty)
+            throw new ArgumentException("Usuário inválido.", nameof(userId));
+
+        return new Category(title, description, userId);
     }
 }

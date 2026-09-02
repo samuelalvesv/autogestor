@@ -23,14 +23,14 @@ public sealed class Transaction : AuditableEntity
     public static Transaction Create(string title, ETransactionType type, decimal amount, Guid categoryId)
     {
         if (string.IsNullOrWhiteSpace(title))
-        {
             throw new ArgumentException("O título da transação não pode ser vazio.", nameof(title));
-        }
 
-        return amount <= 0
-            ? throw new ArgumentException("O valor da transação deve ser maior que zero.", nameof(amount))
-            : categoryId == Guid.Empty
-            ? throw new ArgumentException("Categoria inválida.", nameof(categoryId))
-            : new Transaction(title, type, amount, categoryId);
+        if (amount <= 0)
+            throw new ArgumentException("O valor da transação deve ser maior que zero.", nameof(amount));
+
+        if (categoryId == Guid.Empty)
+            throw new ArgumentException("Categoria inválida.", nameof(categoryId));
+
+        return new Transaction(title, type, amount, categoryId);
     }
 }
