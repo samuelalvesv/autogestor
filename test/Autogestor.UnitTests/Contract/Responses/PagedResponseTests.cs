@@ -14,7 +14,7 @@ public class PagedResponseTests
     public void TotalPage_ShouldCalculateCorrectly(int totalCount, int pageSize, int expectedTotalPages)
     {
         // Act
-        var pagedResponse = new PagedResponse<IReadOnlyList<string>>
+        var pagedResponse = new PagedResponse<string>
         {
             Data = ["item1", "item2"],
             Message = null,
@@ -55,10 +55,10 @@ public class PagedResponseTests
     }
 
     [Fact]
-    public void PagedResponse_WithMessage_ShouldInheritMessageFromBaseResponse()
+    public void PagedResponse_WithMessage_ShouldSetMessageCorrectly()
     {
         // Act
-        var pagedResponse = new PagedResponse<string[]>
+        var pagedResponse = new PagedResponse<string>
         {
             Data = ["item"],
             Message = "List loaded",
