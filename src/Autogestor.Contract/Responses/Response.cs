@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace Autogestor.Contract.Responses;
 
 [DataContract]
-public record Response<T>
+public sealed record Response<T>
 {
     [DataMember(Order = 1)]
     public required T? Data { get; init; }

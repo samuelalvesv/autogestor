@@ -14,7 +14,7 @@ public class PagedResponseTests
     public void TotalPage_ShouldCalculateCorrectly(int totalCount, int pageSize, int expectedTotalPages)
     {
         // Act
-        var pagedResponse = new PagedResponse<IReadOnlyList<string>>
+        var pagedResponse = new PagedResponse<string>
         {
             Data = ["item1", "item2"],
             Message = null,
@@ -29,7 +29,7 @@ public class PagedResponseTests
         Assert.Equal(1, pagedResponse.CurrentPage);
         Assert.Equal(pageSize, pagedResponse.PageSize);
         Assert.NotNull(pagedResponse.Data);
-        Assert.Equal(2, pagedResponse.Data.Count);
+        Assert.Equal(2, pagedResponse.Data.Count());
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class PagedResponseTests
     public void PagedResponse_WithMessage_ShouldInheritMessageFromBaseResponse()
     {
         // Act
-        var pagedResponse = new PagedResponse<string[]>
+        var pagedResponse = new PagedResponse<string>
         {
             Data = ["item"],
             Message = "List loaded",
