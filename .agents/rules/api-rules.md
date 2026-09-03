@@ -7,7 +7,7 @@ applyTo: "src/Autogestor.Api/**/*.cs"
 # Regras do Ponto de Entrada API (Autogestor.Api)
 
 ## Estrutura de Pastas
-- `Services/`: Implementações de serviços gRPC (`[Feature]GrpcService.cs`).
+- `Services/`: Implementações de serviços gRPC (`[Feature]Service.cs`).
 - `Middlewares/`: Interceptadores gRPC e handlers de exceção.
 - `Extensions/`: Métodos de extensão de injeção de dependência e Kestrel.
 - `Program.cs`: Composição raiz do projeto.

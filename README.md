@@ -130,6 +130,7 @@ autogestor/
 | **Formatar Código (dotnet format)** | `dotnet format` |
 | **Validar Build e Integridade** | `./.agents/scripts/verify-build.sh` |
 | **Verificar/Atualizar Pacotes NuGet** | `dotnet outdated -u --pre-release Never` |
+| **Encerrar Servidores de Build (Reset de Locks/Caches)** | `dotnet build-server shutdown` |
 
 ---
 

@@ -136,7 +136,7 @@ public interface IBranchAuthorizationService
 
 | Camada | Artefatos |
 | --- | --- |
-| **Contracts** | Interfaces gRPC decoradas (`IAuthGrpcService`, `IBranchGrpcService`), mensagens de Request/Response (`LoginRequest`, `LoginResponse`, `CreateBranchRequest`) |
+| **Contracts** | Interfaces gRPC decoradas (`IAuthService`, `IBranchService`), mensagens de Request/Response (`LoginRequest`, `LoginResponse`, `CreateBranchRequest`) |
 | **Domain** | `Tenant`, `Branch`, `UserBranchAccess`, `BranchRole`, `TenantEntity` (base), `ITenantProvider`, `IBranchAccessRepository` |
 | **Application** | `IBranchAuthorizationService`, use cases (`CreateBranchCommand`, `GrantBranchAccessCommand`, `RevokeBranchAccessCommand`), DTOs internos |
 | **Infrastructure** | `ApplicationUser : IdentityUser<Guid>`, `TenantProvider` (lê `TenantId` do cabeçalho JWT no contexto do gRPC), Global Query Filters no `DbContext`, implementação de `IBranchAuthorizationService` |

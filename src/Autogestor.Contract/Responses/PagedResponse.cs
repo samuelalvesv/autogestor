@@ -6,7 +6,7 @@ namespace Autogestor.Contract.Responses;
 public sealed record PagedResponse<T>
 {
     [DataMember(Order = 1)]
-    public required IEnumerable<T>? Data { get; init; }
+    public required IReadOnlyList<T>? Data { get; init; }
 
     [DataMember(Order = 2)]
     public required string? Message { get; init; }

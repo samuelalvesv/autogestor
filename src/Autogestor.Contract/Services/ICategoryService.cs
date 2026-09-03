@@ -9,13 +9,13 @@ namespace Autogestor.Contract.Services;
 public interface ICategoryService
 {
     [OperationContract]
-    Task<Response<CategoryResponse?>> CreateAsync(CreateCategoryRequest request, CancellationToken cancellationToken = default);
+    Task<Response<CategoryResponse>> CreateAsync(CreateCategoryRequest request, CancellationToken cancellationToken = default);
     [OperationContract]
-    Task<Response<DeleteResponse?>> DeleteAsync(DeleteCategoryRequest request, CancellationToken cancellationToken = default);
+    Task<Response<DeleteResponse>> DeleteAsync(DeleteCategoryRequest request, CancellationToken cancellationToken = default);
     [OperationContract]
-    Task<PagedResponse<CategoryResponse?>> GetAllAsync(GetAllCategoriesRequest request, CancellationToken cancellationToken = default);
+    Task<PagedResponse<CategoryResponse>> GetAllAsync(GetAllCategoriesRequest request, CancellationToken cancellationToken = default);
     [OperationContract]
-    Task<Response<CategoryResponse?>> GetByIdAsync(GetCategoryByIdRequest request, CancellationToken cancellationToken = default);
+    Task<Response<CategoryResponse>> GetByIdAsync(GetCategoryByIdRequest request, CancellationToken cancellationToken = default);
     [OperationContract]
-    Task<Response<CategoryResponse?>> UpdateAsync(UpdateCategoryRequest request, CancellationToken cancellationToken = default);
+    Task<Response<CategoryResponse>> UpdateAsync(UpdateCategoryRequest request, CancellationToken cancellationToken = default);
 }

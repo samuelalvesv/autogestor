@@ -29,7 +29,7 @@ public class PagedResponseTests
         Assert.Equal(1, pagedResponse.CurrentPage);
         Assert.Equal(pageSize, pagedResponse.PageSize);
         Assert.NotNull(pagedResponse.Data);
-        Assert.Equal(2, pagedResponse.Data.Count());
+        Assert.Equal(2, pagedResponse.Data.Count);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class PagedResponseTests
     }
 
     [Fact]
-    public void PagedResponse_WithMessage_ShouldInheritMessageFromBaseResponse()
+    public void PagedResponse_WithMessage_ShouldSetMessageCorrectly()
     {
         // Act
         var pagedResponse = new PagedResponse<string>
