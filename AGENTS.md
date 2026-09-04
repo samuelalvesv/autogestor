@@ -9,7 +9,7 @@
 ## Idioma
 
 - Todo código-fonte estrutural (classes, propriedades, variáveis, métodos e comentários técnicos) deve ser escrito em **inglês**.
-- Mensagens de erro, validações (exceções de domínio/negócio, DataAnnotations, FluentValidation), retornos e mensagens de resposta de API, interface do usuário (UI), mensagens de commit e documentação devem ser em **português brasileiro (pt-BR)** com ortografia e acentuação corretas.
+- Mensagens de erro, validações (exceções de domínio/negócio, DataAnnotations, FluentValidation), mensagens de falha de asserção em testes (`Assert.True(..., "mensagem")`), retornos e mensagens de resposta de API, interface do usuário (UI), mensagens de commit e documentação devem ser em **português brasileiro (pt-BR)** com ortografia e acentuação corretas.
 
 ## Regras Dinâmicas de Desenvolvimento (Injetadas por Glob)
 

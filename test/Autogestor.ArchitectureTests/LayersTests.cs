@@ -25,7 +25,7 @@ public class LayersTests
             .HaveDependencyOnAny(ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace, ContractNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "Domain layer must not depend on other layers.");
+        Assert.True(result.IsSuccessful, "A camada Domain não deve depender de outras camadas.");
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class LayersTests
             .HaveDependencyOnAny(DomainNamespace, ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "Contract layer must not depend on other layers.");
+        Assert.True(result.IsSuccessful, "A camada Contract não deve depender de outras camadas.");
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class LayersTests
             .HaveDependencyOnAny(InfrastructureNamespace, ApiNamespace, WebNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "Application layer must not depend on Infrastructure, Api or Web.");
+        Assert.True(result.IsSuccessful, "A camada Application não deve depender de Infrastructure, Api ou Web.");
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class LayersTests
             .HaveDependencyOnAny(ApiNamespace, WebNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "Infrastructure layer must not depend on Api or Web.");
+        Assert.True(result.IsSuccessful, "A camada Infrastructure não deve depender de Api ou Web.");
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class LayersTests
             .HaveNameStartingWith("I")
             .GetResult();
 
-        Assert.True(domainResult.IsSuccessful, "Domain interfaces must start with 'I'.");
-        Assert.True(contractResult.IsSuccessful, "Contract interfaces must start with 'I'.");
+        Assert.True(domainResult.IsSuccessful, "As interfaces da camada Domain devem iniciar com 'I'.");
+        Assert.True(contractResult.IsSuccessful, "As interfaces da camada Contract devem iniciar com 'I'.");
     }
 }

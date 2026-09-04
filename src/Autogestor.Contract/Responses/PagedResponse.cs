@@ -15,10 +15,10 @@ public sealed record PagedResponse<T>
     public required int TotalCount { get; init; }
 
     [DataMember(Order = 4)]
-    public required int CurrentPage { get; init; }
+    public required int PageNumber { get; init; }
 
     [DataMember(Order = 5)]
     public required int PageSize { get; init; }
 
-    public int TotalPage => PageSize > 0 ? (int)Math.Ceiling(TotalCount / (decimal)PageSize) : 0;
+    public int TotalPage => PageSize > 0 ? (TotalCount + PageSize - 1) / PageSize : 0;
 }

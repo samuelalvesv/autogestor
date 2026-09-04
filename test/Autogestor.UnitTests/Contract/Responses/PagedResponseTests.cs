@@ -19,14 +19,14 @@ public class PagedResponseTests
             Data = ["item1", "item2"],
             Message = null,
             TotalCount = totalCount,
-            CurrentPage = 1,
+            PageNumber = 1,
             PageSize = pageSize
         };
 
         // Assert
         Assert.Equal(expectedTotalPages, pagedResponse.TotalPage);
         Assert.Equal(totalCount, pagedResponse.TotalCount);
-        Assert.Equal(1, pagedResponse.CurrentPage);
+        Assert.Equal(1, pagedResponse.PageNumber);
         Assert.Equal(pageSize, pagedResponse.PageSize);
         Assert.NotNull(pagedResponse.Data);
         Assert.Equal(2, pagedResponse.Data.Count);
@@ -41,7 +41,7 @@ public class PagedResponseTests
             Data = null,
             Message = null,
             TotalCount = 0,
-            CurrentPage = 1,
+            PageNumber = 1,
             PageSize = 25
         };
 
@@ -49,7 +49,7 @@ public class PagedResponseTests
         Assert.Null(pagedResponse.Data);
         Assert.Null(pagedResponse.Message);
         Assert.Equal(0, pagedResponse.TotalCount);
-        Assert.Equal(1, pagedResponse.CurrentPage);
+        Assert.Equal(1, pagedResponse.PageNumber);
         Assert.Equal(25, pagedResponse.PageSize);
         Assert.Equal(0, pagedResponse.TotalPage);
     }
@@ -63,7 +63,7 @@ public class PagedResponseTests
             Data = ["item"],
             Message = "List loaded",
             TotalCount = 1,
-            CurrentPage = 1,
+            PageNumber = 1,
             PageSize = 25
         };
 
