@@ -14,6 +14,7 @@
 ## Regras Dinâmicas de Desenvolvimento (Injetadas por Glob)
 
 Este projeto utiliza regras de ativação dinâmica pelo Antigravity baseadas no arquivo editado. A IA **não precisa ler** estes arquivos manualmente, eles são injetados automaticamente:
+- **Otimização de CLI (RTK)**: [.agents/rules/antigravity-rtk-rules.md](.agents/rules/antigravity-rtk-rules.md) (Redução de tokens no terminal).
 - **Convenções C#**: [.agents/rules/csharp-conventions.md](.agents/rules/csharp-conventions.md) (Geral C# e Razor).
 - **Camada de Contratos**: [.agents/rules/contracts-rules.md](.agents/rules/contracts-rules.md) (DTOs, Requests, Responses e Services).
 - **Contratos gRPC**: [.agents/rules/grpc-contracts.md](.agents/rules/grpc-contracts.md) (gRPC Code-First).
@@ -35,4 +36,3 @@ Documentações com YAML Frontmatter carregadas dinamicamente pela IA apenas qua
 - **Arquitetura Geral**: [.agents/rules/architecture.md](.agents/rules/architecture.md) (Estrutura de dependências e responsabilidades).
 - **Autenticação & Multi-Tenancy**: [.agents/rules/identity-multitenancy.md](.agents/rules/identity-multitenancy.md) (TenantId, acessos e branches).
 - **Convenções de Commit**: [.agents/rules/git-commit.md](.agents/rules/git-commit.md).
-- **Otimização de CLI (RTK)**: [.agents/rules/antigravity-rtk-rules.md](.agents/rules/antigravity-rtk-rules.md) (Redução de tokens no terminal).
