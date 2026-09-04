@@ -21,6 +21,9 @@
         "dotnet-test-migration",
         "dotnet-upgrade",
         "dotnet11"]
+    },
+    {
+      "path": ".agents/vendor/ponytail"
     }
   ]
 }

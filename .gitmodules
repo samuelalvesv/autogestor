@@ -1,3 +1,6 @@
 [submodule ".agents/vendor/dotnet-skills"]
 	path = .agents/vendor/dotnet-skills
 	url = https://github.com/dotnet/skills.git
+[submodule ".agents/vendor/ponytail"]
+	path = .agents/vendor/ponytail
+	url = https://github.com/dietrichgebert/ponytail.git
