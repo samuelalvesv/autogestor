@@ -1,0 +1,26 @@
+{
+  "entries": [
+    {
+      "path": ".agents/vendor/dotnet-skills/plugins",
+      "include_only": [
+        "dotnet",
+        "dotnet-advanced",
+        "dotnet-aspnetcore",
+        "dotnet-blazor",
+        "dotnet-data",
+        "dotnet-diag",
+        "dotnet-maui",
+        "dotnet-msbuild",
+        "dotnet-nuget",
+        "dotnet-test"
+      ],
+      "exclude": [
+        "dotnet-ai",
+        "dotnet-experimental",
+        "dotnet-template-engine",
+        "dotnet-test-migration",
+        "dotnet-upgrade",
+        "dotnet11"]
+    }
+  ]
+}

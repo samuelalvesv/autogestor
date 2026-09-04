@@ -1,0 +1,3 @@
+[submodule ".agents/vendor/dotnet-skills"]
+	path = .agents/vendor/dotnet-skills
+	url = https://github.com/dotnet/skills.git
