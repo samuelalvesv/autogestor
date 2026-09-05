@@ -1,37 +1,54 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "permissions": {
+  "globalPermissionGrants": {
     "allow": [
-      "command(rtk git status)",
-      "command(rtk git status *)",
-      "command(rtk git log)",
-      "command(rtk git log *)",
-      "command(rtk git diff)",
-      "command(rtk git diff *)",
+      "read_url(https://antigravity.google/docs)",
+      "read_url(https://learn.microsoft.com/en-us/docs)",
       "command(rtk dotnet build)",
       "command(rtk dotnet build *)",
-      "command(rtk dotnet test)",
-      "command(rtk dotnet test *)",
+      "command(rtk dotnet format)",
+      "command(rtk dotnet format *)",
       "command(rtk dotnet restore)",
       "command(rtk dotnet restore *)",
-      "command(rtk dotnet format)",
-      "command(rtk dotnet format *)"
+      "command(rtk dotnet test)",
+      "command(rtk dotnet test *)",
+      "command(rtk git diff)",
+      "command(rtk git diff *)",
+      "command(rtk git log)",
+      "command(rtk git log *)",
+      "command(rtk git status)",
+      "command(rtk git status *)"
+    ],
+    "ask": [
+      "command(rtk rm *)",
+      "command(rtk rm)"
     ],
     "deny": [
-      "command(git branch *)",
-      "command(rtk git branch *)",
-      "command(git commit *)",
-      "command(rtk git commit *)",
+      "command(git add)",
       "command(git add *)",
-      "command(rtk git add *)",
-      "command(git rm *)",
-      "command(rtk git rm *)",
-      "command(git reset *)",
-      "command(rtk git reset *)",
+      "command(git branch)",
+      "command(git branch *)",
+      "command(git commit)",
+      "command(git commit *)",
+      "command(git push)",
       "command(git push *)",
-      "command(rtk git push *)",
+      "command(git reset)",
+      "command(git reset *)",
+      "command(git rm)",
+      "command(git rm *)",
+      "command(rm)",
       "command(rm *)",
-      "command(rtk rm *)"
+      "command(rtk git add)",
+      "command(rtk git add *)",
+      "command(rtk git branch)",
+      "command(rtk git branch *)",
+      "command(rtk git commit)",
+      "command(rtk git commit *)",
+      "command(rtk git push)",
+      "command(rtk git push *)",
+      "command(rtk git reset)",
+      "command(rtk git reset *)",
+      "command(rtk git rm)",
+      "command(rtk git rm *)"
     ]
   }
 }
