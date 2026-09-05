@@ -5,4 +5,8 @@
     <ProjectReference Include="../../src/Autogestor.Api/Autogestor.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Testcontainers.PostgreSql" />
+  </ItemGroup>
+
 </Project>

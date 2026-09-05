@@ -9,7 +9,15 @@ namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
 
 public class CreateCategoryUseCaseTests
 {
-    private sealed class FakeCategoryRepository : ICategoryRepository
+    private static void SetAuditFields(AuditableEntity entity, Guid userId, DateTime timestamp)
+    {
+        typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.CreatedBy))!
+            .SetValue(obj: entity, value: userId);
+        typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.CreatedAt))!
+            .SetValue(obj: entity, value: timestamp);
+    }
+
+    private sealed class CategoryRepositoryFake : ICategoryRepository
     {
         public List<Category> Categories { get; } = [];
         public CancellationToken PassedCancellationToken { get; private set; }
@@ -17,6 +25,7 @@ public class CreateCategoryUseCaseTests
         public Task AddAsync(Category category, CancellationToken cancellationToken = default)
         {
             PassedCancellationToken = cancellationToken;
+            SetAuditFields(entity: category, userId: category.UserId, timestamp: DateTime.UtcNow);
             Categories.Add(item: category);
             return Task.CompletedTask;
         }
@@ -28,7 +37,7 @@ public class CreateCategoryUseCaseTests
             Task.FromResult<IReadOnlyList<Category>>(result: Categories.AsReadOnly());
     }
 
-    private sealed class FakeUnitOfWork : IUnitOfWork
+    private sealed class UnitOfWorkFake : IUnitOfWork
     {
         public int CommitCount { get; private set; }
         public CancellationToken PassedCancellationToken { get; private set; }
@@ -45,8 +54,8 @@ public class CreateCategoryUseCaseTests
     public async Task ExecuteAsync_WithValidRequest_ReturnsSuccessResponseAndPersistsCategory()
     {
         // Arrange
-        var repository = new FakeCategoryRepository();
-        var unitOfWork = new FakeUnitOfWork();
+        var repository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
             unitOfWork: unitOfWork);
@@ -86,8 +95,8 @@ public class CreateCategoryUseCaseTests
     public async Task ExecuteAsync_WithInvalidTitle_ThrowsArgumentException(string? invalidTitle)
     {
         // Arrange
-        var repository = new FakeCategoryRepository();
-        var unitOfWork = new FakeUnitOfWork();
+        var repository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
             unitOfWork: unitOfWork);
@@ -115,8 +124,8 @@ public class CreateCategoryUseCaseTests
     public async Task ExecuteAsync_WithInvalidDescription_ThrowsArgumentException(string? invalidDescription)
     {
         // Arrange
-        var repository = new FakeCategoryRepository();
-        var unitOfWork = new FakeUnitOfWork();
+        var repository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
             unitOfWork: unitOfWork);
@@ -141,8 +150,8 @@ public class CreateCategoryUseCaseTests
     public async Task ExecuteAsync_WithEmptyUserId_ThrowsArgumentException()
     {
         // Arrange
-        var repository = new FakeCategoryRepository();
-        var unitOfWork = new FakeUnitOfWork();
+        var repository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
             unitOfWork: unitOfWork);
@@ -167,8 +176,8 @@ public class CreateCategoryUseCaseTests
     public async Task ExecuteAsync_WithCancellationToken_PropagatesTokenToDependencies()
     {
         // Arrange
-        var repository = new FakeCategoryRepository();
-        var unitOfWork = new FakeUnitOfWork();
+        var repository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
             unitOfWork: unitOfWork);
@@ -191,4 +200,3 @@ public class CreateCategoryUseCaseTests
         Assert.Equal(expected: token, actual: unitOfWork.PassedCancellationToken);
     }
 }
-

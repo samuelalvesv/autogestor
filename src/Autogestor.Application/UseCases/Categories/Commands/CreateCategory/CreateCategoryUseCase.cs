@@ -28,8 +28,8 @@ public sealed class CreateCategoryUseCase(
         {
             Id = category.Id,
             Active = category.Active,
-            CreatedBy = category.CreatedBy != Guid.Empty ? category.CreatedBy : request.UserId,
-            CreatedAt = category.CreatedAt != default ? category.CreatedAt : DateTime.UtcNow,
+            CreatedBy = category.CreatedBy,
+            CreatedAt = category.CreatedAt,
             UpdatedBy = category.UpdatedBy,
             UpdatedAt = category.UpdatedAt,
             Title = category.Title,

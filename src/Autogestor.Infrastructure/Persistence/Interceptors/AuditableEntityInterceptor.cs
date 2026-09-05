@@ -1,15 +1,16 @@
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Autogestor.Infrastructure.Persistence.Interceptors;
 
-public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
+public sealed class AuditableEntityInterceptor(IUserContext userContext) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        UpdateAuditEntities(context: eventData.Context);
+        UpdateAuditEntities(context: eventData.Context!);
         return base.SavingChanges(eventData: eventData, result: result);
     }
 
@@ -18,27 +19,20 @@ public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        UpdateAuditEntities(context: eventData.Context);
+        UpdateAuditEntities(context: eventData.Context!);
         return base.SavingChangesAsync(
             eventData: eventData,
             result: result,
             cancellationToken: cancellationToken);
     }
 
-    private static void UpdateAuditEntities(DbContext? context)
+    private void UpdateAuditEntities(DbContext context)
     {
-        if (context is null)
-            return;
-
         DateTime utcNow = DateTime.UtcNow;
+        Guid currentUserId = userContext.UserId;
 
         foreach (EntityEntry<AuditableEntity> entry in context.ChangeTracker.Entries<AuditableEntity>())
         {
-            Guid userId = entry.Entity.CreatedBy;
-
-            if (userId == Guid.Empty && entry.Entity is Category category)
-                userId = category.UserId;
-
             switch (entry.State)
             {
                 case EntityState.Added:
@@ -48,32 +42,22 @@ public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
 
                         entry.Property(e => e.UpdatedAt).CurrentValue = utcNow;
 
-                        if (userId != Guid.Empty)
-                        {
-                            if (entry.Property(e => e.CreatedBy).CurrentValue == Guid.Empty)
-                                entry.Property(e => e.CreatedBy).CurrentValue = userId;
+                        if (entry.Entity.CreatedBy == Guid.Empty)
+                            entry.Property(e => e.CreatedBy).CurrentValue = currentUserId;
 
-                            entry.Property(e => e.UpdatedBy).CurrentValue = userId;
-                        }
-
+                        entry.Property(e => e.UpdatedBy).CurrentValue = currentUserId;
                         break;
                     }
                 case EntityState.Modified:
                     {
                         entry.Property(e => e.UpdatedAt).CurrentValue = utcNow;
-
-                        Guid updateUserId = entry.Entity.UpdatedBy ?? userId;
-                        if (updateUserId != Guid.Empty)
-                            entry.Property(e => e.UpdatedBy).CurrentValue = updateUserId;
+                        entry.Property(e => e.UpdatedBy).CurrentValue = currentUserId;
                         break;
                     }
 
                 case EntityState.Detached:
-                    break;
                 case EntityState.Unchanged:
-                    break;
                 case EntityState.Deleted:
-                    break;
                 default:
                     break;
             }

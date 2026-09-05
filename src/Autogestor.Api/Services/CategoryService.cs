@@ -8,13 +8,12 @@ namespace Autogestor.Api.Services;
 
 public sealed class CategoryService(ICreateCategoryUseCase createCategoryUseCase) : ICategoryService
 {
-    public async Task<Response<CategoryResponse>> CreateAsync(CreateCategoryRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        return await createCategoryUseCase.ExecuteAsync(
+    public Task<Response<CategoryResponse>> CreateAsync(
+        CreateCategoryRequest request,
+        CancellationToken cancellationToken = default) =>
+        createCategoryUseCase.ExecuteAsync(
             request: request,
             cancellationToken: cancellationToken);
-    }
 
     public Task<Response<DeleteResponse>> DeleteAsync(
         DeleteCategoryRequest request,
