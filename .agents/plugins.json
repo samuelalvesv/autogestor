@@ -9,7 +9,6 @@
         "dotnet-blazor",
         "dotnet-data",
         "dotnet-diag",
-        "dotnet-maui",
         "dotnet-msbuild",
         "dotnet-nuget",
         "dotnet-test"
@@ -17,6 +16,7 @@
       "exclude": [
         "dotnet-ai",
         "dotnet-experimental",
+        "dotnet-maui",
         "dotnet-template-engine",
         "dotnet-test-migration",
         "dotnet-upgrade",
