@@ -1,0 +1,1 @@
+../vendor/dotnet-skills/plugins/dotnet-msbuild/agents/msbuild-code-review.agent.md

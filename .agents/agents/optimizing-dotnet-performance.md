@@ -1,0 +1,1 @@
+../vendor/dotnet-skills/plugins/dotnet-diag/agents/optimizing-dotnet-performance.agent.md

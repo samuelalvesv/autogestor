@@ -1,0 +1,1 @@
+../vendor/dotnet-skills/plugins/dotnet-test/agents/test-quality-auditor.agent.md
