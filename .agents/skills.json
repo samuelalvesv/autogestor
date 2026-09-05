@@ -1,0 +1,118 @@
+{
+  "entries": [
+    {
+      "path": ".agents/vendor/dotnet-skills/plugins/dotnet-diag/skills",
+      "include_only": [
+        "analyzing-dotnet-performance",
+        "microbenchmarking",
+        "dotnet-trace-collect",
+        "dump-collect"
+      ],
+      "exclude": [
+        "android-tombstone-symbolication",
+        "apple-crash-symbolication",
+        "clr-activation-debugging"
+      ]
+    },
+    {
+      "path": ".agents/vendor/dotnet-skills/plugins/dotnet-msbuild/skills",
+      "include_only": [
+        "msbuild-antipatterns",
+        "including-generated-files",
+        "incremental-build",
+        "directory-build-organization",
+        "binlog-failure-analysis",
+        "binlog-generation",
+        "copy-to-output-directory",
+        "check-bin-obj-clash"
+      ],
+      "exclude": [
+        "build-parallelism",
+        "build-perf-baseline",
+        "build-perf-diagnostics",
+        "eval-performance",
+        "extension-points",
+        "item-management",
+        "msbuild-modernization",
+        "msbuild-server",
+        "property-patterns",
+        "resolve-project-references",
+        "target-authoring"
+      ]
+    },
+    {
+      "path": ".agents/vendor/dotnet-skills/plugins/dotnet-test/skills",
+      "include_only": [
+        "test-anti-patterns",
+        "test-analysis-extensions",
+        "assertion-quality",
+        "coverage-analysis",
+        "crap-score",
+        "find-untested-sources",
+        "test-gap-analysis"
+      ],
+      "exclude": [
+        "code-testing-agent",
+        "code-testing-extensions",
+        "detect-static-dependencies",
+        "filter-syntax",
+        "generate-testability-wrappers",
+        "grade-tests",
+        "migrate-static-to-wrapper",
+        "mtp-hot-reload",
+        "platform-detection",
+        "run-tests",
+        "scaffold-dotnet-test-project",
+        "test-smell-detection",
+        "test-tagging",
+        "testability-obstacle",
+        "writing-mstest-tests"
+      ]
+    },
+    {
+      "path": ".agents/vendor/dotnet-skills/plugins/dotnet-upgrade/skills",
+      "include_only": [
+        "migrate-nullable-references",
+        "dotnet-aot-compat",
+        "migrate-dotnet9-to-dotnet10"
+      ],
+      "exclude": [
+        "migrate-dotnet10-to-dotnet11",
+        "migrate-dotnet8-to-dotnet9",
+        "thread-abort-migration"
+      ]
+    },
+    {
+      "path": ".agents/vendor/dotnet-skills/plugins/dotnet-test-migration/skills",
+      "include_only": [
+        "migrate-xunit-to-xunit-v3",
+        "migrate-vstest-to-mtp"
+      ],
+      "exclude": [
+        "migrate-mstest-v1v2-to-v3",
+        "migrate-mstest-v3-to-v4",
+        "migrate-xunit-to-mstest"
+      ]
+    },
+    {
+      "path": ".agents/vendor/dotnet-skills/plugins/dotnet-template-engine/skills",
+      "include_only": [
+        "template-instantiation"
+      ],
+      "exclude": [
+        "template-authoring",
+        "template-comparison",
+        "template-discovery",
+        "template-smart-defaults",
+        "template-validation"
+      ]
+    },
+    {
+      "path": ".agents/vendor/postgres-skills/skills",
+      "include_only": [
+        "postgres-best-practices"
+      ],
+      "exclude": []
+    }
+  ]
+}

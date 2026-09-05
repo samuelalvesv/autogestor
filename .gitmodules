@@ -4,3 +4,9 @@
 [submodule ".agents/vendor/ponytail"]
 	path = .agents/vendor/ponytail
 	url = https://github.com/dietrichgebert/ponytail.git
+[submodule ".agents/vendor/agent-skills"]
+	path = .agents/vendor/agent-skills
+	url = https://github.com/neondatabase/agent-skills.git
+[submodule ".agents/vendor/postgres-skills"]
+	path = .agents/vendor/postgres-skills
+	url = https://github.com/neondatabase/postgres-skills.git
