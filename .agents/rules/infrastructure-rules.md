@@ -24,4 +24,6 @@ applyTo: "src/Autogestor.Infrastructure/**/*.cs"
 - **Tipos de Coluna (PostgreSQL)**:
   - **Data e Hora**: Mapear propriedades `DateTime` com o tipo de coluna `"timestamptz"` para suporte correto a UTC global.
   - **Texto**: Mapear propriedades string com o tipo de coluna `"text"`.
+- **Ciclo de Vida e Registro de Interceptadores**: Interceptadores do EF Core que dependem de serviços com ciclo de vida com escopo devem ser registrados obrigatoriamente no contêiner de injeção de dependência e resolvidos dinamicamente na configuração do contexto de banco de dados. É proibido instanciá-los manualmente com operador de instanciação direta ou mantê-los como campos estáticos no contexto.
+- **Desacoplamento de Entidades em Interceptadores**: Interceptadores de infraestrutura devem operar exclusivamente sobre contratos ou classes base genéricas de domínio. É estritamente proibido acoplar a execução a tipos concretos, verificações de tipos derivados ou condicionais específicos para entidades individuais.
 - **Isolamento de Banco (Multi-tenant)**: Consultar regra `identity-multitenancy` para detalhes de filtros globais.
