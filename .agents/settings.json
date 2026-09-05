@@ -5,6 +5,8 @@
       "read_url(https://learn.microsoft.com/en-us/docs)",
       "command(rtk dotnet build)",
       "command(rtk dotnet build *)",
+      "command(rtk dotnet clean)",
+      "command(rtk dotnet clean *)",
       "command(rtk dotnet format)",
       "command(rtk dotnet format *)",
       "command(rtk dotnet restore)",
@@ -19,8 +21,8 @@
       "command(rtk git status *)"
     ],
     "ask": [
-      "command(rtk rm *)",
-      "command(rtk rm)"
+      "command(rtk rm)",
+      "command(rtk rm *)"
     ],
     "deny": [
       "command(git add)",
