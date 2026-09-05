@@ -15,23 +15,23 @@ public class ResponseTests
         };
 
         // Assert
-        Assert.Equal("test-data", response.Data);
-        Assert.Equal("Operation successful", response.Message);
+        Assert.Equal(expected: "test-data", actual: response.Data);
+        Assert.Equal(expected: "Operation successful", actual: response.Message);
     }
 
     [Fact]
-    public void Response_ShouldAllowExplicitNulls()
+    public void Response_WithNullData_ShouldAllowNullData()
     {
         // Act
         var response = new Response<string?>
         {
             Data = null,
-            Message = null
+            Message = "Sem dados"
         };
 
         // Assert
-        Assert.Null(response.Data);
-        Assert.Null(response.Message);
+        Assert.Null(@object: response.Data);
+        Assert.Equal(expected: "Sem dados", actual: response.Message);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class ResponseTests
         };
 
         // Assert
-        Assert.Equal(42, response.Data);
-        Assert.Equal("Created", response.Message);
+        Assert.Equal(expected: 42, actual: response.Data);
+        Assert.Equal(expected: "Created", actual: response.Message);
     }
 }

@@ -13,4 +13,5 @@ applyTo: "test/Autogestor.UnitTests/**/*.cs"
 - **TDD (Test-Driven Development)**: Aplicar TDD rigoroso para novas regras de domínio e fluxos de aplicação.
   - Ciclo: Escrever o teste que falha (Red) ➜ Escrever o código mínimo para passar (Green) ➜ Refatorar o código (Refactor).
 - **CancellationToken**: Sempre passar `CancellationToken.None` ou testar fluxos de cancelamento nos Handlers assíncronos.
+- **Princípio YAGNI e Eficiência de Testes**: É estritamente proibido criar testes unitários para validar comportamentos, restrições ou garantias nativas da linguagem C#, do compilador, do sistema de tipos ou do container de injeção de dependência. Todo teste deve validar exclusivamente comportamento observável de negócio, invariantes de domínio, orquestração de casos de uso e cenários de borda com relevância funcional.
 - **Performance**: Todos os testes devem ser extremamente rápidos (rodando em poucos milissegundos).

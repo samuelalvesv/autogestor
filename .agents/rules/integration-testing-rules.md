@@ -12,3 +12,4 @@ applyTo: "test/Autogestor.IntegrationTests/**/*.cs"
 - **Sem Mocks para Banco**: Proibido mockar o `DbContext` ou as classes de repositórios. O objetivo é testar a integração real.
 - **Isolamento de Estado**: Cada teste deve garantir a limpeza ou reversão de dados criados para que a execução de um teste não afete o resultado do próximo.
 - **Tratamento de Cancelamento**: Validar que os métodos de infraestrutura e controladores propagam e respeitam o `CancellationToken` quando requisitado.
+- **Princípio YAGNI e Escopo Real**: Focar estritamente em integrações reais (queries no banco, persistência, interceptors e fluxos ponta a ponta). É proibido criar testes de integração para checagens sintáticas, validações de nulidade já garantidas pelo framework ou comportamentos intrínsecos do C#.

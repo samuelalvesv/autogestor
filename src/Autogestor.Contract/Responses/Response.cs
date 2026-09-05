@@ -9,5 +9,5 @@ public sealed record Response<T>
     public required T? Data { get; init; }
 
     [DataMember(Order = 2)]
-    public required string? Message { get; init; }
+    public required string Message { get; init; }
 }

@@ -17,19 +17,19 @@ public class PagedResponseTests
         var pagedResponse = new PagedResponse<string>
         {
             Data = ["item1", "item2"],
-            Message = null,
+            Message = "Sucesso",
             TotalCount = totalCount,
             PageNumber = 1,
             PageSize = pageSize
         };
 
         // Assert
-        Assert.Equal(expectedTotalPages, pagedResponse.TotalPage);
-        Assert.Equal(totalCount, pagedResponse.TotalCount);
-        Assert.Equal(1, pagedResponse.PageNumber);
-        Assert.Equal(pageSize, pagedResponse.PageSize);
-        Assert.NotNull(pagedResponse.Data);
-        Assert.Equal(2, pagedResponse.Data.Count);
+        Assert.Equal(expected: expectedTotalPages, actual: pagedResponse.TotalPage);
+        Assert.Equal(expected: totalCount, actual: pagedResponse.TotalCount);
+        Assert.Equal(expected: 1, actual: pagedResponse.PageNumber);
+        Assert.Equal(expected: pageSize, actual: pagedResponse.PageSize);
+        Assert.NotNull(@object: pagedResponse.Data);
+        Assert.Equal(expected: 2, actual: pagedResponse.Data.Count);
     }
 
     [Fact]
@@ -39,19 +39,19 @@ public class PagedResponseTests
         var pagedResponse = new PagedResponse<object?>
         {
             Data = null,
-            Message = null,
+            Message = "Sem dados",
             TotalCount = 0,
             PageNumber = 1,
             PageSize = 25
         };
 
         // Assert
-        Assert.Null(pagedResponse.Data);
-        Assert.Null(pagedResponse.Message);
-        Assert.Equal(0, pagedResponse.TotalCount);
-        Assert.Equal(1, pagedResponse.PageNumber);
-        Assert.Equal(25, pagedResponse.PageSize);
-        Assert.Equal(0, pagedResponse.TotalPage);
+        Assert.Null(@object: pagedResponse.Data);
+        Assert.Equal(expected: "Sem dados", actual: pagedResponse.Message);
+        Assert.Equal(expected: 0, actual: pagedResponse.TotalCount);
+        Assert.Equal(expected: 1, actual: pagedResponse.PageNumber);
+        Assert.Equal(expected: 25, actual: pagedResponse.PageSize);
+        Assert.Equal(expected: 0, actual: pagedResponse.TotalPage);
     }
 
     [Fact]
@@ -68,8 +68,8 @@ public class PagedResponseTests
         };
 
         // Assert
-        Assert.Equal("List loaded", pagedResponse.Message);
-        Assert.NotNull(pagedResponse.Data);
-        Assert.Single(pagedResponse.Data);
+        Assert.Equal(expected: "List loaded", actual: pagedResponse.Message);
+        Assert.NotNull(@object: pagedResponse.Data);
+        Assert.Single(collection: pagedResponse.Data);
     }
 }
