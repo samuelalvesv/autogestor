@@ -9,7 +9,7 @@ public sealed record PagedResponse<T>
     public required IReadOnlyList<T>? Data { get; init; }
 
     [DataMember(Order = 2)]
-    public required string? Message { get; init; }
+    public required string Message { get; init; }
 
     [DataMember(Order = 3)]
     public required int TotalCount { get; init; }

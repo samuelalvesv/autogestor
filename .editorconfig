@@ -236,8 +236,9 @@ csharp_style_prefer_not_pattern = true:warning
 # --------------------------------------------------------------------------
 # 13. BLOCOS DE CÓDIGO
 # --------------------------------------------------------------------------
-# IDE0011 — Exigir chaves apenas para blocos multilinha e omitir em instruções de linha única
-csharp_prefer_braces = when_multiline:warning
+# IDE0011 — Omitir chaves em instruções de linha única
+csharp_prefer_braces = false:warning
+dotnet_diagnostic.IDE0011.severity = warning
 
 # IDE0063 — Usar using simplificado
 csharp_prefer_simple_using_statement = true:warning
@@ -535,10 +536,11 @@ dotnet_naming_style.end_with_async.capitalization = pascal_case
 # ==========================================================================
 
 # --- Confiabilidade ---
-dotnet_diagnostic.CA2007.severity = warning    # Não chamar await diretamente em Task sem ConfigureAwait (library)
+dotnet_diagnostic.CA2007.severity = none       # Desabilitado: ASP.NET Core e serviços modernos no .NET 10 não possuem SynchronizationContext
 dotnet_diagnostic.CA2008.severity = warning    # Não criar tasks sem TaskScheduler
 dotnet_diagnostic.CA2012.severity = warning    # Usar ValueTask corretamente
 dotnet_diagnostic.CA2013.severity = warning    # Não usar ReferenceEquals com value types
+dotnet_diagnostic.CA2016.severity = warning    # Propagar CancellationToken para métodos que o aceitam
 
 # --- Performance ---
 dotnet_diagnostic.CA1822.severity = warning    # Marcar membros como static
@@ -677,3 +679,11 @@ dotnet_diagnostic.CA1311.severity = warning    # Especificar cultura ou usar ver
 [**/Migrations/**.cs]
 generated_code = true
 charset = unset
+
+# ==========================================================================
+# 24. TESTES (UNIT, INTEGRATION, ARCHITECTURE)
+# ==========================================================================
+# Permite a convenção canônica de nomenclatura de testes: Metodo_Cenario_ResultadoEsperado
+[test/**.cs]
+dotnet_diagnostic.IDE1006.severity = none
+

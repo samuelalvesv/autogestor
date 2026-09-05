@@ -6,23 +6,25 @@ applyTo: "**/*.{cs,razor}"
 
 # Convenções de Código C#
 
+> O arquivo `.editorconfig` na raiz do repositório é a fonte única de verdade para estilo de escrita de código, formatação, regras de chaves, espaçamento, nomenclatura e analisadores do Roslyn. Este documento especifica exclusivamente diretrizes arquiteturais, semânticas de design e decisões que o `.editorconfig` não é capaz de validar nativamente.
+
 ## Convenções Gerais
 
 - Usar `record` para DTOs e Value Objects imutáveis.
 - Usar `sealed class` por padrão; remover `sealed` apenas se herança for intencional.
 - Nunca instanciar dependências com `new`; sempre usar injeção de dependência.
-- Nomes de interfaces começam com `I` (ex: `IOrderRepository`).
-- **Programação Assíncrona**: Usar obrigatoriamente `async`/`await` de ponta a ponta para todas as operações de I/O e tarefas concorrentes.
-- **Propagação de Cancelamento**: Todos os métodos assíncronos (Endpoints da API, Request Handlers e chamadas de I/O no banco/HTTP) devem obrigatoriamente aceitar e propagar um `CancellationToken` para evitar retenção de recursos no servidor.
+- **Programação Assíncrona**: Usar obrigatoriamente `async`/`await` de ponta a ponta para operações assíncronas que executam processamento local ou manipulação de recursos. Métodos que realizam estritamente o repasse direto de chamadas (sem blocos de controle locais, capturas de exceção ou descarte de recursos no escopo) devem retornar a tarefa diretamente sem a sobrecarga da máquina de estados assíncrona.
+- **Propagação de CancellationToken**: Métodos assíncronos devem configurar o token de cancelamento como parâmetro opcional com valor padrão (`default`). É estritamente proibida a invocação manual de `ThrowIfCancellationRequested()` em camadas de orquestração (use cases, serviços e repositórios), delegando a interrupção exclusivamente às operações nativas da BCL e do EF Core através da propagação direta do token.
 - **Tratamento de Exceções Nativo**: O handler de exceções globais mencionado nos wrappers deve ser implementado utilizando a interface nativa `IExceptionHandler` (disponível a partir do .NET 8), evitando middlewares customizados pesados.
 - **Performance de Alocação**: Em métodos assíncronos que possuem caminhos de execução síncronos frequentes (como checagem de cache ou validações em memória rápidos), preferir `ValueTask` ou `ValueTask<T>` ao invés de `Task` para reduzir alocações na Heap.
 - **Tratamento de Data/Hora (UTC)**: É obrigatório instanciar e manipular valores de data e hora sempre em formato UTC na aplicação (ex: utilizando `DateTime.UtcNow`). Para regras de mapeamento de persistência, consultar o README da infraestrutura.
 - **Ferramentas e Bibliotecas**: Adotar exclusivamente tecnologias open source consolidadas e amplamente validadas pela comunidade do .NET.
-- **Desacoplamento e Reuso (Wrappers)**:
-  - Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
+- **Desacoplamento e Reuso (Wrappers)**: Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
 - **Validação Estática em Tempo de Compilação**: Preferir sempre que possível a validação estática de código, detectando erros em tempo de compilação ao invés de em tempo de execução. Isso inclui: uso de tipos fortes ao invés de `string`/`object` genéricos, atributos de análise estática (`[NotNullWhen]`, `[MemberNotNull]`, `[StringSyntax]`), `const` e `readonly` para imutabilidade verificável pelo compilador, nullable reference types habilitados (`<Nullable>enable</Nullable>`), e warnings tratados como erros (`<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`) para impedir que avisos de análise sejam ignorados.
-- **Guard Clauses e Blocos Condicionais**: Utilizar guard clauses explícitas (`if (...) throw ...`) sem chaves para validações de instrução única e fail-fast no início dos métodos/fábricas, evitando encadeamentos aninhados de operadores ternários com `throw`.
-- **Qualidade de Código e Roslyn**: Forçar padrões rígidos de qualidade, estilo de escrita e formatação de código C# utilizando analisadores do Roslyn configurados via arquivo `.editorconfig` na raiz da solução.
+- **Contratos de Contexto Fortes e Falha Rápida (Fail-Fast)**: Contratos de contexto de execução obrigatório devem expor tipos de valor não anuláveis. É proibido mascarar ausência de contexto com tipos anuláveis ou valores sentinela padrão que ocultem estados inválidos. Implementações de contexto devem falhar imediatamente ao serem consumidas fora do estado de execução esperado.
+- **Primary Constructors e Injeção de Dependência**: Utilizar os parâmetros de *primary constructor* diretamente no corpo dos métodos da classe, sem criar campos privados extras nem verificações defensivas de nulidade para dependências resolvidas pelo container de injeção de dependência.
+- **Sem Validações Defensivas Redundantes (Anti-Overengineering / YAGNI)**: Proibido adicionar verificações defensivas de nulidade quando essa garantia já for fornecida pelo pipeline do framework, pelo sistema de tipos ou por camadas precedentes. A validação de dados de negócio deve residir de forma única e centralizada na camada de Aplicação/Domínio, sem duplicações em camadas intermediárias.
+- **Argumentos Nomeados Obrigatórios**: É estritamente obrigatório utilizar argumentos nomeados em todas as invocações de construtores, métodos, funções e instanciações sempre que a sintaxe da linguagem permitir essa opção. É proibido o uso de argumentos posicionais quando houver a possibilidade de passá-los de forma nomeada, maximizando a clareza semântica e prevenindo erros de inversão de parâmetros.
 
 ## Diretrizes de Otimização e Performance
 
@@ -33,5 +35,3 @@ applyTo: "**/*.{cs,razor}"
 - **Estruturas de Dados e Passagem por Referência**:
   - Utilizar `readonly struct` para criar tipos de valor imutáveis que não necessitam de alocações na Heap.
   - Ao passar structs grandes como argumentos de método para evitar a cópia de seus dados na Stack, utilizar o modificador de parâmetro `in` (passagem por referência somente leitura).
-- **Desvirtualização e Inlining**:
-  - Utilizar `sealed class` por padrão para permitir que o compilador JIT realize desvirtualização de chamadas e otimizações de *inlining* agressivas.
