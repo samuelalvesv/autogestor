@@ -21,14 +21,14 @@ public class TenantEntityInterceptorTests(PostgreSqlFixture fixture)
             description: "Gadgets e informática");
 
         // Act
-        await context.Categories.AddAsync(entity: category);
-        await context.SaveChangesAsync();
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(expected: tenantId, actual: category.TenantId);
 
         await using AppDbContext verifyContext = fixture.CreateContext(tenantContext: tenantContext);
-        Category? persisted = await verifyContext.Categories.FirstOrDefaultAsync(predicate: c => c.Id == category.Id);
+        Category? persisted = await verifyContext.Categories.FirstOrDefaultAsync(predicate: c => c.Id == category.Id, cancellationToken: TestContext.Current.CancellationToken);
         Assert.NotNull(@object: persisted);
         Assert.Equal(expected: tenantId, actual: persisted.TenantId);
     }
@@ -45,18 +45,18 @@ public class TenantEntityInterceptorTests(PostgreSqlFixture fixture)
             title: "Móveis",
             description: "Mobiliário para escritório");
 
-        await context.Categories.AddAsync(entity: category);
-        await context.SaveChangesAsync();
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - Tenta alterar o TenantId diretamente via Entry
         var maliciousTenantId = Guid.NewGuid();
         context.Entry(entity: category).Property(propertyExpression: c => c.TenantId).CurrentValue = maliciousTenantId;
         context.Entry(entity: category).State = EntityState.Modified;
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - O interceptador deve ter marcado IsModified = false para o TenantId
         await using AppDbContext verifyContext = fixture.CreateContext(tenantContext: tenantContext);
-        Category? persisted = await verifyContext.Categories.FirstOrDefaultAsync(predicate: c => c.Id == category.Id);
+        Category? persisted = await verifyContext.Categories.FirstOrDefaultAsync(predicate: c => c.Id == category.Id, cancellationToken: TestContext.Current.CancellationToken);
         Assert.NotNull(@object: persisted);
         Assert.Equal(expected: originalTenantId, actual: persisted.TenantId);
     }
@@ -72,11 +72,11 @@ public class TenantEntityInterceptorTests(PostgreSqlFixture fixture)
             title: "Livros",
             description: "Livros técnicos");
 
-        await context.Categories.AddAsync(entity: category);
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act & Assert
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            testCode: () => context.SaveChangesAsync());
+            testCode: () => context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(
             expected: "Não é possível salvar entidades com escopo de tenant sem um identificador de tenant válido.",
             actual: exception.Message);
@@ -95,6 +95,6 @@ public class TenantEntityInterceptorTests(PostgreSqlFixture fixture)
         await using AppDbContext context = fixture.CreateContext(tenantContext: tenantContext);
 
         // Act & Assert - salvar sem entidades adicionadas não deve acessar tenantContext.TenantId
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
     }
 }

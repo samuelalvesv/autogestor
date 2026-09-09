@@ -24,13 +24,13 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
             description: "Supermercados e restaurantes");
 
         // Act
-        await repository.AddAsync(category: category);
-        await context.SaveChangesAsync();
+        await repository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - consulta em novo contexto sem cache com o mesmo tenant
         await using AppDbContext verifyContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var verifyRepo = new CategoryRepository(context: verifyContext);
-        Category? persisted = await verifyRepo.GetByIdAsync(id: category.Id);
+        Category? persisted = await verifyRepo.GetByIdAsync(id: category.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotNull(@object: persisted);
         Assert.Equal(expected: category.Id, actual: persisted.Id);
@@ -55,14 +55,14 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
         var cat1 = Category.Create(title: "Cat 1", description: "Desc 1");
         var cat2 = Category.Create(title: "Cat 2", description: "Desc 2");
 
-        await repository.AddAsync(category: cat1);
-        await repository.AddAsync(category: cat2);
-        await context.SaveChangesAsync();
+        await repository.AddAsync(category: cat1, cancellationToken: TestContext.Current.CancellationToken);
+        await repository.AddAsync(category: cat2, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta em novo contexto com o mesmo tenant
         await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var queryRepo = new CategoryRepository(context: queryContext);
-        IReadOnlyList<Category> all = await queryRepo.GetAllAsync();
+        IReadOnlyList<Category> all = await queryRepo.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Contains(collection: all, filter: c => c.Id == cat1.Id);
@@ -81,14 +81,14 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
         await using AppDbContext contextTenant1 = fixture.CreateContext(tenantContext: tenantContext1);
         var repoTenant1 = new CategoryRepository(context: contextTenant1);
         var catTenant1 = Category.Create(title: "Cat Tenant 1", description: "Desc");
-        await repoTenant1.AddAsync(category: catTenant1);
-        await contextTenant1.SaveChangesAsync();
+        await repoTenant1.AddAsync(category: catTenant1, cancellationToken: TestContext.Current.CancellationToken);
+        await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta com o contexto do Tenant 2
         await using AppDbContext contextTenant2 = fixture.CreateContext(tenantContext: tenantContext2);
         var repoTenant2 = new CategoryRepository(context: contextTenant2);
-        IReadOnlyList<Category> categoriesTenant2 = await repoTenant2.GetAllAsync();
-        Category? categoryById = await repoTenant2.GetByIdAsync(id: catTenant1.Id);
+        IReadOnlyList<Category> categoriesTenant2 = await repoTenant2.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+        Category? categoryById = await repoTenant2.GetByIdAsync(id: catTenant1.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - isolamento absoluto garantido por Global Query Filter
         Assert.DoesNotContain(collection: categoriesTenant2, filter: c => c.Id == catTenant1.Id);

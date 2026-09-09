@@ -2,6 +2,7 @@
 # Descarta arquivos de compilação do .NET
 bin/
 obj/
+TestResults/
 
 ## [Visual Studio / VS Code / Rider]
 # Configurações locais de IDEs

@@ -16,7 +16,7 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
 
     private string ConnectionString => _container.GetConnectionString();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
 
@@ -24,7 +24,7 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
         await context.Database.EnsureCreatedAsync();
     }
 
-    public Task DisposeAsync() => _container.DisposeAsync().AsTask();
+    public ValueTask DisposeAsync() => _container.DisposeAsync();
 
     public AppDbContext CreateContext() =>
         CreateContext(userContext: new UserContextFake(), tenantContext: new TenantContextFake());

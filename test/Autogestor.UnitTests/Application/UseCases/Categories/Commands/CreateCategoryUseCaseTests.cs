@@ -74,7 +74,9 @@ public class CreateCategoryUseCaseTests
         };
 
         // Act
-        Response<CategoryResponse> response = await useCase.ExecuteAsync(request: request);
+        Response<CategoryResponse> response = await useCase.ExecuteAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
@@ -116,7 +118,9 @@ public class CreateCategoryUseCaseTests
 
         // Act & Assert
         ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
-            testCode: () => useCase.ExecuteAsync(request: request));
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(expected: "title", actual: exception.ParamName);
         Assert.Equal(expected: "O título da categoria não pode ser vazio. (Parameter 'title')", actual: exception.Message);
         Assert.Empty(collection: repository.Categories);
@@ -144,7 +148,9 @@ public class CreateCategoryUseCaseTests
 
         // Act & Assert
         ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
-            testCode: () => useCase.ExecuteAsync(request: request));
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(expected: "description", actual: exception.ParamName);
         Assert.Equal(expected: "A descrição da categoria não pode ser vazia. (Parameter 'description')", actual: exception.Message);
         Assert.Empty(collection: repository.Categories);

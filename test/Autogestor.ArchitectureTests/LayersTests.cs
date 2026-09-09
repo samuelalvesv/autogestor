@@ -1,5 +1,6 @@
 using System.Reflection;
 using NetArchTest.Rules;
+using TestResult = NetArchTest.Rules.TestResult;
 
 namespace Autogestor.ArchitectureTests;
 

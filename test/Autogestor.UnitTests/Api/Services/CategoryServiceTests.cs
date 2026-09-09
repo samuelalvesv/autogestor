@@ -61,7 +61,9 @@ public class CategoryServiceTests
         useCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await service.CreateAsync(request: request);
+        Response<CategoryResponse> response = await service.CreateAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
@@ -109,20 +111,23 @@ public class CategoryServiceTests
             request: new DeleteCategoryRequest
             {
                 Id = Guid.NewGuid()
-            });
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         PagedResponse<CategoryResponse> getAllResponse = await service.GetAllAsync(
             request: new GetAllCategoriesRequest
             {
                 PageNumber = 1,
                 PageSize = 10
-            });
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Response<CategoryResponse> getByIdResponse = await service.GetByIdAsync(
             request: new GetCategoryByIdRequest
             {
                 Id = Guid.NewGuid()
-            });
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Response<CategoryResponse> updateResponse = await service.UpdateAsync(
             request: new UpdateCategoryRequest
@@ -130,7 +135,8 @@ public class CategoryServiceTests
                 Id = Guid.NewGuid(),
                 Title = "Educação",
                 Description = "Livros"
-            });
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(expected: "Implementação pendente.", actual: deleteResponse.Message);

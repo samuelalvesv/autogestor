@@ -37,8 +37,8 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
         var category = Category.Create(
             title: "Transporte",
             description: "Combustível");
-        await context.Categories.AddAsync(entity: category);
-        await context.SaveChangesAsync();
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotEqual(expected: default, actual: category.CreatedAt);
         Assert.Null(@object: category.UpdatedAt);
@@ -56,8 +56,8 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
         var category = Category.Create(
             title: "Saúde",
             description: "Remédios");
-        await context.Categories.AddAsync(entity: category);
-        await context.SaveChangesAsync();
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         DateTime createdAt = category.CreatedAt;
 
@@ -68,7 +68,7 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
         context.Entry(entity: category).Property(propertyExpression: c => c.CreatedAt).CurrentValue = DateTime.UtcNow.AddDays(value: -10);
         context.Entry(entity: category).Property(propertyExpression: c => c.CreatedBy).CurrentValue = Guid.NewGuid();
         context.Entry(entity: category).State = EntityState.Modified;
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(expected: createdAt, actual: category.CreatedAt);
         Assert.Equal(expected: initialUser, actual: category.CreatedBy);

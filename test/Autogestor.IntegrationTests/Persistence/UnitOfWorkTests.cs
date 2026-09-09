@@ -14,7 +14,7 @@ public class UnitOfWorkTests(PostgreSqlFixture fixture)
         await using AppDbContext context = fixture.CreateContext();
         var unitOfWork = new UnitOfWork(context: context);
 
-        await unitOfWork.CommitAsync();
+        await unitOfWork.CommitAsync(cancellationToken: TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -31,15 +31,16 @@ public class UnitOfWorkTests(PostgreSqlFixture fixture)
         var category = Category.Create(
             title: "UnitOfWork Test",
             description: "Testando commit real no banco");
-        await context.Categories.AddAsync(entity: category);
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
-        await unitOfWork.CommitAsync();
+        await unitOfWork.CommitAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         await using AppDbContext verifyContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         Category? persisted = await verifyContext.Categories.AsNoTracking().FirstOrDefaultAsync(
-            predicate: c => c.Id == category.Id);
+            predicate: c => c.Id == category.Id,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotNull(@object: persisted);
         Assert.Equal(expected: "UnitOfWork Test", actual: persisted.Title);
@@ -55,7 +56,7 @@ public class UnitOfWorkTests(PostgreSqlFixture fixture)
         var category = Category.Create(
             title: "Test",
             description: "Description");
-        await context.Categories.AddAsync(entity: category);
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
 
         using var cts = new CancellationTokenSource();
         cts.Cancel();
