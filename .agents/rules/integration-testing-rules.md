@@ -15,3 +15,20 @@ applyTo: "test/Autogestor.IntegrationTests/**/*.cs"
 - **Princípio YAGNI e Escopo Real**: Focar estritamente em integrações reais (queries no banco, persistência, interceptors e fluxos ponta a ponta). É proibido criar testes de integração para checagens sintáticas, validações de nulidade já garantidas pelo framework ou comportamentos intrínsecos do C#.
 - **Convenção de Nomenclatura para Recursos Compartilhados**: Classes responsáveis pela inicialização e gerenciamento do ciclo de vida de contêineres e dependências externas compartilhadas devem utilizar obrigatoriamente o sufixo `Fixture`.
 - **Escopo Exclusivo de Infraestrutura Real**: Este projeto é reservado estritamente para validações que exigem a integração efetiva com recursos reais em contêineres. É expressamente proibido alocar neste projeto testes que utilizem dublês de repositório em substituição ao banco de dados ou testes unitários de regras lógicas que não exerçam persistência real.
+
+## Ferramentas
+
+- **Plugin `dotnet-test`**:
+  - Subagente `test-quality-auditor`: Auditoria da suíte de testes de integração e robustez dos fluxos ponta a ponta.
+  - Skills `test-anti-patterns`, `assertion-quality`: Diagnóstico de fragilidades e validação de estado efetivamente persistido no banco.
+  - Skills `test-gap-analysis`, `test-analysis-extensions`: Análise de mutações e extensões de asserções em fluxos integrados.
+  - Skills `find-untested-sources`, `coverage-analysis`: Mapeamento de repositórios e interceptadores sem cobertura de integração.
+- **Plugin `dotnet-data`**:
+  - Skill `optimizing-ef-core-queries`: Inspeção do SQL gerado nas consultas de integração para evitar queries lentas e múltiplos round-trips.
+- **Plugin `dotnet-experimental`**:
+  - Skill `exp-test-maintainability`: Reutilização limpa e redução de duplicação de setup em classes de `Fixture`.
+- **Submódulo `postgres-skills`**:
+  - Skill `postgres-best-practices`: Validação das definições de tabelas, índices e tipos de dados no PostgreSQL do Testcontainers.
+- **Submódulo `agent-skills`**:
+  - Skill `neon-postgres-branches`: Criação de branches efêmeras de banco para simular e validar migrações e persistência de integração.
+  - Servidor MCP `neon`: Comparação entre os mapeamentos executados no Testcontainers e o schema esperado no Lakebase Postgres.

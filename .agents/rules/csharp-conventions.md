@@ -35,3 +35,18 @@ applyTo: "**/*.{cs,razor}"
 - **Estruturas de Dados e Passagem por Referência**:
   - Utilizar `readonly struct` para criar tipos de valor imutáveis que não necessitam de alocações na Heap.
   - Ao passar structs grandes como argumentos de método para evitar a cópia de seus dados na Stack, utilizar o modificador de parâmetro `in` (passagem por referência somente leitura).
+
+## Ferramentas
+
+- **Plugin `dotnet-diag`**:
+  - Subagente `optimizing-dotnet-performance`: Diagnóstico profundo em duas etapas (análise direta de gargalos e varredura do catálogo de anti-patterns).
+  - Skill `analyzing-dotnet-performance`: Varredura estática de anti-patterns em async, memória, strings, coleções, LINQ e I/O.
+  - Skill `microbenchmarking`: Metodologia e execução de benchmarks empíricos com BenchmarkDotNet.
+  - Skills `dotnet-trace-collect`, `dump-collect`: Coleta de traces de execução e memory dumps para diagnosticar hotspots.
+- **Plugin `dotnet-upgrade`**:
+  - Skill `dotnet-aot-compat`: Eliminação de reflexão dinâmica e garantia de compatibilidade com Native AOT e trimming.
+  - Skill `migrate-nullable-references`: Aderência estrita a tipos anuláveis (NRTs) e resolução de avisos em tempo de compilação.
+- **Plugin `dotnet-msbuild`**:
+  - Skill `including-generated-files`: Suporte à compilação e inclusão correta de código produzido por Source Generators.
+- **Submódulo `ponytail`**:
+  - Skills `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`: Auditoria permanente contra over-engineering e rastreamento de débitos técnicos conscientes.

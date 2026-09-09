@@ -19,3 +19,17 @@ applyTo: "test/Autogestor.UnitTests/**/*.cs"
   - Dublês manuais devem ser inicializados em estado funcional e válido por padrão, assegurando que o contexto represente uma execução legítima e prevenindo a necessidade de código defensivo artificial no código de produção.
 - **Escopo Exclusivo em Memória**: Toda validação unitária de casos de uso, lógica de domínio e serviços de apresentação isolados via dublês deve residir obrigatoriamente neste projeto.
 - **Performance**: Todos os testes devem ser extremamente rápidos (rodando em poucos milissegundos).
+
+## Ferramentas
+
+- **Plugin `dotnet-test`**:
+  - Subagente `test-quality-auditor`: Auditoria multi-dimensional da suíte de testes xUnit, detectando fragilidades, tautologias e pontos cegos.
+  - Skills `test-anti-patterns`, `assertion-quality`: Varredura por testes com falsa confiança e diagnóstico de completude e profundidade das asserções.
+  - Skills `test-gap-analysis`, `test-analysis-extensions`: Análise de pseudo-mutação e diagnóstico aprofundado de padrões de asserção.
+  - Skills `find-untested-sources`, `coverage-analysis`, `crap-score`: Mapeamento de fontes sem teste, análise de cobertura e índice de risco CRAP.
+- **Plugin `dotnet-experimental`**:
+  - Skills `exp-mock-usage-analysis`, `exp-test-maintainability`: Auditoria de dublês de teste, eliminação de setups mortos e oportunidades de parametrização.
+- **Plugin `dotnet-test-migration`**:
+  - Skills `migrate-xunit-to-xunit-v3`, `migrate-vstest-to-mtp`: Adoção das melhores práticas modernas do ecossistema xUnit e runner de alta performance.
+- **Submódulo `ponytail`**:
+  - Skill `ponytail`: Testes unitários enxutos e focados (YAGNI), sem asserções redundantes sobre o compilador ou linguagem.

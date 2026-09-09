@@ -25,3 +25,15 @@ applyTo: "src/Autogestor.UI/**/*.{cs,razor}"
   - Não referencia pacotes específicos de hosts (`Microsoft.AspNetCore.Components.WebAssembly` ou `Microsoft.Maui`).
   - Não referencia `Autogestor.ServiceDefaults`.
   - Acesso a APIs externas/nativas deve ser feito via **interfaces** com implementação registrada via injeção de dependência pelo host final.
+
+## Ferramentas
+
+- **Plugin `dotnet-blazor`**:
+  - Skills `author-component`, `plan-ui-change`: Diretrizes de ciclo de vida de componentes Blazor, parametrização e decomposição de páginas ricas.
+  - Skills `collect-user-input`, `coordinate-components`: Formulários, validações, binding de dados e compartilhamento de estado desacoplado.
+  - Skills `fetch-and-send-data`, `support-prerendering`: Ciclo de carregamento assíncrono de contratos e prevenção de flicker no prerender.
+  - Skill `use-js-interop`: Padrões seguros de interoperação com JavaScript e descarte assíncrono de referências.
+- **Plugin `dotnet-data`**:
+  - Skill `create-datadriven-aspnetcore`: Scaffolding de formulários, tabelas e visualizações orientadas a dados integradas aos contratos.
+- **Submódulo `ponytail`**:
+  - Skill `ponytail`: UI simples e direta, priorizando os recursos nativos do MudBlazor sem complexidade de estado acidental.

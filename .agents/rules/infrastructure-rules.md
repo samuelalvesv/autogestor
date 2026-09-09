@@ -27,3 +27,20 @@ applyTo: "src/Autogestor.Infrastructure/**/*.cs"
 - **Ciclo de Vida e Registro de Interceptadores**: Interceptadores do EF Core que dependem de serviços com ciclo de vida com escopo devem ser registrados obrigatoriamente no contêiner de injeção de dependência e resolvidos dinamicamente na configuração do contexto de banco de dados. É proibido instanciá-los manualmente com operador de instanciação direta ou mantê-los como campos estáticos no contexto.
 - **Desacoplamento de Entidades em Interceptadores**: Interceptadores de infraestrutura devem operar exclusivamente sobre contratos ou classes base genéricas de domínio. É estritamente proibido acoplar a execução a tipos concretos, verificações de tipos derivados ou condicionais específicos para entidades individuais.
 - **Isolamento de Banco (Multi-tenant)**: Consultar regra `identity-multitenancy` para detalhes de filtros globais.
+
+## Ferramentas
+
+- **Plugin `dotnet-data`**:
+  - Skill `optimizing-ef-core-queries`: Otimização avançada de queries LINQ/EF Core, estratégias de consulta sem rastreamento, divisão de consultas e prevenção de consultas N+1.
+- **Plugin `dotnet-diag`**:
+  - Subagente `optimizing-dotnet-performance`: Profiling de performance em operações assíncronas de I/O, queries pesadas e pooling do DbContext.
+  - Skill `analyzing-dotnet-performance`: Detecção de anti-patterns em chamadas assíncronas de banco e consumo de memória.
+- **Submódulo `postgres-skills`**:
+  - Skill `postgres-best-practices`: Validação de tipos de dados PostgreSQL, restrições relacionais, estratégias de indexação e integridade referencial.
+- **Submódulo `agent-skills`**:
+  - Skills `neon`, `neon-postgres`, `neon-postgres-branches`: Padrões de conexão para Lakebase Postgres, pooling de conexões, scale-to-zero e isolamento em branches.
+  - Skill `neon-postgres-egress-optimizer`: Prevenção de transferência excessiva de dados de rede (egress) via projeções estritas de dados.
+  - Skills `neon-object-storage`, `neon-functions`: Armazenamento de objetos (S3/blob storage) e computação periférica integrada ao banco.
+  - Servidor MCP `neon`: Inspeção direta do schema remoto, tabelas, colunas geradas e status do banco Lakebase Postgres.
+- **Submódulo `ponytail`**:
+  - Skill `ponytail`: Repositórios enxutos e diretos com o EF Core, rejeitando Unit of Work redundante ou camadas desnecessárias.

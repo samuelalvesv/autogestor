@@ -141,3 +141,16 @@ public interface IBranchAuthorizationService
 | **Application** | `IBranchAuthorizationService`, use cases (`CreateBranchCommand`, `GrantBranchAccessCommand`, `RevokeBranchAccessCommand`), DTOs internos |
 | **Infrastructure** | `ApplicationUser : IdentityUser<Guid>`, `TenantProvider` (lê `TenantId` do cabeçalho JWT no contexto do gRPC), Global Query Filters no `DbContext`, implementação de `IBranchAuthorizationService` |
 | **Api** | Configuração do ASP.NET Identity, JWT Bearer, interceptador de resolução de tenant gRPC, Authorization Policies, mapeamento de serviços gRPC |
+
+## Ferramentas
+
+- **Plugin `dotnet-test`**:
+  - Subagente `test-quality-auditor`: Auditoria da cobertura de testes para checagens de isolamento multi-tenant e autorização por filial.
+  - Skills `assertion-quality`, `test-gap-analysis`: Verificação de impossibilidade de vazamento entre tenants e brechas de autorização.
+- **Plugin `dotnet-diag`**:
+  - Subagente `optimizing-dotnet-performance`: Avaliação do impacto de performance do middleware de resolução de tenant e Global Query Filters.
+- **Plugin `dotnet-data`**:
+  - Skill `optimizing-ef-core-queries`: Otimização de consultas indexadas com `TenantId` prevenindo table scans no PostgreSQL.
+- **Submódulo `agent-skills`**:
+  - Skill `neon-postgres-branches`: Criação de branches efêmeras de banco para simular e testar isolamento de dados com segurança total.
+  - Servidor MCP `neon`: Inspeção de colunas `tenant_id`, índices compostos e integridade relacional no Lakebase Postgres.

@@ -93,11 +93,12 @@ autogestor/
 │   ├── triggers/                         # Triggers SQL
 │   └── views/                            # Views SQL
 ├── .agents/                              # Governança, regras e inteligência para agentes AI
+│   ├── agents/                           # Subagentes especializados (performance, testes, msbuild)
 │   ├── doc/                              # Documentação de customizações e capacidades do agente
 │   ├── rules/                            # Regras de arquitetura, C#, testes, multi-tenancy e git
 │   ├── scripts/                          # Scripts de validação e CI local (ex: verify-build.sh)
-│   ├── skills/                           # Skills especializadas (ex: neon, code-review)
-│   └── workflows/                        # Workflows automatizados (ex: propagate-domain.md)
+│   ├── vendor/                           # Skills e plugins de fornecedores (dotnet, ponytail, neon)
+│   └── workflows/                        # Workflows automatizados (/code-review, /audit-tests, etc.)
 ├── AGENTS.md                             # Identidade do agente, convenções de código e diretrizes
 ├── Autogestor.slnx                       # Arquivo de solução .NET
 ├── Directory.Build.props                 # Configurações globais de compilação MSBuild
