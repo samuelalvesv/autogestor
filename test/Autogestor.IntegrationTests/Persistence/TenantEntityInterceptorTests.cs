@@ -60,4 +60,41 @@ public class TenantEntityInterceptorTests(PostgreSqlFixture fixture)
         Assert.NotNull(@object: persisted);
         Assert.Equal(expected: originalTenantId, actual: persisted.TenantId);
     }
+
+    [Fact]
+    public async Task SavingChangesAsync_WhenTenantIdIsEmpty_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var tenantContext = new TenantContextFake(tenantId: Guid.Empty);
+        await using AppDbContext context = fixture.CreateContext(tenantContext: tenantContext);
+
+        var category = Category.Create(
+            title: "Livros",
+            description: "Livros técnicos");
+
+        await context.Categories.AddAsync(entity: category);
+
+        // Act & Assert
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            testCode: () => context.SaveChangesAsync());
+        Assert.Equal(
+            expected: "Não é possível salvar entidades com escopo de tenant sem um identificador de tenant válido.",
+            actual: exception.Message);
+    }
+
+    private sealed class ThrowingTenantContextFake : Domain.Interfaces.ITenantContext
+    {
+        public Guid TenantId => throw new InvalidOperationException(message: "Contexto de tenant não deve ser acessado.");
+    }
+
+    [Fact]
+    public async Task SavingChangesAsync_WhenNoTenantEntitiesAreAdded_DoesNotAccessTenantContext()
+    {
+        // Arrange
+        var tenantContext = new ThrowingTenantContextFake();
+        await using AppDbContext context = fixture.CreateContext(tenantContext: tenantContext);
+
+        // Act & Assert - salvar sem entidades adicionadas não deve acessar tenantContext.TenantId
+        await context.SaveChangesAsync();
+    }
 }

@@ -8,40 +8,30 @@ public class GetAllCategoriesRequestTests
     [Fact]
     public void GetAllCategoriesRequest_InheritsPagedRequest_SetsPaginationDefaults()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-
         // Act
         var request = new GetAllCategoriesRequest
         {
-            UserId = userId,
             PageNumber = ContractDefaults.DefaultPageNumber,
             PageSize = ContractDefaults.DefaultPageSize
         };
 
         // Assert
-        Assert.Equal(userId, request.UserId);
-        Assert.Equal(ContractDefaults.DefaultPageNumber, request.PageNumber);
-        Assert.Equal(ContractDefaults.DefaultPageSize, request.PageSize);
+        Assert.Equal(expected: ContractDefaults.DefaultPageNumber, actual: request.PageNumber);
+        Assert.Equal(expected: ContractDefaults.DefaultPageSize, actual: request.PageSize);
     }
 
     [Fact]
     public void GetAllCategoriesRequest_AllowsCustomPaginationValues()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-
         // Act
         var request = new GetAllCategoriesRequest
         {
-            UserId = userId,
             PageNumber = 2,
             PageSize = 50
         };
 
         // Assert
-        Assert.Equal(userId, request.UserId);
-        Assert.Equal(2, request.PageNumber);
-        Assert.Equal(50, request.PageSize);
+        Assert.Equal(expected: 2, actual: request.PageNumber);
+        Assert.Equal(expected: 50, actual: request.PageSize);
     }
 }

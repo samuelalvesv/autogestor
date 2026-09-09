@@ -28,31 +28,26 @@ public sealed class TenantEntityInterceptor(ITenantContext tenantContext) : Save
 
     private void UpdateTenantEntities(DbContext context)
     {
-        Guid currentTenantId = tenantContext.TenantId;
+        var addedTenantEntries = context.ChangeTracker.Entries<TenantEntity>()
+            .Where(predicate: e => e.State == EntityState.Added)
+            .ToList();
+
+        if (addedTenantEntries.Count > 0)
+        {
+            Guid currentTenantId = tenantContext.TenantId;
+            if (currentTenantId == Guid.Empty)
+                throw new InvalidOperationException(message: "Não é possível salvar entidades com escopo de tenant sem um identificador de tenant válido.");
+
+            foreach (EntityEntry<TenantEntity> entry in addedTenantEntries)
+            {
+                entry.Property(propertyExpression: e => e.TenantId).CurrentValue = currentTenantId;
+            }
+        }
 
         foreach (EntityEntry<TenantEntity> entry in context.ChangeTracker.Entries<TenantEntity>())
         {
-            switch (entry.State)
-            {
-                case EntityState.Added:
-                    {
-                        if (entry.Entity.TenantId == Guid.Empty)
-                            entry.Property(e => e.TenantId).CurrentValue = currentTenantId;
-
-                        break;
-                    }
-                case EntityState.Modified:
-                    {
-                        entry.Property(e => e.TenantId).IsModified = false;
-                        break;
-                    }
-
-                case EntityState.Detached:
-                case EntityState.Unchanged:
-                case EntityState.Deleted:
-                default:
-                    break;
-            }
+            if (entry.State == EntityState.Modified)
+                entry.Property(propertyExpression: e => e.TenantId).IsModified = false;
         }
     }
 }

@@ -12,13 +12,13 @@ public class CategoryTests
         string description = "Test Description";
 
         // Act
-        var category = Category.Create(title, description);
+        var category = Category.Create(title: title, description: description);
 
         // Assert
-        Assert.Equal(title, category.Title);
-        Assert.Equal(description, category.Description);
-        Assert.True(category.Active); // Verify default state inherited from AuditableEntity
-        Assert.IsAssignableFrom<TenantEntity>(category);
+        Assert.Equal(expected: title, actual: category.Title);
+        Assert.Equal(expected: description, actual: category.Description);
+        Assert.True(condition: category.Active, userMessage: "A categoria deve ser criada como ativa por padrão.");
+        Assert.IsAssignableFrom<TenantEntity>(@object: category);
     }
 
     [Theory]
@@ -31,8 +31,9 @@ public class CategoryTests
         string description = "Test Description";
 
         // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(invalidTitle!, description));
-        Assert.Equal("title", exception.ParamName);
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            testCode: () => Category.Create(title: invalidTitle!, description: description));
+        Assert.Equal(expected: "title", actual: exception.ParamName);
     }
 
     [Theory]
@@ -45,7 +46,8 @@ public class CategoryTests
         string title = "Test Category";
 
         // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(title, invalidDescription!));
-        Assert.Equal("description", exception.ParamName);
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            testCode: () => Category.Create(title: title, description: invalidDescription!));
+        Assert.Equal(expected: "description", actual: exception.ParamName);
     }
 }

@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 namespace Autogestor.Contract.Requests.Categories;
 
 [DataContract]
-public sealed record DeleteCategoryRequest : Request
+public sealed record DeleteCategoryRequest
 {
-    [DataMember(Order = 2)]
+    [DataMember(Order = 1)]
     [Required(ErrorMessage = "Categoria inválida")]
     public required Guid Id { get; init; }
 }

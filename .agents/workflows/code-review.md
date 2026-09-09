@@ -113,6 +113,8 @@ Auditar o código de forma neutra e orientada aos fatos, categorizando cada acha
 
 ### 💡 4. Sugestão de Atualização de Regras / Documentação (.agents)
 - Se durante o review for identificado:
-  - Um novo padrão adotado na solução que ainda **não está documentado** nos `.md`.
-  - Uma ambiguidade entre o que as regras pedem e o que a solução precisa.
-- Apresentar a proposta de texto exata para inclusão/edição no arquivo correspondente em `.agents/rules/`.
+  - Um novo padrão ou diretriz adotada na solução que ainda **não está documentada** nos arquivos de governança.
+  - Uma ambiguidade entre o que as regras pedem e o que a arquitetura do projeto necessita.
+- Apresentar a proposta de texto para inclusão ou edição no arquivo correspondente em `.agents/rules/`.
+- **Diretriz de Agnosticismo (Conformidade com AGENTS.md)**: As propostas de alteração documental devem ser **estritamente conceituais e agnósticas de código concreto**. É expressamente proibido sugerir textos contendo menções a classes pontuais, métodos, propriedades, variáveis ou trechos de código específicos. As propostas devem expressar exclusivamente diretrizes macro, fronteiras arquiteturais, semânticas de responsabilidade por camada e invariantes de governança, prevenindo o viés de confirmação ou visão de túnel (*tunnel vision*).
+

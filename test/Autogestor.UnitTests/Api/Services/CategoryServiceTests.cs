@@ -38,8 +38,7 @@ public class CategoryServiceTests
         var request = new CreateCategoryRequest
         {
             Title = "Educação",
-            Description = "Cursos e livros",
-            UserId = Guid.NewGuid()
+            Description = "Cursos e livros"
         };
 
         var expectedResponse = new Response<CategoryResponse>
@@ -48,7 +47,7 @@ public class CategoryServiceTests
             {
                 Id = Guid.NewGuid(),
                 Active = true,
-                CreatedBy = request.UserId,
+                CreatedBy = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedBy = null,
                 UpdatedAt = null,
@@ -79,8 +78,7 @@ public class CategoryServiceTests
         var request = new CreateCategoryRequest
         {
             Title = "Saúde",
-            Description = "Farmácia e consultas",
-            UserId = Guid.NewGuid()
+            Description = "Farmácia e consultas"
         };
 
         useCaseFake.ResponseToReturn = new Response<CategoryResponse>
@@ -106,29 +104,24 @@ public class CategoryServiceTests
         var useCaseFake = new CreateCategoryUseCaseFake();
         var service = new CategoryService(createCategoryUseCase: useCaseFake);
 
-        var userId = Guid.NewGuid();
-
         // Act
         Response<DeleteResponse> deleteResponse = await service.DeleteAsync(
             request: new DeleteCategoryRequest
             {
-                Id = Guid.NewGuid(),
-                UserId = userId
+                Id = Guid.NewGuid()
             });
 
         PagedResponse<CategoryResponse> getAllResponse = await service.GetAllAsync(
             request: new GetAllCategoriesRequest
             {
                 PageNumber = 1,
-                PageSize = 10,
-                UserId = userId
+                PageSize = 10
             });
 
         Response<CategoryResponse> getByIdResponse = await service.GetByIdAsync(
             request: new GetCategoryByIdRequest
             {
-                Id = Guid.NewGuid(),
-                UserId = userId
+                Id = Guid.NewGuid()
             });
 
         Response<CategoryResponse> updateResponse = await service.UpdateAsync(
@@ -136,8 +129,7 @@ public class CategoryServiceTests
             {
                 Id = Guid.NewGuid(),
                 Title = "Educação",
-                Description = "Livros",
-                UserId = userId
+                Description = "Livros"
             });
 
         // Assert

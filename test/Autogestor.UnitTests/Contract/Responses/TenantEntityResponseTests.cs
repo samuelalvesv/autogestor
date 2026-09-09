@@ -30,13 +30,13 @@ public class TenantEntityResponseTests
         };
 
         // Assert
-        Assert.Equal(id, response.Id);
-        Assert.True(response.Active);
-        Assert.Equal(createdBy, response.CreatedBy);
-        Assert.Equal(createdAt, response.CreatedAt);
-        Assert.Equal(updatedBy, response.UpdatedBy);
-        Assert.Equal(updatedAt, response.UpdatedAt);
-        Assert.Equal(tenantId, response.TenantId);
-        Assert.IsAssignableFrom<AuditableEntityResponse>(response);
+        Assert.Equal(expected: id, actual: response.Id);
+        Assert.True(condition: response.Active, userMessage: "O DTO da entidade de tenant deve reportar estado ativo.");
+        Assert.Equal(expected: createdBy, actual: response.CreatedBy);
+        Assert.Equal(expected: createdAt, actual: response.CreatedAt);
+        Assert.Equal(expected: updatedBy, actual: response.UpdatedBy);
+        Assert.Equal(expected: updatedAt, actual: response.UpdatedAt);
+        Assert.Equal(expected: tenantId, actual: response.TenantId);
+        Assert.IsAssignableFrom<AuditableEntityResponse>(@object: response);
     }
 }

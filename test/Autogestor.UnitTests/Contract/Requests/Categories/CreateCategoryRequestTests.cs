@@ -19,18 +19,17 @@ public class CreateCategoryRequestTests
         // Arrange
         var request = new CreateCategoryRequest
         {
-            UserId = Guid.NewGuid(),
             Title = "Investimentos",
             Description = "Categoria para despesas de investimento"
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Empty(errors);
-        Assert.Equal("Investimentos", request.Title);
-        Assert.Equal("Categoria para despesas de investimento", request.Description);
+        Assert.Empty(collection: errors);
+        Assert.Equal(expected: "Investimentos", actual: request.Title);
+        Assert.Equal(expected: "Categoria para despesas de investimento", actual: request.Description);
     }
 
     [Theory]
@@ -41,16 +40,15 @@ public class CreateCategoryRequestTests
         // Arrange
         var request = new CreateCategoryRequest
         {
-            UserId = Guid.NewGuid(),
             Title = invalidTitle,
             Description = "Descrição válida da categoria"
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(errors, e => e.MemberNames.Contains(nameof(CreateCategoryRequest.Title)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(CreateCategoryRequest.Title)));
     }
 
     [Theory]
@@ -60,16 +58,15 @@ public class CreateCategoryRequestTests
         // Arrange
         var request = new CreateCategoryRequest
         {
-            UserId = Guid.NewGuid(),
             Title = "Título Válido",
             Description = shortDescription
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(errors, e => e.MemberNames.Contains(nameof(CreateCategoryRequest.Description)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(CreateCategoryRequest.Description)));
     }
 
     [Fact]
@@ -78,15 +75,14 @@ public class CreateCategoryRequestTests
         // Arrange
         var request = new CreateCategoryRequest
         {
-            UserId = Guid.NewGuid(),
             Title = "Título Válido",
             Description = new string('A', 181)
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(errors, e => e.MemberNames.Contains(nameof(CreateCategoryRequest.Description)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(CreateCategoryRequest.Description)));
     }
 }

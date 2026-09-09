@@ -30,15 +30,15 @@ public class CategoryResponseTests
         };
 
         // Assert
-        Assert.Equal(id, response.Id);
-        Assert.True(response.Active);
-        Assert.Equal(createdBy, response.CreatedBy);
-        Assert.Equal(createdAt, response.CreatedAt);
-        Assert.Equal(updatedBy, response.UpdatedBy);
-        Assert.Equal(updatedAt, response.UpdatedAt);
-        Assert.Equal(tenantId, response.TenantId);
-        Assert.Equal("Investimentos", response.Title);
-        Assert.Equal("Categoria de investimentos financeiros", response.Description);
+        Assert.Equal(expected: id, actual: response.Id);
+        Assert.True(condition: response.Active, userMessage: "O DTO da categoria deve reportar estado ativo.");
+        Assert.Equal(expected: createdBy, actual: response.CreatedBy);
+        Assert.Equal(expected: createdAt, actual: response.CreatedAt);
+        Assert.Equal(expected: updatedBy, actual: response.UpdatedBy);
+        Assert.Equal(expected: updatedAt, actual: response.UpdatedAt);
+        Assert.Equal(expected: tenantId, actual: response.TenantId);
+        Assert.Equal(expected: "Investimentos", actual: response.Title);
+        Assert.Equal(expected: "Categoria de investimentos financeiros", actual: response.Description);
     }
 
     [Fact]
@@ -65,14 +65,14 @@ public class CategoryResponseTests
         };
 
         // Assert
-        Assert.Equal(id, response.Id);
-        Assert.False(response.Active);
-        Assert.Equal(createdBy, response.CreatedBy);
-        Assert.Equal(createdAt, response.CreatedAt);
-        Assert.Null(response.UpdatedBy);
-        Assert.Null(response.UpdatedAt);
-        Assert.Equal(tenantId, response.TenantId);
-        Assert.Equal("Alimentação", response.Title);
-        Assert.Equal("Despesas com supermercado e alimentação", response.Description);
+        Assert.Equal(expected: id, actual: response.Id);
+        Assert.False(condition: response.Active, userMessage: "O DTO da categoria deve reportar estado inativo.");
+        Assert.Equal(expected: createdBy, actual: response.CreatedBy);
+        Assert.Equal(expected: createdAt, actual: response.CreatedAt);
+        Assert.Null(@object: response.UpdatedBy);
+        Assert.Null(@object: response.UpdatedAt);
+        Assert.Equal(expected: tenantId, actual: response.TenantId);
+        Assert.Equal(expected: "Alimentação", actual: response.Title);
+        Assert.Equal(expected: "Despesas com supermercado e alimentação", actual: response.Description);
     }
 }

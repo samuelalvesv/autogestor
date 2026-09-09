@@ -18,24 +18,21 @@ public class UpdateCategoryRequestTests
     {
         // Arrange
         var categoryId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
         var request = new UpdateCategoryRequest
         {
             Id = categoryId,
-            UserId = userId,
             Title = "Alimentação",
             Description = "Gastos com restaurantes e supermercado"
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Empty(errors);
-        Assert.Equal(categoryId, request.Id);
-        Assert.Equal(userId, request.UserId);
-        Assert.Equal("Alimentação", request.Title);
-        Assert.Equal("Gastos com restaurantes e supermercado", request.Description);
+        Assert.Empty(collection: errors);
+        Assert.Equal(expected: categoryId, actual: request.Id);
+        Assert.Equal(expected: "Alimentação", actual: request.Title);
+        Assert.Equal(expected: "Gastos com restaurantes e supermercado", actual: request.Description);
     }
 
     [Theory]
@@ -47,16 +44,15 @@ public class UpdateCategoryRequestTests
         var request = new UpdateCategoryRequest
         {
             Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
             Title = invalidTitle,
             Description = "Descrição válida da categoria"
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(errors, e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Title)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Title)));
     }
 
     [Theory]
@@ -67,16 +63,15 @@ public class UpdateCategoryRequestTests
         var request = new UpdateCategoryRequest
         {
             Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
             Title = "Título Válido",
             Description = shortDescription
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(errors, e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Description)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Description)));
     }
 
     [Fact]
@@ -86,15 +81,14 @@ public class UpdateCategoryRequestTests
         var request = new UpdateCategoryRequest
         {
             Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
             Title = "Título Válido",
             Description = new string('A', 181)
         };
 
         // Act
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(errors, e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Description)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Description)));
     }
 }

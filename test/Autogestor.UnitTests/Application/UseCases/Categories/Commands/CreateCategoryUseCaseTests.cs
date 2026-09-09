@@ -10,12 +10,14 @@ namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
 
 public class CreateCategoryUseCaseTests
 {
-    private static void SetAuditFields(AuditableEntity entity, Guid userId, DateTime timestamp)
+    private static void SetPersistenceFields(TenantEntity entity, Guid userId, Guid tenantId, DateTime timestamp)
     {
         typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.CreatedBy))!
             .SetValue(obj: entity, value: userId);
         typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.CreatedAt))!
             .SetValue(obj: entity, value: timestamp);
+        typeof(TenantEntity).GetProperty(name: nameof(TenantEntity.TenantId))!
+            .SetValue(obj: entity, value: tenantId);
     }
 
     private sealed class CategoryRepositoryFake : ICategoryRepository
@@ -26,7 +28,11 @@ public class CreateCategoryUseCaseTests
         public Task AddAsync(Category category, CancellationToken cancellationToken = default)
         {
             PassedCancellationToken = cancellationToken;
-            SetAuditFields(entity: category, userId: Guid.NewGuid(), timestamp: DateTime.UtcNow);
+            SetPersistenceFields(
+                entity: category,
+                userId: Guid.NewGuid(),
+                tenantId: Guid.NewGuid(),
+                timestamp: DateTime.UtcNow);
             Categories.Add(item: category);
             return Task.CompletedTask;
         }
@@ -64,8 +70,7 @@ public class CreateCategoryUseCaseTests
         var request = new CreateCategoryRequest
         {
             Title = "Alimentação",
-            Description = "Despesas com restaurantes e mercados",
-            UserId = Guid.NewGuid()
+            Description = "Despesas com restaurantes e mercados"
         };
 
         // Act
@@ -78,7 +83,11 @@ public class CreateCategoryUseCaseTests
         Assert.Equal(expected: request.Title, actual: response.Data.Title);
         Assert.Equal(expected: request.Description, actual: response.Data.Description);
         Assert.NotEqual(expected: Guid.Empty, actual: response.Data.Id);
-        Assert.True(condition: response.Data.Active);
+        Assert.True(condition: response.Data.Active, userMessage: "A categoria deve ser criada como ativa por padrão.");
+        Assert.NotEqual(expected: Guid.Empty, actual: response.Data.TenantId);
+        Assert.Equal(expected: repository.Categories[0].TenantId, actual: response.Data.TenantId);
+        Assert.Null(@object: response.Data.UpdatedBy);
+        Assert.Null(@object: response.Data.UpdatedAt);
 
         Assert.Single(collection: repository.Categories);
         Assert.Equal(expected: request.Title, actual: repository.Categories[0].Title);
@@ -102,8 +111,7 @@ public class CreateCategoryUseCaseTests
         var request = new CreateCategoryRequest
         {
             Title = invalidTitle!,
-            Description = "Descrição válida",
-            UserId = Guid.NewGuid()
+            Description = "Descrição válida"
         };
 
         // Act & Assert
@@ -131,8 +139,7 @@ public class CreateCategoryUseCaseTests
         var request = new CreateCategoryRequest
         {
             Title = "Título válido",
-            Description = invalidDescription!,
-            UserId = Guid.NewGuid()
+            Description = invalidDescription!
         };
 
         // Act & Assert
@@ -157,8 +164,7 @@ public class CreateCategoryUseCaseTests
         var request = new CreateCategoryRequest
         {
             Title = "Transporte",
-            Description = "Combustível e manutenção",
-            UserId = Guid.NewGuid()
+            Description = "Combustível e manutenção"
         };
 
         using var cts = new CancellationTokenSource();

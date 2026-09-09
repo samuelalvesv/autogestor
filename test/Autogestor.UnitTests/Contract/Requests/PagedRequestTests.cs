@@ -13,34 +13,27 @@ public class PagedRequestTests
         // Act
         var request = new TestPagedRequest
         {
-            UserId = Guid.Empty,
             PageNumber = ContractDefaults.DefaultPageNumber,
             PageSize = ContractDefaults.DefaultPageSize
         };
 
         // Assert
-        Assert.Equal(ContractDefaults.DefaultPageNumber, request.PageNumber);
-        Assert.Equal(ContractDefaults.DefaultPageSize, request.PageSize);
-        Assert.Equal(Guid.Empty, request.UserId);
+        Assert.Equal(expected: ContractDefaults.DefaultPageNumber, actual: request.PageNumber);
+        Assert.Equal(expected: ContractDefaults.DefaultPageSize, actual: request.PageSize);
     }
 
     [Fact]
     public void PagedRequest_ShouldAllowCustomValuesOnInit()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-
         // Act
         var request = new TestPagedRequest
         {
             PageNumber = 3,
-            PageSize = 30,
-            UserId = userId
+            PageSize = 30
         };
 
         // Assert
-        Assert.Equal(3, request.PageNumber);
-        Assert.Equal(30, request.PageSize);
-        Assert.Equal(userId, request.UserId);
+        Assert.Equal(expected: 3, actual: request.PageNumber);
+        Assert.Equal(expected: 30, actual: request.PageSize);
     }
 }

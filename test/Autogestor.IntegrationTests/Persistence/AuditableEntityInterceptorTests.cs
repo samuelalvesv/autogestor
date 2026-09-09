@@ -22,9 +22,9 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
         context.SaveChanges();
 
         Assert.NotEqual(expected: default, actual: category.CreatedAt);
-        Assert.NotEqual(expected: default, actual: category.UpdatedAt);
+        Assert.Null(@object: category.UpdatedAt);
         Assert.Equal(expected: userId, actual: category.CreatedBy);
-        Assert.Equal(expected: userId, actual: category.UpdatedBy);
+        Assert.Null(@object: category.UpdatedBy);
     }
 
     [Fact]
@@ -41,9 +41,9 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
         await context.SaveChangesAsync();
 
         Assert.NotEqual(expected: default, actual: category.CreatedAt);
-        Assert.NotEqual(expected: default, actual: category.UpdatedAt);
+        Assert.Null(@object: category.UpdatedAt);
         Assert.Equal(expected: userId, actual: category.CreatedBy);
-        Assert.Equal(expected: userId, actual: category.UpdatedBy);
+        Assert.Null(@object: category.UpdatedBy);
     }
 
     [Fact]
@@ -61,16 +61,19 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 
         DateTime createdAt = category.CreatedAt;
 
-        // Modifica com outro usuário no contexto
+        // Modifica com outro usuário no contexto e tenta alterar campos imutáveis de criação
         var updatingUser = Guid.NewGuid();
         userContext.UserId = updatingUser;
 
+        context.Entry(entity: category).Property(propertyExpression: c => c.CreatedAt).CurrentValue = DateTime.UtcNow.AddDays(value: -10);
+        context.Entry(entity: category).Property(propertyExpression: c => c.CreatedBy).CurrentValue = Guid.NewGuid();
         context.Entry(entity: category).State = EntityState.Modified;
         await context.SaveChangesAsync();
 
         Assert.Equal(expected: createdAt, actual: category.CreatedAt);
         Assert.Equal(expected: initialUser, actual: category.CreatedBy);
         Assert.Equal(expected: updatingUser, actual: category.UpdatedBy);
+        Assert.NotNull(@object: category.UpdatedAt);
         Assert.True(condition: category.UpdatedAt >= createdAt);
     }
 }

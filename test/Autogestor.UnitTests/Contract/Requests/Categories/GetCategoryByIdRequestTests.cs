@@ -18,20 +18,17 @@ public class GetCategoryByIdRequestTests
     {
         // Arrange
         var categoryId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
 
         // Act
         var request = new GetCategoryByIdRequest
         {
-            Id = categoryId,
-            UserId = userId
+            Id = categoryId
         };
 
-        IList<ValidationResult> errors = ValidateModel(request);
+        IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Empty(errors);
-        Assert.Equal(categoryId, request.Id);
-        Assert.Equal(userId, request.UserId);
+        Assert.Empty(collection: errors);
+        Assert.Equal(expected: categoryId, actual: request.Id);
     }
 }
