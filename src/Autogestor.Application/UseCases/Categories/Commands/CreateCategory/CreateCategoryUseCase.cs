@@ -1,3 +1,4 @@
+using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
@@ -16,8 +17,7 @@ public sealed class CreateCategoryUseCase(
     {
         var category = Category.Create(
             title: request.Title,
-            description: request.Description,
-            userId: request.UserId);
+            description: request.Description);
 
         await categoryRepository.AddAsync(
             category: category,
@@ -32,9 +32,9 @@ public sealed class CreateCategoryUseCase(
             CreatedAt = category.CreatedAt,
             UpdatedBy = category.UpdatedBy,
             UpdatedAt = category.UpdatedAt,
+            TenantId = category.TenantId,
             Title = category.Title,
-            Description = category.Description,
-            UserId = category.UserId
+            Description = category.Description
         };
 
         return new Response<CategoryResponse>

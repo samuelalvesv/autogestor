@@ -9,7 +9,7 @@ public class CategoryResponseTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         var createdBy = Guid.NewGuid();
         var updatedBy = Guid.NewGuid();
         DateTime createdAt = DateTime.UtcNow;
@@ -24,9 +24,9 @@ public class CategoryResponseTests
             CreatedAt = createdAt,
             UpdatedBy = updatedBy,
             UpdatedAt = updatedAt,
+            TenantId = tenantId,
             Title = "Investimentos",
-            Description = "Categoria de investimentos financeiros",
-            UserId = userId
+            Description = "Categoria de investimentos financeiros"
         };
 
         // Assert
@@ -36,9 +36,9 @@ public class CategoryResponseTests
         Assert.Equal(createdAt, response.CreatedAt);
         Assert.Equal(updatedBy, response.UpdatedBy);
         Assert.Equal(updatedAt, response.UpdatedAt);
+        Assert.Equal(tenantId, response.TenantId);
         Assert.Equal("Investimentos", response.Title);
         Assert.Equal("Categoria de investimentos financeiros", response.Description);
-        Assert.Equal(userId, response.UserId);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class CategoryResponseTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         var createdBy = Guid.NewGuid();
         DateTime createdAt = DateTime.UtcNow;
 
@@ -59,9 +59,9 @@ public class CategoryResponseTests
             CreatedAt = createdAt,
             UpdatedBy = null,
             UpdatedAt = null,
+            TenantId = tenantId,
             Title = "Alimentação",
-            Description = "Despesas com supermercado e alimentação",
-            UserId = userId
+            Description = "Despesas com supermercado e alimentação"
         };
 
         // Assert
@@ -71,6 +71,7 @@ public class CategoryResponseTests
         Assert.Equal(createdAt, response.CreatedAt);
         Assert.Null(response.UpdatedBy);
         Assert.Null(response.UpdatedAt);
+        Assert.Equal(tenantId, response.TenantId);
         Assert.Equal("Alimentação", response.Title);
         Assert.Equal("Despesas com supermercado e alimentação", response.Description);
     }

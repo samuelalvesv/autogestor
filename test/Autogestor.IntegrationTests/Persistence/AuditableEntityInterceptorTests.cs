@@ -17,8 +17,7 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 
         var category = Category.Create(
             title: "Alimentação",
-            description: "Restaurantes",
-            userId: userId);
+            description: "Restaurantes");
         context.Categories.Add(entity: category);
         context.SaveChanges();
 
@@ -37,8 +36,7 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 
         var category = Category.Create(
             title: "Transporte",
-            description: "Combustível",
-            userId: userId);
+            description: "Combustível");
         await context.Categories.AddAsync(entity: category);
         await context.SaveChangesAsync();
 
@@ -57,8 +55,7 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 
         var category = Category.Create(
             title: "Saúde",
-            description: "Remédios",
-            userId: initialUser);
+            description: "Remédios");
         await context.Categories.AddAsync(entity: category);
         await context.SaveChangesAsync();
 

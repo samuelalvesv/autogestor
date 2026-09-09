@@ -2,7 +2,7 @@ using Autogestor.Domain.Enums;
 
 namespace Autogestor.Domain.Entities;
 
-public sealed class Transaction : AuditableEntity
+public sealed class Transaction : TenantEntity
 {
     public string Title { get; private set; } = string.Empty;
     public ETransactionType Type { get; private set; }

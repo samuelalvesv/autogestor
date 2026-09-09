@@ -18,7 +18,11 @@ builder.Services.AddDbContext<AppDbContext>(optionsAction: (serviceProvider, opt
     options.UseNpgsql(
         connectionString: connectionString,
         npgsqlOptionsAction: b => b.MigrationsAssembly(assemblyName: "Autogestor.Infrastructure"));
-    options.AddInterceptors(interceptors: serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
+    options.AddInterceptors(interceptors:
+    [
+        serviceProvider.GetRequiredService<AuditableEntityInterceptor>(),
+        serviceProvider.GetRequiredService<TenantEntityInterceptor>()
+    ]);
 });
 
 builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();

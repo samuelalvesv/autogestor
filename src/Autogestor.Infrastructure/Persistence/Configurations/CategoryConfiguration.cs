@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Autogestor.Infrastructure.Persistence.Configurations;
 
-public class CategoryConfiguration : AuditableEntityConfiguration<Category>
+public class CategoryConfiguration : TenantEntityConfiguration<Category>
 {
     public override void Configure(EntityTypeBuilder<Category> builder)
     {
@@ -17,9 +17,5 @@ public class CategoryConfiguration : AuditableEntityConfiguration<Category>
         builder.Property(c => c.Description)
             .IsRequired()
             .HasColumnType("text");
-
-        builder.Property(c => c.UserId)
-            .IsRequired()
-            .HasColumnType("uuid");
     }
 }

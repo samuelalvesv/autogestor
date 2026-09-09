@@ -12,7 +12,11 @@ public class CategoryServiceTests
     {
         public CreateCategoryRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<CategoryResponse> ResponseToReturn { get; set; } = null!;
+        public Response<CategoryResponse> ResponseToReturn { get; set; } = new()
+        {
+            Data = null,
+            Message = string.Empty
+        };
 
         public Task<Response<CategoryResponse>> ExecuteAsync(
             CreateCategoryRequest request,
@@ -50,7 +54,7 @@ public class CategoryServiceTests
                 UpdatedAt = null,
                 Title = request.Title,
                 Description = request.Description,
-                UserId = request.UserId
+                TenantId = Guid.NewGuid()
             },
             Message = "Categoria criada com sucesso."
         };

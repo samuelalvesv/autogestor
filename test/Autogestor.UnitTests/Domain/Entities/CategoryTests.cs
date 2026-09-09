@@ -10,16 +10,15 @@ public class CategoryTests
         // Arrange
         string title = "Test Category";
         string description = "Test Description";
-        var userId = Guid.NewGuid();
 
         // Act
-        var category = Category.Create(title, description, userId);
+        var category = Category.Create(title, description);
 
         // Assert
         Assert.Equal(title, category.Title);
         Assert.Equal(description, category.Description);
-        Assert.Equal(userId, category.UserId);
         Assert.True(category.Active); // Verify default state inherited from AuditableEntity
+        Assert.IsAssignableFrom<TenantEntity>(category);
     }
 
     [Theory]
@@ -30,10 +29,9 @@ public class CategoryTests
     {
         // Arrange
         string description = "Test Description";
-        var userId = Guid.NewGuid();
 
         // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(invalidTitle!, description, userId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(invalidTitle!, description));
         Assert.Equal("title", exception.ParamName);
     }
 
@@ -45,23 +43,9 @@ public class CategoryTests
     {
         // Arrange
         string title = "Test Category";
-        var userId = Guid.NewGuid();
 
         // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(title, invalidDescription!, userId));
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(title, invalidDescription!));
         Assert.Equal("description", exception.ParamName);
-    }
-
-    [Fact]
-    public void Create_WithEmptyUserId_ThrowsArgumentException()
-    {
-        // Arrange
-        string title = "Test Category";
-        string description = "Test Description";
-        Guid userId = Guid.Empty;
-
-        // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(title, description, userId));
-        Assert.Equal("userId", exception.ParamName);
     }
 }

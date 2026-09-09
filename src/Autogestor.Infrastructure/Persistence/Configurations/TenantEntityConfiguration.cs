@@ -14,5 +14,7 @@ public abstract class TenantEntityConfiguration<TEntity> : AuditableEntityConfig
         builder.Property(e => e.TenantId)
             .IsRequired()
             .HasColumnType("uuid");
+
+        builder.HasIndex(e => e.TenantId);
     }
 }

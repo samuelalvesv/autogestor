@@ -137,9 +137,9 @@ public interface IBranchAuthorizationService
 | Camada | Artefatos |
 | --- | --- |
 | **Contracts** | Interfaces gRPC decoradas (`IAuthService`, `IBranchService`), mensagens de Request/Response (`LoginRequest`, `LoginResponse`, `CreateBranchRequest`) |
-| **Domain** | `Tenant`, `Branch`, `UserBranchAccess`, `BranchRole`, `TenantEntity` (base), `ITenantProvider`, `IBranchAccessRepository` |
+| **Domain** | `Tenant`, `Branch`, `UserBranchAccess`, `BranchRole`, `TenantEntity` (base), `ITenantContext`, `IBranchAccessRepository` |
 | **Application** | `IBranchAuthorizationService`, use cases (`CreateBranchCommand`, `GrantBranchAccessCommand`, `RevokeBranchAccessCommand`), DTOs internos |
-| **Infrastructure** | `ApplicationUser : IdentityUser<Guid>`, `TenantProvider` (lê `TenantId` do cabeçalho JWT no contexto do gRPC), Global Query Filters no `DbContext`, implementação de `IBranchAuthorizationService` |
+| **Infrastructure** | `ApplicationUser : IdentityUser<Guid>`, `TenantContext` (lê `TenantId` do cabeçalho JWT no contexto do gRPC), Global Query Filters no `DbContext`, implementação de `IBranchAuthorizationService` |
 | **Api** | Configuração do ASP.NET Identity, JWT Bearer, interceptador de resolução de tenant gRPC, Authorization Policies, mapeamento de serviços gRPC |
 
 ## Ferramentas

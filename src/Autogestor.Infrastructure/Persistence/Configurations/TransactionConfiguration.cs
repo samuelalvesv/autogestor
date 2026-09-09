@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Autogestor.Infrastructure.Persistence.Configurations;
 
-public class TransactionConfiguration : AuditableEntityConfiguration<Transaction>
+public class TransactionConfiguration : TenantEntityConfiguration<Transaction>
 {
     public override void Configure(EntityTypeBuilder<Transaction> builder)
     {

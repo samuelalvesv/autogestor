@@ -1,3 +1,4 @@
+using Autogestor.Application.Interfaces;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
@@ -25,7 +26,7 @@ public class CreateCategoryUseCaseTests
         public Task AddAsync(Category category, CancellationToken cancellationToken = default)
         {
             PassedCancellationToken = cancellationToken;
-            SetAuditFields(entity: category, userId: category.UserId, timestamp: DateTime.UtcNow);
+            SetAuditFields(entity: category, userId: Guid.NewGuid(), timestamp: DateTime.UtcNow);
             Categories.Add(item: category);
             return Task.CompletedTask;
         }
@@ -42,11 +43,11 @@ public class CreateCategoryUseCaseTests
         public int CommitCount { get; private set; }
         public CancellationToken PassedCancellationToken { get; private set; }
 
-        public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        public Task CommitAsync(CancellationToken cancellationToken = default)
         {
             PassedCancellationToken = cancellationToken;
             CommitCount++;
-            return Task.FromResult(result: 1);
+            return Task.CompletedTask;
         }
     }
 
@@ -76,15 +77,12 @@ public class CreateCategoryUseCaseTests
         Assert.Equal(expected: "Categoria criada com sucesso.", actual: response.Message);
         Assert.Equal(expected: request.Title, actual: response.Data.Title);
         Assert.Equal(expected: request.Description, actual: response.Data.Description);
-        Assert.Equal(expected: request.UserId, actual: response.Data.UserId);
         Assert.NotEqual(expected: Guid.Empty, actual: response.Data.Id);
         Assert.True(condition: response.Data.Active);
-        Assert.Equal(expected: request.UserId, actual: response.Data.CreatedBy);
 
         Assert.Single(collection: repository.Categories);
         Assert.Equal(expected: request.Title, actual: repository.Categories[0].Title);
         Assert.Equal(expected: request.Description, actual: repository.Categories[0].Description);
-        Assert.Equal(expected: request.UserId, actual: repository.Categories[0].UserId);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
     }
 
@@ -142,32 +140,6 @@ public class CreateCategoryUseCaseTests
             testCode: () => useCase.ExecuteAsync(request: request));
         Assert.Equal(expected: "description", actual: exception.ParamName);
         Assert.Equal(expected: "A descrição da categoria não pode ser vazia. (Parameter 'description')", actual: exception.Message);
-        Assert.Empty(collection: repository.Categories);
-        Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_WithEmptyUserId_ThrowsArgumentException()
-    {
-        // Arrange
-        var repository = new CategoryRepositoryFake();
-        var unitOfWork = new UnitOfWorkFake();
-        var useCase = new CreateCategoryUseCase(
-            categoryRepository: repository,
-            unitOfWork: unitOfWork);
-
-        var request = new CreateCategoryRequest
-        {
-            Title = "Título válido",
-            Description = "Descrição válida",
-            UserId = Guid.Empty
-        };
-
-        // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
-            testCode: () => useCase.ExecuteAsync(request: request));
-        Assert.Equal(expected: "userId", actual: exception.ParamName);
-        Assert.Equal(expected: "Usuário inválido. (Parameter 'userId')", actual: exception.Message);
         Assert.Empty(collection: repository.Categories);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
