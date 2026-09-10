@@ -3,7 +3,7 @@
     "Stop": [
       {
         "type": "command",
-        "command": "./.agents/scripts/verify-build.sh",
+        "command": "./scripts/verify-build.sh",
         "timeout": 60
       }
     ]
