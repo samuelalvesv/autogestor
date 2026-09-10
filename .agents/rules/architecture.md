@@ -76,3 +76,14 @@ Para garantir a melhor performance, facilidade de manutenção e integração na
 >
 > A dependência SEMPRE aponta para dentro (em direção ao `Domain` e `Contract`).
 > O `Domain` nunca referencia nenhum outro projeto.
+
+## Ferramentas
+
+- **Plugin `dotnet-msbuild`**: subagentes `msbuild-code-review`, `build-perf`, `msbuild`, skills `directory-build-organization`, `msbuild-antipatterns`, `including-generated-files`, `incremental-build`, `check-bin-obj-clash`, `copy-to-output-directory`, `binlog-failure-analysis`, `binlog-generation`, servidor MCP `binlog`
+- **Plugin `dotnet-nuget`**: skill `convert-to-cpm`
+- **Plugin `dotnet-template-engine`**: skill `template-instantiation`
+- **Plugin `dotnet`**: skill `setup-local-sdk`
+- **Plugin `dotnet-upgrade`**: skill `migrate-dotnet9-to-dotnet10`
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skill `find-untested-sources`
+- **Submódulo `agent-skills`**: servidor MCP `neon`
+- **Submódulo `ponytail`**: skills `ponytail`, `ponytail-review`

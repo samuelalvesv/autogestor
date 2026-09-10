@@ -1,0 +1,1 @@
+../vendor/dotnet-skills/plugins/dotnet-msbuild/agents/build-perf.agent.md

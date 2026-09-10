@@ -17,15 +17,14 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 
         var category = Category.Create(
             title: "Alimentação",
-            description: "Restaurantes",
-            userId: userId);
+            description: "Restaurantes");
         context.Categories.Add(entity: category);
         context.SaveChanges();
 
         Assert.NotEqual(expected: default, actual: category.CreatedAt);
-        Assert.NotEqual(expected: default, actual: category.UpdatedAt);
+        Assert.Null(@object: category.UpdatedAt);
         Assert.Equal(expected: userId, actual: category.CreatedBy);
-        Assert.Equal(expected: userId, actual: category.UpdatedBy);
+        Assert.Null(@object: category.UpdatedBy);
     }
 
     [Fact]
@@ -37,15 +36,14 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 
         var category = Category.Create(
             title: "Transporte",
-            description: "Combustível",
-            userId: userId);
-        await context.Categories.AddAsync(entity: category);
-        await context.SaveChangesAsync();
+            description: "Combustível");
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotEqual(expected: default, actual: category.CreatedAt);
-        Assert.NotEqual(expected: default, actual: category.UpdatedAt);
+        Assert.Null(@object: category.UpdatedAt);
         Assert.Equal(expected: userId, actual: category.CreatedBy);
-        Assert.Equal(expected: userId, actual: category.UpdatedBy);
+        Assert.Null(@object: category.UpdatedBy);
     }
 
     [Fact]
@@ -57,23 +55,25 @@ public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 
         var category = Category.Create(
             title: "Saúde",
-            description: "Remédios",
-            userId: initialUser);
-        await context.Categories.AddAsync(entity: category);
-        await context.SaveChangesAsync();
+            description: "Remédios");
+        await context.Categories.AddAsync(entity: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         DateTime createdAt = category.CreatedAt;
 
-        // Modifica com outro usuário no contexto
+        // Modifica com outro usuário no contexto e tenta alterar campos imutáveis de criação
         var updatingUser = Guid.NewGuid();
         userContext.UserId = updatingUser;
 
+        context.Entry(entity: category).Property(propertyExpression: c => c.CreatedAt).CurrentValue = DateTime.UtcNow.AddDays(value: -10);
+        context.Entry(entity: category).Property(propertyExpression: c => c.CreatedBy).CurrentValue = Guid.NewGuid();
         context.Entry(entity: category).State = EntityState.Modified;
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(expected: createdAt, actual: category.CreatedAt);
         Assert.Equal(expected: initialUser, actual: category.CreatedBy);
         Assert.Equal(expected: updatingUser, actual: category.UpdatedBy);
+        Assert.NotNull(@object: category.UpdatedAt);
         Assert.True(condition: category.UpdatedAt >= createdAt);
     }
 }

@@ -9,7 +9,7 @@ public class CategoryResponseTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         var createdBy = Guid.NewGuid();
         var updatedBy = Guid.NewGuid();
         DateTime createdAt = DateTime.UtcNow;
@@ -24,21 +24,21 @@ public class CategoryResponseTests
             CreatedAt = createdAt,
             UpdatedBy = updatedBy,
             UpdatedAt = updatedAt,
+            TenantId = tenantId,
             Title = "Investimentos",
-            Description = "Categoria de investimentos financeiros",
-            UserId = userId
+            Description = "Categoria de investimentos financeiros"
         };
 
         // Assert
-        Assert.Equal(id, response.Id);
-        Assert.True(response.Active);
-        Assert.Equal(createdBy, response.CreatedBy);
-        Assert.Equal(createdAt, response.CreatedAt);
-        Assert.Equal(updatedBy, response.UpdatedBy);
-        Assert.Equal(updatedAt, response.UpdatedAt);
-        Assert.Equal("Investimentos", response.Title);
-        Assert.Equal("Categoria de investimentos financeiros", response.Description);
-        Assert.Equal(userId, response.UserId);
+        Assert.Equal(expected: id, actual: response.Id);
+        Assert.True(condition: response.Active, userMessage: "O DTO da categoria deve reportar estado ativo.");
+        Assert.Equal(expected: createdBy, actual: response.CreatedBy);
+        Assert.Equal(expected: createdAt, actual: response.CreatedAt);
+        Assert.Equal(expected: updatedBy, actual: response.UpdatedBy);
+        Assert.Equal(expected: updatedAt, actual: response.UpdatedAt);
+        Assert.Equal(expected: tenantId, actual: response.TenantId);
+        Assert.Equal(expected: "Investimentos", actual: response.Title);
+        Assert.Equal(expected: "Categoria de investimentos financeiros", actual: response.Description);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class CategoryResponseTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
         var createdBy = Guid.NewGuid();
         DateTime createdAt = DateTime.UtcNow;
 
@@ -59,19 +59,20 @@ public class CategoryResponseTests
             CreatedAt = createdAt,
             UpdatedBy = null,
             UpdatedAt = null,
+            TenantId = tenantId,
             Title = "Alimentação",
-            Description = "Despesas com supermercado e alimentação",
-            UserId = userId
+            Description = "Despesas com supermercado e alimentação"
         };
 
         // Assert
-        Assert.Equal(id, response.Id);
-        Assert.False(response.Active);
-        Assert.Equal(createdBy, response.CreatedBy);
-        Assert.Equal(createdAt, response.CreatedAt);
-        Assert.Null(response.UpdatedBy);
-        Assert.Null(response.UpdatedAt);
-        Assert.Equal("Alimentação", response.Title);
-        Assert.Equal("Despesas com supermercado e alimentação", response.Description);
+        Assert.Equal(expected: id, actual: response.Id);
+        Assert.False(condition: response.Active, userMessage: "O DTO da categoria deve reportar estado inativo.");
+        Assert.Equal(expected: createdBy, actual: response.CreatedBy);
+        Assert.Equal(expected: createdAt, actual: response.CreatedAt);
+        Assert.Null(@object: response.UpdatedBy);
+        Assert.Null(@object: response.UpdatedAt);
+        Assert.Equal(expected: tenantId, actual: response.TenantId);
+        Assert.Equal(expected: "Alimentação", actual: response.Title);
+        Assert.Equal(expected: "Despesas com supermercado e alimentação", actual: response.Description);
     }
 }

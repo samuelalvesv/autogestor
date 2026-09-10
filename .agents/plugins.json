@@ -4,26 +4,30 @@
       "path": ".agents/vendor/dotnet-skills/plugins",
       "include_only": [
         "dotnet",
-        "dotnet-advanced",
+        "dotnet-ai",
         "dotnet-aspnetcore",
         "dotnet-blazor",
         "dotnet-data",
+        "dotnet-experimental",
+        "dotnet-nuget"
+      ],
+      "exclude": [
+        "dotnet-advanced",
         "dotnet-diag",
         "dotnet-maui",
         "dotnet-msbuild",
-        "dotnet-nuget",
-        "dotnet-test"
-      ],
-      "exclude": [
-        "dotnet-ai",
-        "dotnet-experimental",
         "dotnet-template-engine",
         "dotnet-test-migration",
         "dotnet-upgrade",
-        "dotnet11"]
+        "dotnet-test",
+        "dotnet11"
+      ]
     },
     {
       "path": ".agents/vendor/ponytail"
+    },
+    {
+      "path": ".agents/vendor/agent-skills"
     }
   ]
 }

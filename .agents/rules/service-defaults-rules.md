@@ -11,3 +11,9 @@ applyTo: "src/Autogestor.ServiceDefaults/**/*.cs"
 - **Padrão de Extensão**: Deve expor o método de extensão `AddServiceDefaults(this IHostApplicationBuilder)` para configurar observabilidade, resiliência e health checks de forma uniforme em todos os serviços.
 - **Observabilidade**: Exporte métricas, logs e traces via OpenTelemetry (OTLP).
 - **Resiliência HTTP**: Configurar timeouts, retries e circuit breakers utilizando as políticas do `Microsoft.Extensions.Http.Resilience`.
+
+## Ferramentas
+
+- **Plugin `dotnet-aspnetcore`**: skills `configuring-opentelemetry-dotnet`, `dotnet-webapi`
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Submódulo `ponytail`**: skill `ponytail`

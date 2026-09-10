@@ -29,37 +29,26 @@ public sealed class AuditableEntityInterceptor(IUserContext userContext) : SaveC
     private void UpdateAuditEntities(DbContext context)
     {
         DateTime utcNow = DateTime.UtcNow;
-        Guid currentUserId = userContext.UserId;
+        Guid? currentUserId = null;
 
         foreach (EntityEntry<AuditableEntity> entry in context.ChangeTracker.Entries<AuditableEntity>())
         {
-            switch (entry.State)
+            if (entry.State == EntityState.Added)
             {
-                case EntityState.Added:
-                    {
-                        if (entry.Property(e => e.CreatedAt).CurrentValue == default)
-                            entry.Property(e => e.CreatedAt).CurrentValue = utcNow;
+                currentUserId ??= userContext.UserId;
+                if (entry.Property(propertyExpression: e => e.CreatedAt).CurrentValue == default)
+                    entry.Property(propertyExpression: e => e.CreatedAt).CurrentValue = utcNow;
 
-                        entry.Property(e => e.UpdatedAt).CurrentValue = utcNow;
-
-                        if (entry.Entity.CreatedBy == Guid.Empty)
-                            entry.Property(e => e.CreatedBy).CurrentValue = currentUserId;
-
-                        entry.Property(e => e.UpdatedBy).CurrentValue = currentUserId;
-                        break;
-                    }
-                case EntityState.Modified:
-                    {
-                        entry.Property(e => e.UpdatedAt).CurrentValue = utcNow;
-                        entry.Property(e => e.UpdatedBy).CurrentValue = currentUserId;
-                        break;
-                    }
-
-                case EntityState.Detached:
-                case EntityState.Unchanged:
-                case EntityState.Deleted:
-                default:
-                    break;
+                if (entry.Entity.CreatedBy == Guid.Empty)
+                    entry.Property(propertyExpression: e => e.CreatedBy).CurrentValue = currentUserId.Value;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                currentUserId ??= userContext.UserId;
+                entry.Property(propertyExpression: e => e.CreatedAt).IsModified = false;
+                entry.Property(propertyExpression: e => e.CreatedBy).IsModified = false;
+                entry.Property(propertyExpression: e => e.UpdatedAt).CurrentValue = utcNow;
+                entry.Property(propertyExpression: e => e.UpdatedBy).CurrentValue = currentUserId.Value;
             }
         }
     }

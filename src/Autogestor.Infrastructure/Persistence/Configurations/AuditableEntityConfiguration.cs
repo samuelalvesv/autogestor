@@ -24,12 +24,12 @@ public abstract class AuditableEntityConfiguration<TEntity> : EntityConfiguratio
             .IsRequired()
             .HasColumnType("timestamptz");
 
-        builder.Property(e => e.UpdatedBy)
-            .IsRequired()
-            .HasColumnType("uuid");
+        builder.Property(propertyExpression: e => e.UpdatedBy)
+            .IsRequired(required: false)
+            .HasColumnType(typeName: "uuid");
 
-        builder.Property(e => e.UpdatedAt)
-            .IsRequired()
-            .HasColumnType("timestamptz");
+        builder.Property(propertyExpression: e => e.UpdatedAt)
+            .IsRequired(required: false)
+            .HasColumnType(typeName: "timestamptz");
     }
 }

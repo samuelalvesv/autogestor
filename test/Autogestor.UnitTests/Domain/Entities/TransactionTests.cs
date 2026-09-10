@@ -23,6 +23,7 @@ public class TransactionTests
         Assert.Equal(amount, transaction.Amount);
         Assert.Equal(categoryId, transaction.CategoryId);
         Assert.True(transaction.Active); // Verify default state inherited from AuditableEntity
+        Assert.IsAssignableFrom<TenantEntity>(transaction);
     }
 
     [Theory]

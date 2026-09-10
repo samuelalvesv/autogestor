@@ -26,4 +26,12 @@ applyTo: "src/Autogestor.Infrastructure/**/*.cs"
   - **Texto**: Mapear propriedades string com o tipo de coluna `"text"`.
 - **Ciclo de Vida e Registro de Interceptadores**: Interceptadores do EF Core que dependem de serviços com ciclo de vida com escopo devem ser registrados obrigatoriamente no contêiner de injeção de dependência e resolvidos dinamicamente na configuração do contexto de banco de dados. É proibido instanciá-los manualmente com operador de instanciação direta ou mantê-los como campos estáticos no contexto.
 - **Desacoplamento de Entidades em Interceptadores**: Interceptadores de infraestrutura devem operar exclusivamente sobre contratos ou classes base genéricas de domínio. É estritamente proibido acoplar a execução a tipos concretos, verificações de tipos derivados ou condicionais específicos para entidades individuais.
-- **Isolamento de Banco (Multi-tenant)**: Consultar regra `identity-multitenancy` para detalhes de filtros globais.
+- **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](identity-multitenancy.md).
+
+## Ferramentas
+
+- **Plugin `dotnet-data`**: skill `optimizing-ef-core-queries`
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Submódulo `postgres-skills`**: skill `postgres-best-practices`
+- **Submódulo `agent-skills`**: skills `neon`, `neon-postgres`, `neon-postgres-branches`, `neon-postgres-egress-optimizer`, `neon-object-storage`, `neon-functions`, servidor MCP `neon`
+- **Submódulo `ponytail`**: skill `ponytail`

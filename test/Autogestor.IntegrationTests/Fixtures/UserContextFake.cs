@@ -2,7 +2,11 @@ using Autogestor.Domain.Interfaces;
 
 namespace Autogestor.IntegrationTests.Fixtures;
 
-public sealed class UserContextFake(Guid? userId = null) : IUserContext
+public sealed class UserContextFake(Guid userId) : IUserContext
 {
-    public Guid UserId { get; set; } = userId ?? Guid.NewGuid();
+    public UserContextFake() : this(userId: Guid.NewGuid())
+    {
+    }
+
+    public Guid UserId { get; set; } = userId;
 }

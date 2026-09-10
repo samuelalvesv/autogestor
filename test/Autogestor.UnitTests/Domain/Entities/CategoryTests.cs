@@ -10,16 +10,15 @@ public class CategoryTests
         // Arrange
         string title = "Test Category";
         string description = "Test Description";
-        var userId = Guid.NewGuid();
 
         // Act
-        var category = Category.Create(title, description, userId);
+        var category = Category.Create(title: title, description: description);
 
         // Assert
-        Assert.Equal(title, category.Title);
-        Assert.Equal(description, category.Description);
-        Assert.Equal(userId, category.UserId);
-        Assert.True(category.Active); // Verify default state inherited from AuditableEntity
+        Assert.Equal(expected: title, actual: category.Title);
+        Assert.Equal(expected: description, actual: category.Description);
+        Assert.True(condition: category.Active, userMessage: "A categoria deve ser criada como ativa por padrão.");
+        Assert.IsAssignableFrom<TenantEntity>(@object: category);
     }
 
     [Theory]
@@ -30,11 +29,11 @@ public class CategoryTests
     {
         // Arrange
         string description = "Test Description";
-        var userId = Guid.NewGuid();
 
         // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(invalidTitle!, description, userId));
-        Assert.Equal("title", exception.ParamName);
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            testCode: () => Category.Create(title: invalidTitle!, description: description));
+        Assert.Equal(expected: "title", actual: exception.ParamName);
     }
 
     [Theory]
@@ -45,23 +44,10 @@ public class CategoryTests
     {
         // Arrange
         string title = "Test Category";
-        var userId = Guid.NewGuid();
 
         // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(title, invalidDescription!, userId));
-        Assert.Equal("description", exception.ParamName);
-    }
-
-    [Fact]
-    public void Create_WithEmptyUserId_ThrowsArgumentException()
-    {
-        // Arrange
-        string title = "Test Category";
-        string description = "Test Description";
-        Guid userId = Guid.Empty;
-
-        // Act & Assert
-        ArgumentException exception = Assert.Throws<ArgumentException>(() => Category.Create(title, description, userId));
-        Assert.Equal("userId", exception.ParamName);
+        ArgumentException exception = Assert.Throws<ArgumentException>(
+            testCode: () => Category.Create(title: title, description: invalidDescription!));
+        Assert.Equal(expected: "description", actual: exception.ParamName);
     }
 }

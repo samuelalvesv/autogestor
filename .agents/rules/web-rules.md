@@ -19,3 +19,11 @@ applyTo: "src/Autogestor.Web/**/*.{cs,razor}"
   - Registra no DI as implementações web concretas das interfaces exigidas pela RCL.
 - **Compilação AOT (Ahead-Of-Time)**:
   - A publicação em produção deve ter `<RunAOTCompilation>true</RunAOTCompilation>` no `.csproj` para otimizar os serializadores de Protobuf e evitar reflexão pesada no browser.
+
+## Ferramentas
+
+- **Plugin `dotnet-msbuild`**: subagentes `build-perf`, `msbuild`, servidor MCP `binlog`
+- **Plugin `dotnet-blazor`**: skills `author-component`, `support-prerendering`, `use-js-interop`
+- **Plugin `dotnet-upgrade`**: skill `dotnet-aot-compat`
+- **Plugin `dotnet-aspnetcore`**: skill `convert-blazor-server-to-webapp`
+- **Plugin `dotnet-diag`**: skill `analyzing-dotnet-performance`

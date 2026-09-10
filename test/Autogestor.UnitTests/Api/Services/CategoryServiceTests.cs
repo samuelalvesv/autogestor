@@ -12,7 +12,11 @@ public class CategoryServiceTests
     {
         public CreateCategoryRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<CategoryResponse> ResponseToReturn { get; set; } = null!;
+        public Response<CategoryResponse> ResponseToReturn { get; set; } = new()
+        {
+            Data = null,
+            Message = string.Empty
+        };
 
         public Task<Response<CategoryResponse>> ExecuteAsync(
             CreateCategoryRequest request,
@@ -34,8 +38,7 @@ public class CategoryServiceTests
         var request = new CreateCategoryRequest
         {
             Title = "Educação",
-            Description = "Cursos e livros",
-            UserId = Guid.NewGuid()
+            Description = "Cursos e livros"
         };
 
         var expectedResponse = new Response<CategoryResponse>
@@ -44,13 +47,13 @@ public class CategoryServiceTests
             {
                 Id = Guid.NewGuid(),
                 Active = true,
-                CreatedBy = request.UserId,
+                CreatedBy = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedBy = null,
                 UpdatedAt = null,
                 Title = request.Title,
                 Description = request.Description,
-                UserId = request.UserId
+                TenantId = Guid.NewGuid()
             },
             Message = "Categoria criada com sucesso."
         };
@@ -58,7 +61,9 @@ public class CategoryServiceTests
         useCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await service.CreateAsync(request: request);
+        Response<CategoryResponse> response = await service.CreateAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
@@ -75,8 +80,7 @@ public class CategoryServiceTests
         var request = new CreateCategoryRequest
         {
             Title = "Saúde",
-            Description = "Farmácia e consultas",
-            UserId = Guid.NewGuid()
+            Description = "Farmácia e consultas"
         };
 
         useCaseFake.ResponseToReturn = new Response<CategoryResponse>
@@ -102,39 +106,37 @@ public class CategoryServiceTests
         var useCaseFake = new CreateCategoryUseCaseFake();
         var service = new CategoryService(createCategoryUseCase: useCaseFake);
 
-        var userId = Guid.NewGuid();
-
         // Act
         Response<DeleteResponse> deleteResponse = await service.DeleteAsync(
             request: new DeleteCategoryRequest
             {
-                Id = Guid.NewGuid(),
-                UserId = userId
-            });
+                Id = Guid.NewGuid()
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         PagedResponse<CategoryResponse> getAllResponse = await service.GetAllAsync(
             request: new GetAllCategoriesRequest
             {
                 PageNumber = 1,
-                PageSize = 10,
-                UserId = userId
-            });
+                PageSize = 10
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Response<CategoryResponse> getByIdResponse = await service.GetByIdAsync(
             request: new GetCategoryByIdRequest
             {
-                Id = Guid.NewGuid(),
-                UserId = userId
-            });
+                Id = Guid.NewGuid()
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Response<CategoryResponse> updateResponse = await service.UpdateAsync(
             request: new UpdateCategoryRequest
             {
                 Id = Guid.NewGuid(),
                 Title = "Educação",
-                Description = "Livros",
-                UserId = userId
-            });
+                Description = "Livros"
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(expected: "Implementação pendente.", actual: deleteResponse.Message);

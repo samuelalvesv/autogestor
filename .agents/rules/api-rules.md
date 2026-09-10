@@ -21,3 +21,11 @@ applyTo: "src/Autogestor.Api/**/*.cs"
   - Habilitar suporte a gRPC-Web no `Program.cs` com `app.UseGrpcWeb()`.
   - Mapear serviços com `app.MapGrpcService<T>().EnableGrpcWeb()`.
 - **Injeção de Dependências**: O `Program.cs` deste projeto é o único que conhece todas as camadas concretas da aplicação para poder compor o contêiner de DI.
+
+## Ferramentas
+
+- **Plugin `dotnet-aspnetcore`**: skills `dotnet-webapi`, `configuring-opentelemetry-dotnet`, `minimal-api-file-upload`
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Plugin `dotnet-data`**: skill `create-datadriven-aspnetcore`
+- **Plugin `dotnet-nuget`**: skill `convert-to-cpm`
+- **Submódulo `ponytail`**: skill `ponytail`

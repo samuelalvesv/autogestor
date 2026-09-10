@@ -24,3 +24,8 @@ As migrações de tabelas e chaves são gerenciadas via C# (EF Core Migrations).
   - Functions: `fn_`
   - Views: `vw_`
   - Triggers: `tr_`
+
+## Ferramentas
+
+- **Submódulo `postgres-skills`**: skill `postgres-best-practices`
+- **Submódulo `agent-skills`**: skills `neon`, `neon-postgres`, `neon-postgres-branches`, `neon-postgres-egress-optimizer`, servidor MCP `neon`

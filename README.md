@@ -93,11 +93,12 @@ autogestor/
 │   ├── triggers/                         # Triggers SQL
 │   └── views/                            # Views SQL
 ├── .agents/                              # Governança, regras e inteligência para agentes AI
+│   ├── agents/                           # Subagentes especializados (performance, testes, msbuild)
 │   ├── doc/                              # Documentação de customizações e capacidades do agente
 │   ├── rules/                            # Regras de arquitetura, C#, testes, multi-tenancy e git
 │   ├── scripts/                          # Scripts de validação e CI local (ex: verify-build.sh)
-│   ├── skills/                           # Skills especializadas (ex: neon, code-review)
-│   └── workflows/                        # Workflows automatizados (ex: propagate-domain.md)
+│   ├── vendor/                           # Skills e plugins de fornecedores (dotnet, ponytail, neon)
+│   └── skills/                           # Skills operacionais (/code-review, /audit-tests, etc.)
 ├── AGENTS.md                             # Identidade do agente, convenções de código e diretrizes
 ├── Autogestor.slnx                       # Arquivo de solução .NET
 ├── Directory.Build.props                 # Configurações globais de compilação MSBuild
@@ -152,8 +153,8 @@ O sistema adota isolamento em **dois níveis**:
 
 Para entender em detalhes os padrões do projeto, consulte a documentação técnica:
 
-- **[AGENTS.md](AGENTS.md)**: Convenções de código C#, identidade do agente e regras fundamentais.
-- **[Arquitetura](.agents/rules/architecture.md)**: Detalhamento de camadas, gRPC-Web Code-First e AOT.
-- **[Identity & Multi-Tenancy](.agents/rules/identity-multitenancy.md)**: Modelo de Tenants, Branches e cardinalidades.
-- **[Convenções C#](.agents/rules/csharp-conventions.md)**: Padrões de escrita em C# moderno.
-- **[Git Commit](.agents/rules/git-commit.md)**: Convenções semânticas de commit e boas práticas.
+- **[AGENTS.md](AGENTS.md)**.
+- **[Arquitetura](.agents/rules/architecture.md)**.
+- **[Identity & Multi-Tenancy](.agents/rules/identity-multitenancy.md)**.
+- **[Convenções C#](.agents/rules/csharp-conventions.md)**.
+- **[Git e Controle de Versão](.agents/rules/git.md)**.

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/global.json",
+  "sdk": {
+    "version": "10.0.401",
+    "rollForward": "latestPatch",
+    "allowPrerelease": false,
+    "errorMessage": "O Autogestor requer o .NET 10 SDK (versão 10.0.4xx ou patch superior). Instale o SDK compatível para compilar o projeto."
+  },
+  "test": {
+    "runner": "Microsoft.Testing.Platform"
+  }
+}

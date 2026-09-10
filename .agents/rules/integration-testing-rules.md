@@ -15,3 +15,11 @@ applyTo: "test/Autogestor.IntegrationTests/**/*.cs"
 - **Princípio YAGNI e Escopo Real**: Focar estritamente em integrações reais (queries no banco, persistência, interceptors e fluxos ponta a ponta). É proibido criar testes de integração para checagens sintáticas, validações de nulidade já garantidas pelo framework ou comportamentos intrínsecos do C#.
 - **Convenção de Nomenclatura para Recursos Compartilhados**: Classes responsáveis pela inicialização e gerenciamento do ciclo de vida de contêineres e dependências externas compartilhadas devem utilizar obrigatoriamente o sufixo `Fixture`.
 - **Escopo Exclusivo de Infraestrutura Real**: Este projeto é reservado estritamente para validações que exigem a integração efetiva com recursos reais em contêineres. É expressamente proibido alocar neste projeto testes que utilizem dublês de repositório em substituição ao banco de dados ou testes unitários de regras lógicas que não exerçam persistência real.
+
+## Ferramentas
+
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skills `test-anti-patterns`, `assertion-quality`, `test-gap-analysis`, `test-analysis-extensions`, `find-untested-sources`, `coverage-analysis`
+- **Plugin `dotnet-data`**: skill `optimizing-ef-core-queries`
+- **Plugin `dotnet-experimental`**: skill `exp-test-maintainability`
+- **Submódulo `postgres-skills`**: skill `postgres-best-practices`
+- **Submódulo `agent-skills`**: skill `neon-postgres-branches`, servidor MCP `neon`

@@ -25,3 +25,9 @@ applyTo: "src/Autogestor.UI/**/*.{cs,razor}"
   - Não referencia pacotes específicos de hosts (`Microsoft.AspNetCore.Components.WebAssembly` ou `Microsoft.Maui`).
   - Não referencia `Autogestor.ServiceDefaults`.
   - Acesso a APIs externas/nativas deve ser feito via **interfaces** com implementação registrada via injeção de dependência pelo host final.
+
+## Ferramentas
+
+- **Plugin `dotnet-blazor`**: skills `author-component`, `plan-ui-change`, `collect-user-input`, `coordinate-components`, `fetch-and-send-data`, `support-prerendering`, `use-js-interop`
+- **Plugin `dotnet-data`**: skill `create-datadriven-aspnetcore`
+- **Submódulo `ponytail`**: skill `ponytail`

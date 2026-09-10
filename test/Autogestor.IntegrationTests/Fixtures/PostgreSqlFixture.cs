@@ -16,7 +16,7 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
 
     private string ConnectionString => _container.GetConnectionString();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
 
@@ -24,17 +24,30 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
         await context.Database.EnsureCreatedAsync();
     }
 
-    public Task DisposeAsync() => _container.DisposeAsync().AsTask();
+    public ValueTask DisposeAsync() => _container.DisposeAsync();
 
-    public AppDbContext CreateContext(IUserContext? userContext = null)
+    public AppDbContext CreateContext() =>
+        CreateContext(userContext: new UserContextFake(), tenantContext: new TenantContextFake());
+
+    public AppDbContext CreateContext(ITenantContext tenantContext) =>
+        CreateContext(userContext: new UserContextFake(), tenantContext: tenantContext);
+
+    public AppDbContext CreateContext(IUserContext userContext) =>
+        CreateContext(userContext: userContext, tenantContext: new TenantContextFake());
+
+    public AppDbContext CreateContext(IUserContext userContext, ITenantContext tenantContext)
     {
-        IUserContext effectiveUserContext = userContext ?? new UserContextFake();
         DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(connectionString: ConnectionString)
-            .AddInterceptors(interceptors: new AuditableEntityInterceptor(userContext: effectiveUserContext))
+            .AddInterceptors(
+                interceptors:
+                [
+                    new AuditableEntityInterceptor(userContext: userContext),
+                    new TenantEntityInterceptor(tenantContext: tenantContext)
+                ])
             .Options;
 
-        return new AppDbContext(options: options);
+        return new AppDbContext(options: options, tenantContext: tenantContext);
     }
 }
 
