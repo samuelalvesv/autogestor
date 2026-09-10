@@ -16,6 +16,7 @@ Thumbs.db
 
 ## [Logs]
 # Arquivos de log gerados em tempo de execução
+*.binlog
 .local/
 .nuget
 *.DotSettings.user

@@ -29,37 +29,26 @@ public sealed class AuditableEntityInterceptor(IUserContext userContext) : SaveC
     private void UpdateAuditEntities(DbContext context)
     {
         DateTime utcNow = DateTime.UtcNow;
+        Guid? currentUserId = null;
 
-        var addedEntries = context.ChangeTracker.Entries<AuditableEntity>()
-            .Where(predicate: e => e.State == EntityState.Added)
-            .ToList();
-
-        if (addedEntries.Count > 0)
+        foreach (EntityEntry<AuditableEntity> entry in context.ChangeTracker.Entries<AuditableEntity>())
         {
-            Guid currentUserId = userContext.UserId;
-            foreach (EntityEntry<AuditableEntity> entry in addedEntries)
+            if (entry.State == EntityState.Added)
             {
+                currentUserId ??= userContext.UserId;
                 if (entry.Property(propertyExpression: e => e.CreatedAt).CurrentValue == default)
                     entry.Property(propertyExpression: e => e.CreatedAt).CurrentValue = utcNow;
 
                 if (entry.Entity.CreatedBy == Guid.Empty)
-                    entry.Property(propertyExpression: e => e.CreatedBy).CurrentValue = currentUserId;
+                    entry.Property(propertyExpression: e => e.CreatedBy).CurrentValue = currentUserId.Value;
             }
-        }
-
-        var modifiedEntries = context.ChangeTracker.Entries<AuditableEntity>()
-            .Where(predicate: e => e.State == EntityState.Modified)
-            .ToList();
-
-        if (modifiedEntries.Count > 0)
-        {
-            Guid currentUserId = userContext.UserId;
-            foreach (EntityEntry<AuditableEntity> entry in modifiedEntries)
+            else if (entry.State == EntityState.Modified)
             {
+                currentUserId ??= userContext.UserId;
                 entry.Property(propertyExpression: e => e.CreatedAt).IsModified = false;
                 entry.Property(propertyExpression: e => e.CreatedBy).IsModified = false;
                 entry.Property(propertyExpression: e => e.UpdatedAt).CurrentValue = utcNow;
-                entry.Property(propertyExpression: e => e.UpdatedBy).CurrentValue = currentUserId;
+                entry.Property(propertyExpression: e => e.UpdatedBy).CurrentValue = currentUserId.Value;
             }
         }
     }
