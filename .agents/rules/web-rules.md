@@ -22,14 +22,8 @@ applyTo: "src/Autogestor.Web/**/*.{cs,razor}"
 
 ## Ferramentas
 
-- **Plugin `dotnet-msbuild`**:
-  - Subagentes `build-perf`, `msbuild`: Diagnóstico e otimização dos tempos de compilação Ahead-of-Time (AOT), linking e dependências WebAssembly.
-  - Servidor MCP `binlog`: Inspeção analítica das tarefas e tempos de compilação AOT e empacotamento do WebAssembly.
-- **Plugin `dotnet-blazor`**:
-  - Skills `author-component`, `support-prerendering`, `use-js-interop`: Estruturação do shell `App.razor`, inicialização limpa sem flicker e suporte a PWA.
-- **Plugin `dotnet-upgrade`**:
-  - Skill `dotnet-aot-compat`: Diagnóstico e resolução de avisos de reflexão dinâmica, compatibilidade e trimming para compilação WebAssembly AOT.
-- **Plugin `dotnet-aspnetcore`**:
-  - Skill `convert-blazor-server-to-webapp`: Padrões de hospedagem e arquitetura moderna para Blazor WebAssembly no ecossistema .NET 10.
-- **Plugin `dotnet-diag`**:
-  - Skill `analyzing-dotnet-performance`: Otimização de inicialização, minimização de alocação de heap e redução do payload WASM.
+- **Plugin `dotnet-msbuild`**: subagentes `build-perf`, `msbuild`, servidor MCP `binlog`
+- **Plugin `dotnet-blazor`**: skills `author-component`, `support-prerendering`, `use-js-interop`
+- **Plugin `dotnet-upgrade`**: skill `dotnet-aot-compat`
+- **Plugin `dotnet-aspnetcore`**: skill `convert-blazor-server-to-webapp`
+- **Plugin `dotnet-diag`**: skill `analyzing-dotnet-performance`

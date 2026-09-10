@@ -33,13 +33,7 @@ applyTo: "src/Autogestor.Contract/**/*.cs"
 
 ## Ferramentas
 
-- **Plugin `dotnet-diag`**:
-  - Subagente `optimizing-dotnet-performance`: Avaliação de impacto de alocação de memória em DTOs, coleções e overhead de serialização Protobuf.
-  - Skill `analyzing-dotnet-performance`: Detecção de anti-patterns de alocação de memória em serialização e manipulação de coleções nos contratos.
-- **Plugin `dotnet-test`**:
-  - Subagente `test-quality-auditor`: Auditoria dos testes que comprovam integridade de serialização e compatibilidade de contratos.
-  - Skills `assertion-quality`, `test-gap-analysis`: Validação de profundidade de testes e análise de mutações em contratos ponta a ponta.
-- **Plugin `dotnet-upgrade`**:
-  - Skill `dotnet-aot-compat`: Garantia de compatibilidade de DTOs e serializadores com compilação Native AOT e trimming.
-- **Submódulo `ponytail`**:
-  - Skill `ponytail`: Modelagem minimalista de DTOs, evitando propriedades redundantes ou hierarquias especulativas (YAGNI).
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skills `assertion-quality`, `test-gap-analysis`
+- **Plugin `dotnet-upgrade`**: skill `dotnet-aot-compat`
+- **Submódulo `ponytail`**: skill `ponytail`

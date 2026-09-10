@@ -14,10 +14,6 @@ applyTo: "src/Autogestor.ServiceDefaults/**/*.cs"
 
 ## Ferramentas
 
-- **Plugin `dotnet-aspnetcore`**:
-  - Skills `configuring-opentelemetry-dotnet`, `dotnet-webapi`: Configuração do SDK OpenTelemetry, exporters OTLP, traces distribuídos e endpoints de health check.
-- **Plugin `dotnet-diag`**:
-  - Subagente `optimizing-dotnet-performance`: Profiling de alocações e overhead no pipeline OTLP e resiliência HTTP.
-  - Skill `analyzing-dotnet-performance`: Auditoria de políticas de resiliência HTTP/gRPC, timeouts e pooling de sockets.
-- **Submódulo `ponytail`**:
-  - Skill `ponytail`: Telemetria e resiliência enxutas, aproveitando ao máximo as extensões padrão do Aspire e da BCL.
+- **Plugin `dotnet-aspnetcore`**: skills `configuring-opentelemetry-dotnet`, `dotnet-webapi`
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Submódulo `ponytail`**: skill `ponytail`

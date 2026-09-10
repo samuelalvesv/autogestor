@@ -27,9 +27,5 @@ As migrações de tabelas e chaves são gerenciadas via C# (EF Core Migrations).
 
 ## Ferramentas
 
-- **Submódulo `postgres-skills`**:
-  - Skill `postgres-best-practices`: Melhores práticas de modelagem relacional, estratégias de indexação, otimização de consultas e criação de funções/triggers no PostgreSQL.
-- **Submódulo `agent-skills`**:
-  - Skills `neon`, `neon-postgres`, `neon-postgres-branches`: Padrões de banco de dados Lakebase Postgres, boas práticas de pooler e branches isoladas.
-  - Skill `neon-postgres-egress-optimizer`: Otimização de consultas nativas e views para diminuir transferência de dados de rede (egress).
-  - Servidor MCP `neon`: Execução direta de comandos SQL nativos, inspeção de índices e validação da integridade de views e procedures no Lakebase Postgres.
+- **Submódulo `postgres-skills`**: skill `postgres-best-practices`
+- **Submódulo `agent-skills`**: skills `neon`, `neon-postgres`, `neon-postgres-branches`, `neon-postgres-egress-optimizer`, servidor MCP `neon`

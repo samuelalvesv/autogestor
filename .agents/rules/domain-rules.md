@@ -16,16 +16,11 @@ applyTo: "src/Autogestor.Domain/**/*.cs"
 ## Diretrizes e Restrições
 - **Isolamento de Infraestrutura**: Zero pacotes NuGet externos e zero referências a outros projetos da Solution.
 - **Herança de Classes Base**: As entidades de domínio devem herdar de `AuditableEntity` (para dados globais auditados) ou `TenantEntity` (para dados isolados por tenant auditados). Casos especiais que não requerem auditoria de usuário (como a própria entidade de usuário, logs de sistema ou dados estáticos globais) devem herdar diretamente de `Entity`.
-- **Encapsulamento**: As entidades devem possuir construtores privados/protegidos e métodos de fábrica públicos (`Create`, `From`) para garantir que instâncias inválidas nunca sejam criadas.
-- **Isolamento de Tenants**: Entidades que possuem escopo de tenant devem herdar de `TenantEntity` (consultar regra de `identity-multitenancy`).
+- **Encapsulamento**: Em classes seladas, os construtores devem ser estritamente privados (`private`); em classes base abstratas destinadas a herança, devem ser protegidos (`protected`). A instanciação pública é realizada exclusivamente por métodos de fábrica expressivos (`Create`, `From`) para garantir que instâncias inválidas nunca sejam criadas.
+- **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](identity-multitenancy.md).
 
 ## Ferramentas
 
-- **Plugin `dotnet-test`**:
-  - Subagente `test-quality-auditor`: Auditoria de cobertura e profundidade dos testes de invariantes das entidades e Value Objects.
-  - Skills `assertion-quality`, `test-gap-analysis`: Elaboração de asserções ricas em testes unitários e identificação de mutações e casos de borda.
-- **Plugin `dotnet-diag`**:
-  - Subagente `optimizing-dotnet-performance`: Avaliação de impacto de alocação de memória e execução em métodos de fábrica e operações no hot path.
-  - Skill `analyzing-dotnet-performance`: Garantia de alocação eficiente, imutabilidade e ausência de anti-patterns de memória no domínio.
-- **Submódulo `ponytail`**:
-  - Skills `ponytail`, `ponytail-review`: Modelagem limpa, rica e anti-complexidade, mantendo entidades focadas estritamente nas regras de negócio necessárias (YAGNI).
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skills `assertion-quality`, `test-gap-analysis`
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Submódulo `ponytail`**: skills `ponytail`, `ponytail-review`

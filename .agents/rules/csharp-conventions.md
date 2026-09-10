@@ -17,7 +17,7 @@ applyTo: "**/*.{cs,razor}"
 - **Propagação de CancellationToken**: Métodos assíncronos devem configurar o token de cancelamento como parâmetro opcional com valor padrão (`default`). É estritamente proibida a invocação manual de `ThrowIfCancellationRequested()` em camadas de orquestração (use cases, serviços e repositórios), delegando a interrupção exclusivamente às operações nativas da BCL e do EF Core através da propagação direta do token.
 - **Tratamento de Exceções Nativo**: O handler de exceções globais mencionado nos wrappers deve ser implementado utilizando a interface nativa `IExceptionHandler` (disponível a partir do .NET 8), evitando middlewares customizados pesados.
 - **Performance de Alocação**: Em métodos assíncronos que possuem caminhos de execução síncronos frequentes (como checagem de cache ou validações em memória rápidos), preferir `ValueTask` ou `ValueTask<T>` ao invés de `Task` para reduzir alocações na Heap.
-- **Tratamento de Data/Hora (UTC)**: É obrigatório instanciar e manipular valores de data e hora sempre em formato UTC na aplicação (ex: utilizando `DateTime.UtcNow`). Para regras de mapeamento de persistência, consultar o README da infraestrutura.
+- **Tratamento de Data/Hora (UTC)**: É obrigatório instanciar e manipular valores de data e hora sempre em formato UTC na aplicação.
 - **Ferramentas e Bibliotecas**: Adotar exclusivamente tecnologias open source consolidadas e amplamente validadas pela comunidade do .NET.
 - **Desacoplamento e Reuso (Wrappers)**: Implementar **wrappers** de controle (como o padrão `Result<T>` para fluxos de negócio ou handlers de exceções globais) para evitar a repetição de lógica de tratamento de erro, logs e try-catchs em múltiplos endpoints.
 - **Validação Estática em Tempo de Compilação**: Preferir sempre que possível a validação estática de código, detectando erros em tempo de compilação ao invés de em tempo de execução. Isso inclui: uso de tipos fortes ao invés de `string`/`object` genéricos, atributos de análise estática (`[NotNullWhen]`, `[MemberNotNull]`, `[StringSyntax]`), `const` e `readonly` para imutabilidade verificável pelo compilador, nullable reference types habilitados (`<Nullable>enable</Nullable>`), e warnings tratados como erros (`<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`) para impedir que avisos de análise sejam ignorados.
@@ -39,15 +39,7 @@ applyTo: "**/*.{cs,razor}"
 
 ## Ferramentas
 
-- **Plugin `dotnet-diag`**:
-  - Subagente `optimizing-dotnet-performance`: Diagnóstico profundo em duas etapas (análise direta de gargalos e varredura do catálogo de anti-patterns).
-  - Skill `analyzing-dotnet-performance`: Varredura estática de anti-patterns em async, memória, strings, coleções, LINQ e I/O.
-  - Skill `microbenchmarking`: Metodologia e execução de benchmarks empíricos com BenchmarkDotNet.
-  - Skills `dotnet-trace-collect`, `dump-collect`: Coleta de traces de execução e memory dumps para diagnosticar hotspots.
-- **Plugin `dotnet-upgrade`**:
-  - Skill `dotnet-aot-compat`: Eliminação de reflexão dinâmica e garantia de compatibilidade com Native AOT e trimming.
-  - Skill `migrate-nullable-references`: Aderência estrita a tipos anuláveis (NRTs) e resolução de avisos em tempo de compilação.
-- **Plugin `dotnet-msbuild`**:
-  - Skill `including-generated-files`: Suporte à compilação e inclusão correta de código produzido por Source Generators.
-- **Submódulo `ponytail`**:
-  - Skills `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`: Auditoria permanente contra over-engineering e rastreamento de débitos técnicos conscientes.
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skills `analyzing-dotnet-performance`, `microbenchmarking`, `dotnet-trace-collect`, `dump-collect`
+- **Plugin `dotnet-upgrade`**: skills `dotnet-aot-compat`, `migrate-nullable-references`
+- **Plugin `dotnet-msbuild`**: skill `including-generated-files`
+- **Submódulo `ponytail`**: skills `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`

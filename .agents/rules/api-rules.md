@@ -24,14 +24,8 @@ applyTo: "src/Autogestor.Api/**/*.cs"
 
 ## Ferramentas
 
-- **Plugin `dotnet-aspnetcore`**:
-  - Skills `dotnet-webapi`, `configuring-opentelemetry-dotnet`, `minimal-api-file-upload`: Padrões de semântica HTTP/gRPC, tratamento global de exceções, observabilidade OTLP e streaming seguro de arquivos.
-- **Plugin `dotnet-diag`**:
-  - Subagente `optimizing-dotnet-performance`: Profiling de throughput e latência de endpoints gRPC e middlewares.
-  - Skill `analyzing-dotnet-performance`: Identificação de gargalos assíncronos e alocações no pipeline Kestrel e serialização.
-- **Plugin `dotnet-data`**:
-  - Skill `create-datadriven-aspnetcore`: Mapeamento rápido e estruturação de rotas e endpoints orientados a dados.
-- **Plugin `dotnet-nuget`**:
-  - Skill `convert-to-cpm`: Governança de versões centralizadas para dependências do projeto API.
-- **Submódulo `ponytail`**:
-  - Skill `ponytail`: Manter serviços gRPC estritamente finos (thin presentation), delegando orquestrações para Application.
+- **Plugin `dotnet-aspnetcore`**: skills `dotnet-webapi`, `configuring-opentelemetry-dotnet`, `minimal-api-file-upload`
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Plugin `dotnet-data`**: skill `create-datadriven-aspnetcore`
+- **Plugin `dotnet-nuget`**: skill `convert-to-cpm`
+- **Submódulo `ponytail`**: skill `ponytail`

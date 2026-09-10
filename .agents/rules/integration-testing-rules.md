@@ -18,17 +18,8 @@ applyTo: "test/Autogestor.IntegrationTests/**/*.cs"
 
 ## Ferramentas
 
-- **Plugin `dotnet-test`**:
-  - Subagente `test-quality-auditor`: Auditoria da suíte de testes de integração e robustez dos fluxos ponta a ponta.
-  - Skills `test-anti-patterns`, `assertion-quality`: Diagnóstico de fragilidades e validação de estado efetivamente persistido no banco.
-  - Skills `test-gap-analysis`, `test-analysis-extensions`: Análise de mutações e extensões de asserções em fluxos integrados.
-  - Skills `find-untested-sources`, `coverage-analysis`: Mapeamento de repositórios e interceptadores sem cobertura de integração.
-- **Plugin `dotnet-data`**:
-  - Skill `optimizing-ef-core-queries`: Inspeção do SQL gerado nas consultas de integração para evitar queries lentas e múltiplos round-trips.
-- **Plugin `dotnet-experimental`**:
-  - Skill `exp-test-maintainability`: Reutilização limpa e redução de duplicação de setup em classes de `Fixture`.
-- **Submódulo `postgres-skills`**:
-  - Skill `postgres-best-practices`: Validação das definições de tabelas, índices e tipos de dados no PostgreSQL do Testcontainers.
-- **Submódulo `agent-skills`**:
-  - Skill `neon-postgres-branches`: Criação de branches efêmeras de banco para simular e validar migrações e persistência de integração.
-  - Servidor MCP `neon`: Comparação entre os mapeamentos executados no Testcontainers e o schema esperado no Lakebase Postgres.
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skills `test-anti-patterns`, `assertion-quality`, `test-gap-analysis`, `test-analysis-extensions`, `find-untested-sources`, `coverage-analysis`
+- **Plugin `dotnet-data`**: skill `optimizing-ef-core-queries`
+- **Plugin `dotnet-experimental`**: skill `exp-test-maintainability`
+- **Submódulo `postgres-skills`**: skill `postgres-best-practices`
+- **Submódulo `agent-skills`**: skill `neon-postgres-branches`, servidor MCP `neon`

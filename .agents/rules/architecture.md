@@ -79,24 +79,11 @@ Para garantir a melhor performance, facilidade de manutenção e integração na
 
 ## Ferramentas
 
-- **Plugin `dotnet-msbuild`**:
-  - Subagentes `msbuild-code-review`, `build-perf`, `msbuild`: Auditoria de referências entre projetos, otimização de tempo de compilação e diagnóstico de build.
-  - Skills `directory-build-organization`, `msbuild-antipatterns`, `including-generated-files`: Estruturação centralizada de propriedades, resolução de anti-patterns e integração com Roslyn/Source Generators.
-  - Skills `incremental-build`, `check-bin-obj-clash`, `copy-to-output-directory`: Otimização de compilação incremental, prevenção de colisões de output e cópias redundantes.
-  - Skills `binlog-failure-analysis`, `binlog-generation`: Diagnóstico aprofundado e rastreabilidade via logs binários.
-  - Servidor MCP `binlog`: Inspeção analítica do grafo de compilação do MSBuild.
-- **Plugin `dotnet-nuget`**:
-  - Skill `convert-to-cpm`: Governança de Central Package Management (CPM) para alinhamento de versões na solução.
-- **Plugin `dotnet-template-engine`**:
-  - Skill `template-instantiation`: Scaffolding padronizado de novos projetos em conformidade com o CPM.
-- **Plugin `dotnet`**:
-  - Skill `setup-local-sdk`: Configuração e fixação do .NET SDK 10 local via `global.json`.
-- **Plugin `dotnet-upgrade`**:
-  - Skill `migrate-dotnet9-to-dotnet10`: Manutenção da solução alinhada com as melhores práticas do .NET 10.
-- **Plugin `dotnet-test`**:
-  - Subagente `test-quality-auditor`: Validação da qualidade dos testes que asseguram a integridade arquitetural.
-  - Skill `find-untested-sources`: Mapeamento de novas camadas sem testes associados.
-- **Submódulo `agent-skills`**:
-  - Servidor MCP `neon`: Inspeção da infraestrutura de banco Lakebase Postgres suportada pela arquitetura.
-- **Submódulo `ponytail`**:
-  - Skills `ponytail`, `ponytail-review`: Prevenção de camadas intermediárias e abstrações prematuras que violem o design enxuto.
+- **Plugin `dotnet-msbuild`**: subagentes `msbuild-code-review`, `build-perf`, `msbuild`, skills `directory-build-organization`, `msbuild-antipatterns`, `including-generated-files`, `incremental-build`, `check-bin-obj-clash`, `copy-to-output-directory`, `binlog-failure-analysis`, `binlog-generation`, servidor MCP `binlog`
+- **Plugin `dotnet-nuget`**: skill `convert-to-cpm`
+- **Plugin `dotnet-template-engine`**: skill `template-instantiation`
+- **Plugin `dotnet`**: skill `setup-local-sdk`
+- **Plugin `dotnet-upgrade`**: skill `migrate-dotnet9-to-dotnet10`
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skill `find-untested-sources`
+- **Submódulo `agent-skills`**: servidor MCP `neon`
+- **Submódulo `ponytail`**: skills `ponytail`, `ponytail-review`

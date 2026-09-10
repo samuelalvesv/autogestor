@@ -19,11 +19,5 @@ applyTo: "test/Autogestor.ArchitectureTests/**/*.cs"
 
 ## Ferramentas
 
-- **Plugin `dotnet-test`**:
-  - Subagente `test-quality-auditor`: Auditoria das asserções de integridade arquitetural garantindo que os testes de conformidade com NetArchTest sejam infalíveis.
-  - Skills `test-anti-patterns`, `assertion-quality`: Garantia de asserções ricas com NetArchTest que falhem explicitamente em caso de desrespeito a regras de dependência.
-  - Skill `find-untested-sources`: Garantia de que novos assemblies ou subespaços de nomes criados na solução sejam cobertos pelas regras de testes.
-- **Plugin `dotnet-msbuild`**:
-  - Subagente `msbuild-code-review`: Verificação estática de referências de projetos nos arquivos `.csproj` para validar limites arquiteturais.
-  - Skills `directory-build-organization`, `msbuild-antipatterns`: Auditoria da estrutura de propriedades e prevenção de acoplamentos indevidos.
-  - Servidor MCP `binlog`: Inspeção do grafo de dependências compiladas e referências reais de assemblies na solução.
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skills `test-anti-patterns`, `assertion-quality`, `find-untested-sources`
+- **Plugin `dotnet-msbuild`**: subagente `msbuild-code-review`, skills `directory-build-organization`, `msbuild-antipatterns`, servidor MCP `binlog`

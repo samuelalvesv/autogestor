@@ -19,21 +19,13 @@ applyTo: "src/Autogestor.Application/**/*.cs"
 - **Mediator (MediatR)**:
   - Cada caso de uso é um par Request/Handler (`IRequest<T>` e `IRequestHandler<TRequest, TResponse>`).
   - Cada caso de uso deve ser uma classe isolada (`sealed`) com um único método público.
-- **Autorização**: Consultar regra `identity-multitenancy` para verificação de permissão operacional com `IBranchAuthorizationService`.
+- **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](identity-multitenancy.md).
 
 ## Ferramentas
 
-- **Plugin `dotnet-test`**:
-  - Subagente `test-quality-auditor`: Diagnóstico da qualidade, asserções e cobertura dos testes de casos de uso e orquestrações.
-  - Skills `test-anti-patterns`, `assertion-quality`, `test-gap-analysis`: Detecção de testes fracos, validação de asserções completas e cobertura de validações FluentValidation.
-- **Plugin `dotnet-diag`**:
-  - Subagente `optimizing-dotnet-performance`: Otimização de pipelines de execução e fluxos assíncronos nos handlers do MediatR.
-  - Skill `analyzing-dotnet-performance`: Análise de execução assíncrona, propagação de cancelamento e prevenção de alocações em handlers.
-- **Plugin `dotnet-experimental`**:
-  - Skill `exp-mock-usage-analysis`: Auditoria de dublês de teste e mocks nos handlers para garantir testes realistas e enxutos.
-- **Plugin `dotnet-ai`**:
-  - Skill `technology-selection`: Seleção e integração de bibliotecas de IA/ML (.NET AI, ONNX, ML.NET) nos casos de uso.
-- **Submódulo `ponytail`**:
-  - Skills `ponytail`, `ponytail-review`: Eliminação de camadas intermediárias desnecessárias, serviços vazios ou abstrações prematuras nos casos de uso.
-- **Submódulo `agent-skills`**:
-  - Skill `neon-ai-gateway`: Integração e consumo padronizado de modelos através da infraestrutura unificada do Neon nos fluxos da aplicação.
+- **Plugin `dotnet-test`**: subagente `test-quality-auditor`, skills `test-anti-patterns`, `assertion-quality`, `test-gap-analysis`
+- **Plugin `dotnet-diag`**: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`
+- **Plugin `dotnet-experimental`**: skill `exp-mock-usage-analysis`
+- **Plugin `dotnet-ai`**: skill `technology-selection`
+- **Submódulo `ponytail`**: skills `ponytail`, `ponytail-review`
+- **Submódulo `agent-skills`**: skill `neon-ai-gateway`
