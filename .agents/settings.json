@@ -37,8 +37,6 @@
       "command(git reset *)",
       "command(git rm)",
       "command(git rm *)",
-      "command(rm)",
-      "command(rm *)",
       "command(rtk git add)",
       "command(rtk git add *)",
       "command(rtk git branch)",

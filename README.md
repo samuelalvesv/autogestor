@@ -157,4 +157,4 @@ Para entender em detalhes os padrões do projeto, consulte a documentação téc
 - **[Arquitetura](.agents/rules/architecture.md)**.
 - **[Identity & Multi-Tenancy](.agents/rules/identity-multitenancy.md)**.
 - **[Convenções C#](.agents/rules/csharp-conventions.md)**.
-- **[Git Commit](.agents/rules/git-commit.md)**.
+- **[Git e Controle de Versão](.agents/rules/git.md)**.
