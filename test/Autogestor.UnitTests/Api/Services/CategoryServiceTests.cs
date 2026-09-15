@@ -6,7 +6,7 @@ using Autogestor.Contract.Responses.Categories;
 
 namespace Autogestor.UnitTests.Api.Services;
 
-public class CategoryServiceTests
+public sealed class CategoryServiceTests
 {
     private sealed class CreateCategoryUseCaseFake : ICreateCategoryUseCase
     {

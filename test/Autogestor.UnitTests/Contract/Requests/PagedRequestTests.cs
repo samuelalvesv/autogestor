@@ -1,39 +1,54 @@
+using System.ComponentModel.DataAnnotations;
 using Autogestor.Contract;
 using Autogestor.Contract.Requests;
 
 namespace Autogestor.UnitTests.Contract.Requests;
 
-public class PagedRequestTests
+public sealed class PagedRequestTests
 {
     private sealed record TestPagedRequest : PagedRequest;
 
-    [Fact]
-    public void PagedRequest_ShouldRequireAllPropertiesOnInitialization()
+    private static IList<ValidationResult> ValidateModel(object model)
     {
-        // Act
+        var validationResults = new List<ValidationResult>();
+        var validationContext = new ValidationContext(instance: model, serviceProvider: null, items: null);
+        Validator.TryValidateObject(instance: model, validationContext: validationContext, validationResults: validationResults, validateAllProperties: true);
+        return validationResults;
+    }
+
+    [Fact]
+    public void PagedRequest_WithValidValues_PassesValidation()
+    {
+        // Arrange & Act
         var request = new TestPagedRequest
         {
             PageNumber = ContractDefaults.DefaultPageNumber,
             PageSize = ContractDefaults.DefaultPageSize
         };
 
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
         // Assert
-        Assert.Equal(expected: ContractDefaults.DefaultPageNumber, actual: request.PageNumber);
-        Assert.Equal(expected: ContractDefaults.DefaultPageSize, actual: request.PageSize);
+        Assert.Empty(collection: errors);
     }
 
-    [Fact]
-    public void PagedRequest_ShouldAllowCustomValuesOnInit()
+    [Theory]
+    [InlineData(0, 25)]
+    [InlineData(-1, 25)]
+    [InlineData(1, 5)]
+    [InlineData(1, 51)]
+    public void PagedRequest_WithInvalidValues_FailsValidation(int pageNumber, int pageSize)
     {
-        // Act
+        // Arrange & Act
         var request = new TestPagedRequest
         {
-            PageNumber = 3,
-            PageSize = 30
+            PageNumber = pageNumber,
+            PageSize = pageSize
         };
 
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
         // Assert
-        Assert.Equal(expected: 3, actual: request.PageNumber);
-        Assert.Equal(expected: 30, actual: request.PageSize);
+        Assert.NotEmpty(collection: errors);
     }
 }

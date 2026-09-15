@@ -7,10 +7,10 @@ namespace Autogestor.Contract.Requests;
 public abstract record PagedRequest
 {
     [DataMember(Order = 1)]
-    [Range(ContractDefaults.MinPageNumber, ContractDefaults.MaxPageNumber)]
+    [Range(minimum: ContractDefaults.MinPageNumber, maximum: ContractDefaults.MaxPageNumber)]
     public required int PageNumber { get; init; }
 
     [DataMember(Order = 2)]
-    [Range(ContractDefaults.MinPageSize, ContractDefaults.MaxPageSize)]
+    [Range(minimum: ContractDefaults.MinPageSize, maximum: ContractDefaults.MaxPageSize)]
     public required int PageSize { get; init; }
 }

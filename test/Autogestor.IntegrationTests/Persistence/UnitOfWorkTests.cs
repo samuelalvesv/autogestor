@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Autogestor.IntegrationTests.Persistence;
 
 [Collection(name: "PostgreSql")]
-public class UnitOfWorkTests(PostgreSqlFixture fixture)
+public sealed class UnitOfWorkTests(PostgreSqlFixture fixture)
 {
     [Fact]
     public async Task CommitAsync_WithoutChanges_CompletesSuccessfully()

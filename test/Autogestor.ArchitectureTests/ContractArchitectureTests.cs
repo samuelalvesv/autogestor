@@ -5,7 +5,7 @@ using Autogestor.Contract;
 
 namespace Autogestor.ArchitectureTests;
 
-public class ContractArchitectureTests
+public sealed class ContractArchitectureTests
 {
     private static readonly Assembly ContractAssembly = typeof(ContractDefaults).Assembly;
 
@@ -76,6 +76,27 @@ public class ContractArchitectureTests
             {
                 OperationContractAttribute? operationContract = method.GetCustomAttribute<OperationContractAttribute>(inherit: false);
                 Assert.True(condition: operationContract is not null, userMessage: $"O método '{method.Name}' em '{type.FullName}' deve ser decorado com [OperationContract].");
+            }
+        }
+    }
+
+    [Fact]
+    public void All_Enum_Types_In_Contract_Should_Have_DataContract_And_EnumMember_Attributes()
+    {
+        IEnumerable<Type> enumTypes = ContractAssembly.GetExportedTypes()
+            .Where(predicate: t => t.IsEnum &&
+                        t.Namespace?.StartsWith("Autogestor.Contract.Enums", StringComparison.Ordinal) == true);
+
+        foreach (Type enumType in enumTypes)
+        {
+            DataContractAttribute? dataContract = enumType.GetCustomAttribute<DataContractAttribute>(inherit: false);
+            Assert.True(condition: dataContract is not null, userMessage: $"O Enum '{enumType.FullName}' deve ser decorado com [DataContract].");
+
+            FieldInfo[] fields = enumType.GetFields(bindingAttr: BindingFlags.Public | BindingFlags.Static);
+            foreach (FieldInfo field in fields)
+            {
+                EnumMemberAttribute? enumMember = field.GetCustomAttribute<EnumMemberAttribute>(inherit: false);
+                Assert.True(condition: enumMember is not null, userMessage: $"O membro '{field.Name}' no enum '{enumType.FullName}' deve ser decorado com [EnumMember].");
             }
         }
     }

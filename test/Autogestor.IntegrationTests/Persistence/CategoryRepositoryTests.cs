@@ -6,7 +6,7 @@ using Autogestor.IntegrationTests.Fixtures;
 namespace Autogestor.IntegrationTests.Persistence;
 
 [Collection(name: "PostgreSql")]
-public class CategoryRepositoryTests(PostgreSqlFixture fixture)
+public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
 {
     [Fact]
     public async Task AddAsync_PersistsCategoryToPostgreSqlDatabase()
@@ -42,7 +42,7 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsPersistedCategoriesFromDatabase()
+    public async Task GetPagedAsync_ReturnsPersistedCategoriesFromDatabase()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -62,7 +62,7 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta em novo contexto com o mesmo tenant
         await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var queryRepo = new CategoryRepository(context: queryContext);
-        IReadOnlyList<Category> all = await queryRepo.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+        IReadOnlyList<Category> all = await queryRepo.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Contains(collection: all, filter: c => c.Id == cat1.Id);
@@ -70,7 +70,7 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenQueriedByDifferentTenant_DoesNotReturnCategoriesFromOtherTenant()
+    public async Task GetPagedAsync_WhenQueriedByDifferentTenant_DoesNotReturnCategoriesFromOtherTenant()
     {
         // Arrange
         var tenant1 = Guid.NewGuid();
@@ -87,11 +87,11 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta com o contexto do Tenant 2
         await using AppDbContext contextTenant2 = fixture.CreateContext(tenantContext: tenantContext2);
         var repoTenant2 = new CategoryRepository(context: contextTenant2);
-        IReadOnlyList<Category> categoriesTenant2 = await repoTenant2.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+        IReadOnlyList<Category> categoriesTenant2 = await repoTenant2.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
         Category? categoryById = await repoTenant2.GetByIdAsync(id: catTenant1.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - isolamento absoluto garantido por Global Query Filter
-        Assert.DoesNotContain(collection: categoriesTenant2, filter: c => c.Id == catTenant1.Id);
+        Assert.Empty(collection: categoriesTenant2);
         Assert.Null(@object: categoryById);
     }
 
@@ -109,7 +109,7 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task GetAllAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    public async Task GetPagedAsync_WithCancelledToken_ThrowsOperationCanceledException()
     {
         await using AppDbContext context = fixture.CreateContext();
         var repository = new CategoryRepository(context: context);
@@ -118,6 +118,6 @@ public class CategoryRepositoryTests(PostgreSqlFixture fixture)
         cts.Cancel();
 
         await Assert.ThrowsAsync<OperationCanceledException>(
-            testCode: () => repository.GetAllAsync(cancellationToken: cts.Token));
+            testCode: () => repository.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: cts.Token));
     }
 }

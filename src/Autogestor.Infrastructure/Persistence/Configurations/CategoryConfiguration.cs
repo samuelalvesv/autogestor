@@ -4,18 +4,18 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Autogestor.Infrastructure.Persistence.Configurations;
 
-public class CategoryConfiguration : TenantEntityConfiguration<Category>
+public sealed class CategoryConfiguration : TenantEntityConfiguration<Category>
 {
     public override void Configure(EntityTypeBuilder<Category> builder)
     {
-        base.Configure(builder);
+        base.Configure(builder: builder);
 
-        builder.Property(c => c.Title)
+        builder.Property(propertyExpression: c => c.Title)
             .IsRequired()
-            .HasColumnType("text");
+            .HasColumnType(typeName: "text");
 
-        builder.Property(c => c.Description)
+        builder.Property(propertyExpression: c => c.Description)
             .IsRequired()
-            .HasColumnType("text");
+            .HasColumnType(typeName: "text");
     }
 }

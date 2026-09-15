@@ -4,13 +4,18 @@
     <ProjectReference Include="../Autogestor.ServiceDefaults/Autogestor.ServiceDefaults.csproj" />
     <ProjectReference Include="../Autogestor.Infrastructure/Autogestor.Infrastructure.csproj" />
     <ProjectReference Include="../Autogestor.Application/Autogestor.Application.csproj" />
+    <ProjectReference Include="../Autogestor.Contract/Autogestor.Contract.csproj" />
+    <ProjectReference Include="../Autogestor.Domain/Autogestor.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore.Web" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="protobuf-net.Grpc.AspNetCore" />
+    <PackageReference Include="protobuf-net.Grpc.AspNetCore.Reflection" />
   </ItemGroup>
 
   <PropertyGroup>

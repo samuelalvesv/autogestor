@@ -1,11 +1,11 @@
 ---
 name: code-review
-description: Guia de revisão de código e garantia de qualidade para avaliar alterações contra regras de governança, Clean Architecture, performance e testabilidade no Autogestor.
+description: Orquestrador puro de revisão de código e consolidação de qualidade via delegação cirúrgica paralela para as 6 skills especializadas de auditoria (audit-architecture, audit-api, audit-ui, audit-performance, audit-tests, audit-simplicity).
 ---
 
-# Code Review & Quality Assurance
+# Code Review & Quality Assurance (Orquestrador Puro)
 
-Runbook operacional para guiar o agente em uma revisão completa, aprofundada e factual de alterações produzidas na sessão atual ou durante o ciclo de trabalho, garantindo conformidade arquitetural, performance, testabilidade, simplicidade e melhoria contínua da governança.
+Runbook operacional para atuar como meta-skill orquestradora de revisão de código no Autogestor. O orquestrador não realiza análises manuais diretas nem duplica avaliações; ele descobre os arquivos modificados, mapeia as camadas impactadas, dispara seletivamente e em paralelo os subagentes de auditoria especializada com escopo cirúrgico (`--diff`), consolida os achados padronizados e emite o relatório de fechamento unificado.
 
 ## Como Usar
 Invoque esta skill utilizando o comando:
@@ -19,22 +19,21 @@ Invoque esta skill utilizando o comando:
 
 ```mermaid
 flowchart TD
-    A[1. Git Discovery] --> B[2. Mapeamento de Regras .agents/rules/]
-    B --> C[3. Orquestração de Ferramentas, Subagentes e Skills]
-    C --> D[4. Análise Crítica e Anti-Overengineering]
-    D --> E[5. Relatório e Proposta de Atualização de Regras]
+    A["1. Git Discovery"] --> B["2. Disparo Paralelo Seletivo de Subagentes Especialistas com escopo cirúrgico --diff (audit-architecture, audit-api, audit-ui, audit-performance, audit-tests, audit-simplicity)"]
+    B --> C["3. Consolidação de Achados Padronizados nas 6 Dimensões 1:1"]
+    C --> D["4. Relatório de Fechamento Unificado"]
 ```
 
 ---
 
 ## 1. Descoberta de Arquivos Alterados (Git Discovery)
 
-Mapear as alterações realizadas no repositório executando os comandos CLI com prefixo `rtk`:
+Mapear as alterações realizadas no repositório executando exclusivamente comandos de leitura com prefixo `rtk`:
 
 ```bash
-rtk git log --since="today 00:00" --name-only --oneline
 rtk git status
 rtk git diff --name-only
+rtk git log --since="today 00:00" --name-only --oneline
 ```
 
 Agrupar os arquivos identificados por camadas do Autogestor:
@@ -49,88 +48,81 @@ Agrupar os arquivos identificados por camadas do Autogestor:
 - **Banco Nativo**: `db/**`
 - **Projetos / Build**: `**/*.csproj`, `Directory.Build.*`, `Directory.Packages.props`, `*.slnx`
 - **Testes**: `test/Autogestor.UnitTests/**`, `test/Autogestor.IntegrationTests/**`, `test/Autogestor.ArchitectureTests/**`
+- **Governança**: `.agents/**`, documentação
 
 ---
 
-## 2. Verificação de Conformidade com as Regras do Projeto
+## 2. Mapeamento de Alvos e Disparo Seletivo em Paralelo
 
-Carregar e avaliar os arquivos alterados contra a totalidade das regras aplicáveis em [.agents/rules/](../../rules/):
+O orquestrador mapeia as camadas impactadas e dispara em paralelo os subagentes especializados com escopo cirúrgico `--diff`:
 
-1. **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](../../rules/identity-multitenancy.md).
-2. **Convenções C#**: Seguir integralmente [.agents/rules/csharp-conventions.md](../../rules/csharp-conventions.md).
-3. **Arquitetura**: Seguir integralmente [.agents/rules/architecture.md](../../rules/architecture.md).
-4. **Contratos**: Seguir integralmente [.agents/rules/contracts-rules.md](../../rules/contracts-rules.md).
-5. **Regras Específicas por Camada**: Seguir integralmente os arquivos correspondentes em `.agents/rules/` para cada camada modificada:
-   - Domínio: [.agents/rules/domain-rules.md](../../rules/domain-rules.md)
-   - Aplicação: [.agents/rules/application-rules.md](../../rules/application-rules.md)
-   - Infraestrutura: [.agents/rules/infrastructure-rules.md](../../rules/infrastructure-rules.md)
-   - API: [.agents/rules/api-rules.md](../../rules/api-rules.md)
-   - UI (RCL): [.agents/rules/ui-rules.md](../../rules/ui-rules.md)
-   - Web (WASM): [.agents/rules/web-rules.md](../../rules/web-rules.md)
-   - ServiceDefaults: [.agents/rules/service-defaults-rules.md](../../rules/service-defaults-rules.md)
-   - Banco de Dados: [.agents/rules/database-rules.md](../../rules/database-rules.md)
-   - Testes Unitários: [.agents/rules/unit-testing-rules.md](../../rules/unit-testing-rules.md)
-   - Testes de Integração: [.agents/rules/integration-testing-rules.md](../../rules/integration-testing-rules.md)
-   - Testes de Arquitetura: [.agents/rules/architecture-testing-rules.md](../../rules/architecture-testing-rules.md)
+### Tabela de Mapeamento de Camadas e Skills Especializadas
 
----
+| Alvo / Camada | Arquivos / Diretórios | Skills Especializadas Designadas |
+| :--- | :--- | :--- |
+| **Domínio e Aplicação** | `src/Autogestor.Domain/**`, `src/Autogestor.Application/**` | `/audit-architecture`, `/audit-performance`, `/audit-tests`, `/audit-simplicity` |
+| **Infraestrutura e Persistência** | `src/Autogestor.Infrastructure/**`, `db/**` | `/audit-architecture`, `/audit-performance`, `/audit-tests`, `/audit-simplicity` |
+| **Projetos e MSBuild** | `**/*.csproj`, `Directory.Build.*`, `Directory.Packages.props`, `*.slnx` | `/audit-architecture`, `/audit-simplicity` |
+| **Contratos & gRPC** | `src/Autogestor.Contract/**` | `/audit-api`, `/audit-performance`, `/audit-tests`, `/audit-simplicity` |
+| **APIs e Endpoints** | `src/Autogestor.Api/**` | `/audit-api`, `/audit-performance`, `/audit-tests`, `/audit-simplicity` |
+| **ServiceDefaults & Observabilidade** | `src/Autogestor.ServiceDefaults/**` | `/audit-api`, `/audit-performance`, `/audit-tests`, `/audit-simplicity` |
+| **Frontend Blazor (RCL e Web Host)** | `src/Autogestor.UI/**`, `src/Autogestor.Web/**` | `/audit-ui`, `/audit-performance`, `/audit-tests`, `/audit-simplicity` |
+| **Suíte de Testes** | `test/**` | `/audit-tests`, `/audit-simplicity` |
+| **Governança & Regras Gerais** | `.agents/**`, documentação | `/audit-architecture` |
 
-## 3. Orquestração de Ferramentas Especializadas
+### Disparo Seletivo de Subagentes Especialistas
 
-Para cada categoria de arquivos afetados, acionar as ferramentas, subagentes, skills e servidores MCP correspondentes:
+O agente orquestrador mapeia os arquivos alterados no diff e aciona apenas os subagentes pertinentes com escopo cirúrgico `--diff`:
 
-| Alvo / Camada | Recursos Disponíveis |
-| :--- | :--- |
-| **Código C# Geral (`.cs`)** | • Plugin `dotnet-diag`: subagente `optimizing-dotnet-performance`, skill `analyzing-dotnet-performance`<br>• Plugin `dotnet-upgrade`: skill `migrate-nullable-references` |
-| **Contratos & gRPC (`Contract`)** | • Plugin `dotnet-upgrade`: skill `dotnet-aot-compat`<br>• Plugin `dotnet-test`: skill `assertion-quality`<br>• Plugin `dotnet-diag`: subagente `optimizing-dotnet-performance` |
-| **Persistência / EF Core / SQL** | • Plugin `dotnet-data`: skill `optimizing-ef-core-queries`<br>• Submódulo `postgres-skills`: skill `postgres-best-practices`<br>• Submódulo `agent-skills`: skill `neon-postgres-egress-optimizer`, servidor MCP `neon` |
-| **Projetos e MSBuild (`.csproj`)** | • Plugin `dotnet-msbuild`: subagentes `msbuild-code-review`, `build-perf`, `msbuild`; skills `msbuild-antipatterns`, `directory-build-organization`; servidor MCP `binlog`<br>• Plugin `dotnet-nuget`: skill `convert-to-cpm` |
-| **Testes Unitários e Integração** | • Plugin `dotnet-test`: subagente `test-quality-auditor`; skills `test-anti-patterns`, `assertion-quality`, `test-gap-analysis`, `test-analysis-extensions`<br>• Plugin `dotnet-experimental`: skill `exp-mock-usage-analysis` |
-| **APIs e Observabilidade** | • Plugin `dotnet-aspnetcore`: skills `dotnet-webapi`, `configuring-opentelemetry-dotnet`, `minimal-api-file-upload` |
-| **Frontend Blazor (UI e Web)** | • Plugin `dotnet-blazor`: skills `author-component`, `collect-user-input`, `coordinate-components`, `support-prerendering`, `use-js-interop` |
-| **Armazenamento e Cloud** | • Submódulo `agent-skills`: skills `neon-object-storage`, `neon-functions` |
-| **Todo o Código Produzido** | • Submódulo `ponytail`: skills `ponytail-review`, `ponytail-audit`, `ponytail-gain` |
+- **Auditoria de Arquitetura (`audit-architecture`)**: Disparado quando houver alterações em `Domain`, `Application`, `Infrastructure`, `db/`, projetos MSBuild (`.csproj`, `.props`, `.targets`, `.slnx`) ou governança arquitetural (`.agents/**`). Invocação cirúrgica: `/audit-architecture --diff [arquivos_alterados]`.
+- **Auditoria de API (`audit-api`)**: Disparado quando houver alterações em contratos (`Contract`), serviços de API (`Api`) ou observabilidade/ServiceDefaults (`ServiceDefaults`). Invocação cirúrgica: `/audit-api --diff [arquivos_alterados]`.
+- **Auditoria de UI (`audit-ui`)**: Disparado quando houver alterações em componentes Blazor (`UI`) ou no host WebAssembly (`Web`). Invocação cirúrgica: `/audit-ui --diff [arquivos_alterados]`.
+- **Auditoria de Performance (`audit-performance`)**: Disparado quando houver alterações em C# de produção (`Domain`, `Application`, `Infrastructure`, `Contract`, `Api`, `UI`, `Web`, `ServiceDefaults`) ou persistência (`db/**`). Invocação cirúrgica: `/audit-performance --diff [arquivos_alterados]`.
+- **Auditoria de Testes (`audit-tests`)**: Disparado quando houver alterações em projetos de testes (`test/**`) ou em código de produção (`src/**`). Invocação cirúrgica: `/audit-tests --diff [arquivos_alterados]`.
+- **Auditoria de Simplicidade (`audit-simplicity`)**: Disparado para qualquer alteração de código na solução (produção, testes ou scripts). Invocação cirúrgica: `/audit-simplicity --diff [arquivos_alterados]`.
 
 ---
 
-## 4. Avaliação Crítica e Classificação de Achados
+## 3. Consolidação de Achados Padronizados
 
-Auditar o código de forma neutra e orientada aos fatos, categorizando cada achado:
+Consolidar as respostas dos subagentes nas 6 dimensões padronizadas com simetria 1:1:
 
 ### Classificação de Severidade
-- 🚨 **Crítico**: Riscos de segurança, quebra de isolamento multi-tenant, corrupção de dados, falhas de compilação ou violação grave de fronteiras arquiteturais.
-- ⚠️ **Importante**: Ineficiências de performance, gargalos de I/O, falhas de propagação de cancelamento, ausência de validação ou lacunas em testes.
+- 🚨 **Crítico**: Riscos de segurança, quebra de isolamento multi-tenant, corrupção de dados, falhas de compilação ou regressões bloqueantes.
+- ⚠️ **Importante**: Ineficiências de performance, quebra de contratos gRPC/API, divergências visuais de UI/MudTheme, gargalos de I/O, ausência de validação ou lacunas em testes.
 - 💡 **Sugestão**: Complexidade acidental (over-engineering), código morto, oportunidades de simplificação ou alinhamento fino de estilo.
 
-### Dimensões Obrigatórias de Avaliação
-1. **Segurança & Multi-Tenancy**: Garantia do isolamento de dados entre clientes, consistência de contexto e autorização operacional.
-2. **Performance & Recursos**: Eficiência no uso de memória, concorrência, operações assíncronas e persistência.
-3. **Conformidade Arquitetural**: Aderência às fronteiras da Clean Architecture, modelagem de domínio, contratos e convenções de código.
-4. **Qualidade e Cobertura de Testes**: Profundidade das asserções, cobertura de cenários de negócio e confiabilidade da suíte.
-5. **Simplicidade & Manutenibilidade**: Identificação de abstrações prematuras, camadas desnecessárias ou código defensivo redundante.
+### Dimensões Obrigatórias de Avaliação (Simetria 1:1)
+1. **[Arquitetura & Governança]**: Consolidada a partir do retorno de `audit-architecture`.
+2. **[API & Contratos gRPC]**: Consolidada a partir do retorno de `audit-api`.
+3. **[Interface & Componentes UI]**: Consolidada a partir do retorno de `audit-ui`.
+4. **[Performance & Recursos]**: Consolidada a partir do retorno de `audit-performance`.
+5. **[Qualidade e Cobertura de Testes]**: Consolidada a partir do retorno de `audit-tests`.
+6. **[Simplicidade & Anti-Overengineering]**: Consolidada a partir do retorno de `audit-simplicity`.
 
-### Formato Padronizado de Cada Achado
+### Formato Padronizado de Cada Achado (Contrato de Achados)
 > **[Severidade] [Dimensão]** Título objetivo do achado
 > - **Localização**: `caminho/do/arquivo:linha`
 > - **Comportamento Atual**: Descrição factual do que foi implementado.
-> - **Impacto / Risco Técnico**: Explicação do impacto em produção, manutenibilidade ou segurança.
+> - **Impacto / Risco Técnico**: Explicação do impacto em produção, manutenibilidade, conformidade ou segurança.
 > - **Ação Recomendada**: O que deve ser ajustado, acompanhado do trecho de código/diff sugerido.
 
 ---
 
-## 5. Estrutura do Relatório de Fechamento
+## 4. Estrutura do Relatório de Fechamento Unificado
 
-Ao concluir a análise, apresentar o relatório estruturado:
+Ao consolidar os achados de todos os subagentes especializados disparados, apresentar o relatório unificado:
 
 ### 📋 1. Resumo do Trabalho da Sessão
 - Lista concisa de features, correções ou refatorações desenvolvidas.
 - Principais arquivos criados ou alterados agrupados por camada.
+- Síntese executiva consolidada dos subagentes especializados disparados (`audit-architecture`, `audit-api`, `audit-ui`, `audit-performance`, `audit-tests`, `audit-simplicity`).
 
 ### ✅ 2. Pontos Positivos
-- Destaques de boa arquitetura, conformidade com DDD, asserções de testes rigorosas e código limpo.
+- Destaques concisos e objetivo de conformidade arquitetural, contratos gRPC, fidelidade visual Blazor/MudTheme, isolamento multi-tenant, simplicidade, eficiência de máquina e saúde de testes.
 
 ### ⚠️ 3. Oportunidades de Melhoria e Riscos Identificados (Acionáveis)
-- Achados listados e categorizados conforme a classificação de severidade e dimensões obrigatórias.
+- Achados consolidados categorizados conforme a classificação de severidade e as 6 dimensões obrigatórias de avaliação.
 
 ### 💡 4. Sugestão de Atualização de Regras / Documentação (.agents)
 - Se durante o review for identificado um padrão não documentado ou ambiguidade entre regras e implementação:

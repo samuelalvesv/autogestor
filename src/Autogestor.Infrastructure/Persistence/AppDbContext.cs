@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Autogestor.Infrastructure.Persistence;
 
-public class AppDbContext(
+public sealed class AppDbContext(
     DbContextOptions<AppDbContext> options,
     ITenantContext tenantContext) : DbContext(options: options)
 {

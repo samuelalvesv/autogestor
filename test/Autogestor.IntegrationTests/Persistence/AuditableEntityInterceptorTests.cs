@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Autogestor.IntegrationTests.Persistence;
 
 [Collection(name: "PostgreSql")]
-public class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
+public sealed class AuditableEntityInterceptorTests(PostgreSqlFixture fixture)
 {
     [Fact]
     public void SavingChanges_WhenCategoryIsAdded_PopulatesAuditFields()

@@ -2,16 +2,16 @@ using Autogestor.Contract;
 
 namespace Autogestor.UnitTests.Contract;
 
-public class ContractDefaultsTests
+public sealed class ContractDefaultsTests
 {
     [Fact]
     public void Defaults_ShouldHaveExpectedValues()
     {
-        Assert.Equal(1, ContractDefaults.DefaultPageNumber);
-        Assert.Equal(25, ContractDefaults.DefaultPageSize);
-        Assert.Equal(1, ContractDefaults.MinPageNumber);
-        Assert.Equal(int.MaxValue, ContractDefaults.MaxPageNumber);
-        Assert.Equal(10, ContractDefaults.MinPageSize);
-        Assert.Equal(50, ContractDefaults.MaxPageSize);
+        Assert.Equal(expected: 1, actual: ContractDefaults.DefaultPageNumber);
+        Assert.Equal(expected: 25, actual: ContractDefaults.DefaultPageSize);
+        Assert.Equal(expected: 1, actual: ContractDefaults.MinPageNumber);
+        Assert.Equal(expected: int.MaxValue, actual: ContractDefaults.MaxPageNumber);
+        Assert.Equal(expected: 10, actual: ContractDefaults.MinPageSize);
+        Assert.Equal(expected: 50, actual: ContractDefaults.MaxPageSize);
     }
 }

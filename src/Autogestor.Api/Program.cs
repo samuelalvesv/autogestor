@@ -1,33 +1,18 @@
-using Autogestor.Api.Services;
-using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
-using Autogestor.Contract.Services;
-using Autogestor.Infrastructure;
-using Autogestor.Infrastructure.Persistence;
-using Autogestor.Infrastructure.Persistence.Interceptors;
-using Microsoft.EntityFrameworkCore;
+using Autogestor.Api.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args: args);
 
-string connectionString = builder.Configuration.GetConnectionString(name: "DefaultConnection")
-    ?? throw new ArgumentException(message: "String de conexão não encontrada");
-
-builder.Services.AddInfrastructure();
-
-builder.Services.AddDbContext<AppDbContext>(optionsAction: (serviceProvider, options) =>
-{
-    options.UseNpgsql(
-        connectionString: connectionString,
-        npgsqlOptionsAction: b => b.MigrationsAssembly(assemblyName: "Autogestor.Infrastructure"));
-    options.AddInterceptors(interceptors:
-    [
-        serviceProvider.GetRequiredService<AuditableEntityInterceptor>(),
-        serviceProvider.GetRequiredService<TenantEntityInterceptor>()
-    ]);
-});
-
-builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.AddServiceDefaults();
+builder.ConfigureKestrelProtocols();
+builder.AddDatabasePersistence();
+builder.AddApplicationServices();
+builder.AddGrpcConfiguration();
+builder.AddCorsPolicy();
 
 WebApplication app = builder.Build();
+
+app.UseApiPipeline();
+app.MapGrpcEndpoints();
+app.MapDefaultEndpoints();
 
 app.Run();

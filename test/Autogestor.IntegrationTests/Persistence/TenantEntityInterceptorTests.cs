@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Autogestor.IntegrationTests.Persistence;
 
 [Collection(name: "PostgreSql")]
-public class TenantEntityInterceptorTests(PostgreSqlFixture fixture)
+public sealed class TenantEntityInterceptorTests(PostgreSqlFixture fixture)
 {
     [Fact]
     public async Task SavingChangesAsync_WhenTenantEntityIsAdded_PopulatesTenantId()

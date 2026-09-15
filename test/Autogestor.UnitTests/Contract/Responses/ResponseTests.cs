@@ -2,7 +2,7 @@ using Autogestor.Contract.Responses;
 
 namespace Autogestor.UnitTests.Contract.Responses;
 
-public class ResponseTests
+public sealed class ResponseTests
 {
     [Fact]
     public void Response_ShouldSetDataAndMessageExplicitly()

@@ -9,12 +9,12 @@ public abstract class TenantEntityConfiguration<TEntity> : AuditableEntityConfig
 {
     public override void Configure(EntityTypeBuilder<TEntity> builder)
     {
-        base.Configure(builder);
+        base.Configure(builder: builder);
 
-        builder.Property(e => e.TenantId)
+        builder.Property(propertyExpression: e => e.TenantId)
             .IsRequired()
-            .HasColumnType("uuid");
+            .HasColumnType(typeName: "uuid");
 
-        builder.HasIndex(e => e.TenantId);
+        builder.HasIndex(indexExpression: e => e.TenantId);
     }
 }

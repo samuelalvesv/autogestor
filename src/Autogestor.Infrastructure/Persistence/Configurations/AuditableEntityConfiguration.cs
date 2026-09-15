@@ -9,20 +9,20 @@ public abstract class AuditableEntityConfiguration<TEntity> : EntityConfiguratio
 {
     public override void Configure(EntityTypeBuilder<TEntity> builder)
     {
-        base.Configure(builder);
+        base.Configure(builder: builder);
 
         // Configure AuditableEntity standard properties
-        builder.Property(e => e.Active)
+        builder.Property(propertyExpression: e => e.Active)
             .IsRequired()
-            .HasColumnType("boolean");
+            .HasColumnType(typeName: "boolean");
 
-        builder.Property(e => e.CreatedBy)
+        builder.Property(propertyExpression: e => e.CreatedBy)
             .IsRequired()
-            .HasColumnType("uuid");
+            .HasColumnType(typeName: "uuid");
 
-        builder.Property(e => e.CreatedAt)
+        builder.Property(propertyExpression: e => e.CreatedAt)
             .IsRequired()
-            .HasColumnType("timestamptz");
+            .HasColumnType(typeName: "timestamptz");
 
         builder.Property(propertyExpression: e => e.UpdatedBy)
             .IsRequired(required: false)

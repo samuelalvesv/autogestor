@@ -8,7 +8,7 @@ using Autogestor.Domain.Interfaces;
 
 namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
 
-public class CreateCategoryUseCaseTests
+public sealed class CreateCategoryUseCaseTests
 {
     private static void SetPersistenceFields(TenantEntity entity, Guid userId, Guid tenantId, DateTime timestamp)
     {
@@ -40,8 +40,8 @@ public class CreateCategoryUseCaseTests
         public Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(result: Categories.FirstOrDefault(predicate: c => c.Id == id));
 
-        public Task<IReadOnlyList<Category>> GetAllAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<Category>>(result: Categories.AsReadOnly());
+        public Task<IReadOnlyList<Category>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<Category>>(result: Categories.Skip(count: (pageNumber - 1) * pageSize).Take(count: pageSize).ToList().AsReadOnly());
     }
 
     private sealed class UnitOfWorkFake : IUnitOfWork

@@ -3,32 +3,28 @@ using Autogestor.Contract.Requests.Categories;
 
 namespace Autogestor.UnitTests.Contract.Requests.Categories;
 
-public class DeleteCategoryRequestTests
+public sealed class DeleteCategoryRequestTests
 {
     private static IList<ValidationResult> ValidateModel(object model)
     {
         var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(model, serviceProvider: null, items: null);
-        Validator.TryValidateObject(model, validationContext, validationResults, validateAllProperties: true);
+        var validationContext = new ValidationContext(instance: model, serviceProvider: null, items: null);
+        Validator.TryValidateObject(instance: model, validationContext: validationContext, validationResults: validationResults, validateAllProperties: true);
         return validationResults;
     }
 
     [Fact]
     public void DeleteCategoryRequest_WithValidData_PassesValidation()
     {
-        // Arrange
-        var categoryId = Guid.NewGuid();
-
-        // Act
+        // Arrange & Act
         var request = new DeleteCategoryRequest
         {
-            Id = categoryId
+            Id = Guid.NewGuid()
         };
 
         IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
         Assert.Empty(collection: errors);
-        Assert.Equal(expected: categoryId, actual: request.Id);
     }
 }
