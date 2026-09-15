@@ -10,9 +10,9 @@ public abstract class EntityConfiguration<TEntity> : IEntityTypeConfiguration<TE
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
         // Configure standard base primary key inherited from Entity
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id)
+        builder.HasKey(keyExpression: e => e.Id);
+        builder.Property(propertyExpression: e => e.Id)
             .ValueGeneratedNever() // UUIDv7 is generated in C# constructor
-            .HasColumnType("uuid");
+            .HasColumnType(typeName: "uuid");
     }
 }

@@ -2,7 +2,7 @@ using Autogestor.Contract.Responses;
 
 namespace Autogestor.UnitTests.Contract.Responses;
 
-public class DeleteResponseTests
+public sealed class DeleteResponseTests
 {
     [Fact]
     public void DeleteResponse_WithValidId_SetsPropertyCorrectly()
@@ -17,6 +17,6 @@ public class DeleteResponseTests
         };
 
         // Assert
-        Assert.Equal(id, response.Id);
+        Assert.Equal(expected: id, actual: response.Id);
     }
 }

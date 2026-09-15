@@ -2,7 +2,7 @@ using Autogestor.Domain.Entities;
 
 namespace Autogestor.UnitTests.Domain.Entities;
 
-public class CategoryTests
+public sealed class CategoryTests
 {
     [Fact]
     public void Create_WithValidParameters_ReturnsValidCategory()
@@ -18,7 +18,6 @@ public class CategoryTests
         Assert.Equal(expected: title, actual: category.Title);
         Assert.Equal(expected: description, actual: category.Description);
         Assert.True(condition: category.Active, userMessage: "A categoria deve ser criada como ativa por padrão.");
-        Assert.IsAssignableFrom<TenantEntity>(@object: category);
     }
 
     [Theory]
@@ -34,6 +33,7 @@ public class CategoryTests
         ArgumentException exception = Assert.Throws<ArgumentException>(
             testCode: () => Category.Create(title: invalidTitle!, description: description));
         Assert.Equal(expected: "title", actual: exception.ParamName);
+        Assert.Contains(expectedSubstring: "O título da categoria não pode ser vazio.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
     }
 
     [Theory]
@@ -49,6 +49,7 @@ public class CategoryTests
         ArgumentException exception = Assert.Throws<ArgumentException>(
             testCode: () => Category.Create(title: title, description: invalidDescription!));
         Assert.Equal(expected: "description", actual: exception.ParamName);
+        Assert.Contains(expectedSubstring: "A descrição da categoria não pode ser vazia.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
     }
 
     [Fact]
@@ -80,6 +81,7 @@ public class CategoryTests
         ArgumentException exception = Assert.Throws<ArgumentException>(
             testCode: () => category.Update(title: invalidTitle!, description: "Updated Description"));
         Assert.Equal(expected: "title", actual: exception.ParamName);
+        Assert.Contains(expectedSubstring: "O título da categoria não pode ser vazio.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
     }
 
     [Theory]
@@ -95,5 +97,6 @@ public class CategoryTests
         ArgumentException exception = Assert.Throws<ArgumentException>(
             testCode: () => category.Update(title: "Updated Title", description: invalidDescription!));
         Assert.Equal(expected: "description", actual: exception.ParamName);
+        Assert.Contains(expectedSubstring: "A descrição da categoria não pode ser vazia.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
     }
 }

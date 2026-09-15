@@ -1,6 +1,6 @@
 ---
 name: application-rules
-description: Use Cases, MediatR Commands/Queries, request validators, and application orchestrations.
+description: Use Cases, Commands/Queries, request validators, and application orchestrations.
 applyTo: "src/Autogestor.Application/**/*.cs"
 ---
 
@@ -16,9 +16,9 @@ applyTo: "src/Autogestor.Application/**/*.cs"
 
 ## Diretrizes e Restrições
 - **Isolamento de Infraestrutura**: Referencia apenas `Autogestor.Domain` e `Autogestor.Contract`. Proibido importar namespaces de infraestrutura (`System.Data`, `Microsoft.EntityFrameworkCore`, etc.).
-- **Mediator (MediatR)**:
-  - Cada caso de uso é um par Request/Handler (`IRequest<T>` e `IRequestHandler<TRequest, TResponse>`).
-  - Cada caso de uso deve ser uma classe isolada (`sealed`) com um único método público.
+- **Orquestração de Casos de Uso e Invocação Direta**:
+  - A camada de apresentação consome casos de uso através de injeção direta de dependência (`ICreate[Feature]UseCase`), dispensando mediadores dinâmicos e reflexão em tempo de execução, garantindo total compatibilidade com Native AOT.
+  - Cada caso de uso deve ser uma classe isolada (`sealed`) com um único método público (`ExecuteAsync`).
 - **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](identity-multitenancy.md).
 
 ## Ferramentas

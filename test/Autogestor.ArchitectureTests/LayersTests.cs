@@ -4,7 +4,7 @@ using TestResult = NetArchTest.Rules.TestResult;
 
 namespace Autogestor.ArchitectureTests;
 
-public class LayersTests
+public sealed class LayersTests
 {
     private const string DomainNamespace = "Autogestor.Domain";
     private const string ContractNamespace = "Autogestor.Contract";
@@ -26,7 +26,7 @@ public class LayersTests
             .HaveDependencyOnAny(ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace, ContractNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "A camada Domain não deve depender de outras camadas.");
+        Assert.True(condition: result.IsSuccessful, userMessage: "A camada Domain não deve depender de outras camadas.");
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class LayersTests
             .HaveDependencyOnAny(DomainNamespace, ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "A camada Contract não deve depender de outras camadas.");
+        Assert.True(condition: result.IsSuccessful, userMessage: "A camada Contract não deve depender de outras camadas.");
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class LayersTests
             .HaveDependencyOnAny(InfrastructureNamespace, ApiNamespace, WebNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "A camada Application não deve depender de Infrastructure, Api ou Web.");
+        Assert.True(condition: result.IsSuccessful, userMessage: "A camada Application não deve depender de Infrastructure, Api ou Web.");
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class LayersTests
             .HaveDependencyOnAny(ApiNamespace, WebNamespace)
             .GetResult();
 
-        Assert.True(result.IsSuccessful, "A camada Infrastructure não deve depender de Api ou Web.");
+        Assert.True(condition: result.IsSuccessful, userMessage: "A camada Infrastructure não deve depender de Api ou Web.");
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class LayersTests
             .HaveNameStartingWith("I")
             .GetResult();
 
-        Assert.True(domainResult.IsSuccessful, "As interfaces da camada Domain devem iniciar com 'I'.");
-        Assert.True(contractResult.IsSuccessful, "As interfaces da camada Contract devem iniciar com 'I'.");
+        Assert.True(condition: domainResult.IsSuccessful, userMessage: "As interfaces da camada Domain devem iniciar com 'I'.");
+        Assert.True(condition: contractResult.IsSuccessful, userMessage: "As interfaces da camada Contract devem iniciar com 'I'.");
     }
 }

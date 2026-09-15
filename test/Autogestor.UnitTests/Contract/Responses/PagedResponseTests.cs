@@ -2,7 +2,7 @@ using Autogestor.Contract.Responses;
 
 namespace Autogestor.UnitTests.Contract.Responses;
 
-public class PagedResponseTests
+public sealed class PagedResponseTests
 {
     [Theory]
     [InlineData(100, 25, 4)]

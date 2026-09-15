@@ -9,6 +9,7 @@ namespace Autogestor.Application.UseCases.Transactions.Commands.CreateTransactio
 
 public sealed class CreateTransactionUseCase(
     ITransactionRepository transactionRepository,
+    ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork) : ICreateTransactionUseCase
 {
     public async Task<Response<TransactionResponse>> ExecuteAsync(
@@ -20,6 +21,19 @@ public sealed class CreateTransactionUseCase(
             type: (Domain.Enums.ETransactionType)request.Type,
             amount: request.Amount,
             categoryId: request.CategoryId);
+
+        Category? category = await categoryRepository.GetByIdAsync(
+            id: request.CategoryId,
+            cancellationToken: cancellationToken);
+
+        if (category is null)
+        {
+#pragma warning disable CA2208 // Intentionally naming request.CategoryId for API clarity
+            throw new ArgumentException(
+                message: "Categoria não encontrada para o tenant atual.",
+                paramName: nameof(request.CategoryId));
+#pragma warning restore CA2208
+        }
 
         await transactionRepository.AddAsync(
             transaction: transaction,

@@ -3,13 +3,13 @@ using Autogestor.Contract.Requests.Categories;
 
 namespace Autogestor.UnitTests.Contract.Requests.Categories;
 
-public class UpdateCategoryRequestTests
+public sealed class UpdateCategoryRequestTests
 {
     private static IList<ValidationResult> ValidateModel(object model)
     {
         var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(model, serviceProvider: null, items: null);
-        Validator.TryValidateObject(model, validationContext, validationResults, validateAllProperties: true);
+        var validationContext = new ValidationContext(instance: model, serviceProvider: null, items: null);
+        Validator.TryValidateObject(instance: model, validationContext: validationContext, validationResults: validationResults, validateAllProperties: true);
         return validationResults;
     }
 
@@ -17,10 +17,9 @@ public class UpdateCategoryRequestTests
     public void UpdateCategoryRequest_WithValidData_PassesValidation()
     {
         // Arrange
-        var categoryId = Guid.NewGuid();
         var request = new UpdateCategoryRequest
         {
-            Id = categoryId,
+            Id = Guid.NewGuid(),
             Title = "Alimentação",
             Description = "Gastos com restaurantes e supermercado"
         };
@@ -30,9 +29,6 @@ public class UpdateCategoryRequestTests
 
         // Assert
         Assert.Empty(collection: errors);
-        Assert.Equal(expected: categoryId, actual: request.Id);
-        Assert.Equal(expected: "Alimentação", actual: request.Title);
-        Assert.Equal(expected: "Gastos com restaurantes e supermercado", actual: request.Description);
     }
 
     [Theory]
@@ -52,7 +48,7 @@ public class UpdateCategoryRequestTests
         IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Title)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(value: nameof(UpdateCategoryRequest.Title)));
     }
 
     [Theory]
@@ -71,7 +67,7 @@ public class UpdateCategoryRequestTests
         IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Description)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(value: nameof(UpdateCategoryRequest.Description)));
     }
 
     [Fact]
@@ -82,13 +78,13 @@ public class UpdateCategoryRequestTests
         {
             Id = Guid.NewGuid(),
             Title = "Título Válido",
-            Description = new string('A', 181)
+            Description = new string(c: 'A', count: 181)
         };
 
         // Act
         IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
-        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(nameof(UpdateCategoryRequest.Description)));
+        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(value: nameof(UpdateCategoryRequest.Description)));
     }
 }

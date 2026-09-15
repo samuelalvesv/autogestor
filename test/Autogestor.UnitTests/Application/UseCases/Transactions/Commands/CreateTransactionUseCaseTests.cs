@@ -10,7 +10,7 @@ using DomainTransactionType = Autogestor.Domain.Enums.ETransactionType;
 
 namespace Autogestor.UnitTests.Application.UseCases.Transactions.Commands;
 
-public class CreateTransactionUseCaseTests
+public sealed class CreateTransactionUseCaseTests
 {
     private static void SetPersistenceFields(TenantEntity entity, Guid userId, Guid tenantId, DateTime timestamp)
     {
@@ -42,8 +42,30 @@ public class CreateTransactionUseCaseTests
         public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(result: Transactions.FirstOrDefault(predicate: t => t.Id == id));
 
-        public Task<IReadOnlyList<Transaction>> GetAllAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<Transaction>>(result: Transactions.AsReadOnly());
+        public Task<IReadOnlyList<Transaction>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<Transaction>>(result: Transactions.Skip(count: (pageNumber - 1) * pageSize).Take(count: pageSize).ToList().AsReadOnly());
+    }
+
+    private sealed class CategoryRepositoryFake : ICategoryRepository
+    {
+        public List<Category> Categories { get; } = [];
+        public CancellationToken PassedCancellationToken { get; private set; }
+
+        public Task AddAsync(Category category, CancellationToken cancellationToken = default)
+        {
+            PassedCancellationToken = cancellationToken;
+            Categories.Add(item: category);
+            return Task.CompletedTask;
+        }
+
+        public Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            PassedCancellationToken = cancellationToken;
+            return Task.FromResult(result: Categories.FirstOrDefault(predicate: c => c.Id == id));
+        }
+
+        public Task<IReadOnlyList<Category>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<Category>>(result: Categories.Skip(count: (pageNumber - 1) * pageSize).Take(count: pageSize).ToList().AsReadOnly());
     }
 
     private sealed class UnitOfWorkFake : IUnitOfWork
@@ -65,19 +87,23 @@ public class CreateTransactionUseCaseTests
     public async Task ExecuteAsync_WithValidRequest_ReturnsSuccessResponseAndPersistsTransaction(ETransactionType type)
     {
         // Arrange
-        var repository = new TransactionRepositoryFake();
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateTransactionUseCase(
-            transactionRepository: repository,
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
             unitOfWork: unitOfWork);
 
-        var categoryId = Guid.NewGuid();
+        var category = Category.Create(title: "Serviços", description: "Descrição de serviços");
+        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+
         var request = new CreateTransactionRequest
         {
             Title = "Venda de Serviços",
             Type = type,
             Amount = 3500.00m,
-            CategoryId = categoryId
+            CategoryId = category.Id
         };
 
         // Act
@@ -96,16 +122,47 @@ public class CreateTransactionUseCaseTests
         Assert.NotEqual(expected: Guid.Empty, actual: response.Data.Id);
         Assert.True(condition: response.Data.Active, userMessage: "A transação deve ser criada como ativa por padrão.");
         Assert.NotEqual(expected: Guid.Empty, actual: response.Data.TenantId);
-        Assert.Equal(expected: repository.Transactions[0].TenantId, actual: response.Data.TenantId);
+        Assert.Equal(expected: transactionRepository.Transactions[0].TenantId, actual: response.Data.TenantId);
         Assert.Null(@object: response.Data.UpdatedBy);
         Assert.Null(@object: response.Data.UpdatedAt);
 
-        Assert.Single(collection: repository.Transactions);
-        Assert.Equal(expected: request.Title, actual: repository.Transactions[0].Title);
-        Assert.Equal(expected: (DomainTransactionType)request.Type, actual: repository.Transactions[0].Type);
-        Assert.Equal(expected: request.Amount, actual: repository.Transactions[0].Amount);
-        Assert.Equal(expected: request.CategoryId, actual: repository.Transactions[0].CategoryId);
+        Assert.Single(collection: transactionRepository.Transactions);
+        Assert.Equal(expected: request.Title, actual: transactionRepository.Transactions[0].Title);
+        Assert.Equal(expected: (DomainTransactionType)request.Type, actual: transactionRepository.Transactions[0].Type);
+        Assert.Equal(expected: request.Amount, actual: transactionRepository.Transactions[0].Amount);
+        Assert.Equal(expected: request.CategoryId, actual: transactionRepository.Transactions[0].CategoryId);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithNonExistentCategoryId_ThrowsArgumentException()
+    {
+        // Arrange
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
+        var useCase = new CreateTransactionUseCase(
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
+            unitOfWork: unitOfWork);
+
+        var request = new CreateTransactionRequest
+        {
+            Title = "Venda de Serviços",
+            Type = ETransactionType.Deposit,
+            Amount = 3500.00m,
+            CategoryId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(expected: "CategoryId", actual: exception.ParamName);
+        Assert.Contains(expectedSubstring: "Categoria não encontrada para o tenant atual.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+        Assert.Empty(collection: transactionRepository.Transactions);
+        Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
     [Theory]
@@ -115,10 +172,12 @@ public class CreateTransactionUseCaseTests
     public async Task ExecuteAsync_WithInvalidTitle_ThrowsArgumentException(string? invalidTitle)
     {
         // Arrange
-        var repository = new TransactionRepositoryFake();
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateTransactionUseCase(
-            transactionRepository: repository,
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
             unitOfWork: unitOfWork);
 
         var request = new CreateTransactionRequest
@@ -136,7 +195,7 @@ public class CreateTransactionUseCaseTests
                 cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(expected: "title", actual: exception.ParamName);
         Assert.Contains(expectedSubstring: "O título da transação não pode ser vazio.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
-        Assert.Empty(collection: repository.Transactions);
+        Assert.Empty(collection: transactionRepository.Transactions);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
@@ -147,10 +206,12 @@ public class CreateTransactionUseCaseTests
     public async Task ExecuteAsync_WithZeroOrNegativeAmount_ThrowsArgumentException(double invalidAmountDouble)
     {
         // Arrange
-        var repository = new TransactionRepositoryFake();
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateTransactionUseCase(
-            transactionRepository: repository,
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
             unitOfWork: unitOfWork);
 
         var request = new CreateTransactionRequest
@@ -168,7 +229,7 @@ public class CreateTransactionUseCaseTests
                 cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(expected: "amount", actual: exception.ParamName);
         Assert.Contains(expectedSubstring: "O valor da transação deve ser maior que zero.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
-        Assert.Empty(collection: repository.Transactions);
+        Assert.Empty(collection: transactionRepository.Transactions);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
@@ -176,10 +237,12 @@ public class CreateTransactionUseCaseTests
     public async Task ExecuteAsync_WithEmptyCategoryId_ThrowsArgumentException()
     {
         // Arrange
-        var repository = new TransactionRepositoryFake();
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateTransactionUseCase(
-            transactionRepository: repository,
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
             unitOfWork: unitOfWork);
 
         var request = new CreateTransactionRequest
@@ -197,7 +260,7 @@ public class CreateTransactionUseCaseTests
                 cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(expected: "categoryId", actual: exception.ParamName);
         Assert.Contains(expectedSubstring: "Categoria inválida.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
-        Assert.Empty(collection: repository.Transactions);
+        Assert.Empty(collection: transactionRepository.Transactions);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
@@ -205,18 +268,23 @@ public class CreateTransactionUseCaseTests
     public async Task ExecuteAsync_WithCancellationToken_PropagatesTokenToDependencies()
     {
         // Arrange
-        var repository = new TransactionRepositoryFake();
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateTransactionUseCase(
-            transactionRepository: repository,
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
             unitOfWork: unitOfWork);
+
+        var category = Category.Create(title: "Transporte", description: "Descrição de transporte");
+        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
 
         var request = new CreateTransactionRequest
         {
             Title = "Transporte",
             Type = ETransactionType.Withdraw,
             Amount = 250.00m,
-            CategoryId = Guid.NewGuid()
+            CategoryId = category.Id
         };
 
         using var cts = new CancellationTokenSource();
@@ -226,7 +294,8 @@ public class CreateTransactionUseCaseTests
         await useCase.ExecuteAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: repository.PassedCancellationToken);
+        Assert.Equal(expected: token, actual: categoryRepository.PassedCancellationToken);
+        Assert.Equal(expected: token, actual: transactionRepository.PassedCancellationToken);
         Assert.Equal(expected: token, actual: unitOfWork.PassedCancellationToken);
     }
 
@@ -237,10 +306,12 @@ public class CreateTransactionUseCaseTests
     public async Task ExecuteAsync_WithInvalidType_ThrowsArgumentException(ETransactionType invalidType)
     {
         // Arrange
-        var repository = new TransactionRepositoryFake();
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateTransactionUseCase(
-            transactionRepository: repository,
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
             unitOfWork: unitOfWork);
 
         var request = new CreateTransactionRequest
@@ -258,7 +329,7 @@ public class CreateTransactionUseCaseTests
                 cancellationToken: TestContext.Current.CancellationToken));
         Assert.Equal(expected: "type", actual: exception.ParamName);
         Assert.Contains(expectedSubstring: "Tipo de transação inválido.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
-        Assert.Empty(collection: repository.Transactions);
+        Assert.Empty(collection: transactionRepository.Transactions);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 }

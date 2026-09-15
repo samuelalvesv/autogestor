@@ -2,7 +2,7 @@ using Autogestor.Contract.Responses;
 
 namespace Autogestor.UnitTests.Contract.Responses;
 
-public class TenantEntityResponseTests
+public sealed class TenantEntityResponseTests
 {
     private sealed record TestTenantEntityResponse : TenantEntityResponse;
 
@@ -15,7 +15,7 @@ public class TenantEntityResponseTests
         var createdBy = Guid.NewGuid();
         var updatedBy = Guid.NewGuid();
         DateTime createdAt = DateTime.UtcNow;
-        DateTime updatedAt = DateTime.UtcNow.AddMinutes(5);
+        DateTime updatedAt = DateTime.UtcNow.AddMinutes(value: 5);
 
         // Act
         var response = new TestTenantEntityResponse

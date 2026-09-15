@@ -1,3 +1,4 @@
+using Autogestor.Api.Middlewares;
 using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
@@ -31,7 +32,8 @@ public static class BuilderExtensions
         {
             options.UseNpgsql(
                 connectionString: connectionString,
-                npgsqlOptionsAction: b => b.MigrationsAssembly(assemblyName: "Autogestor.Infrastructure"));
+                npgsqlOptionsAction: b => b.MigrationsAssembly(assemblyName: "Autogestor.Infrastructure"))
+                .UseSnakeCaseNamingConvention();
             options.AddInterceptors(interceptors:
             [
                 serviceProvider.GetRequiredService<AuditableEntityInterceptor>(),
@@ -54,7 +56,7 @@ public static class BuilderExtensions
 
     public static WebApplicationBuilder AddGrpcConfiguration(this WebApplicationBuilder builder)
     {
-        builder.Services.AddCodeFirstGrpc();
+        builder.Services.AddCodeFirstGrpc(configureOptions: options => options.Interceptors.Add<GrpcExceptionInterceptor>());
         builder.Services.AddCodeFirstGrpcReflection();
 
         return builder;
@@ -65,7 +67,7 @@ public static class BuilderExtensions
         builder.Services.AddCors(setupAction: options => options.AddDefaultPolicy(configurePolicy: policy => policy.AllowAnyOrigin()
                       .AllowAnyMethod()
                       .AllowAnyHeader()
-                      .WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding")));
+                      .WithExposedHeaders(exposedHeaders: ["Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding"])));
 
         return builder;
     }

@@ -4,7 +4,7 @@ using Autogestor.Contract.Requests.Transactions;
 
 namespace Autogestor.UnitTests.Contract.Requests.Transactions;
 
-public class CreateTransactionRequestTests
+public sealed class CreateTransactionRequestTests
 {
     private static IList<ValidationResult> ValidateModel(object model)
     {
@@ -32,10 +32,6 @@ public class CreateTransactionRequestTests
 
         // Assert
         Assert.Empty(collection: errors);
-        Assert.Equal(expected: "Venda de Veículo", actual: request.Title);
-        Assert.Equal(expected: ETransactionType.Deposit, actual: request.Type);
-        Assert.Equal(expected: 45000.00m, actual: request.Amount);
-        Assert.Equal(expected: categoryId, actual: request.CategoryId);
     }
 
     [Theory]

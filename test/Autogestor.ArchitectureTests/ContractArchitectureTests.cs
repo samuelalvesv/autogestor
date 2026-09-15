@@ -5,7 +5,7 @@ using Autogestor.Contract;
 
 namespace Autogestor.ArchitectureTests;
 
-public class ContractArchitectureTests
+public sealed class ContractArchitectureTests
 {
     private static readonly Assembly ContractAssembly = typeof(ContractDefaults).Assembly;
 

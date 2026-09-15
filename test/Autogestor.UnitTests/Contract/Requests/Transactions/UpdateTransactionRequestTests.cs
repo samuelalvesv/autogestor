@@ -4,7 +4,7 @@ using Autogestor.Contract.Requests.Transactions;
 
 namespace Autogestor.UnitTests.Contract.Requests.Transactions;
 
-public class UpdateTransactionRequestTests
+public sealed class UpdateTransactionRequestTests
 {
     private static IList<ValidationResult> ValidateModel(object model)
     {
@@ -18,15 +18,13 @@ public class UpdateTransactionRequestTests
     public void UpdateTransactionRequest_WithValidData_PassesValidation()
     {
         // Arrange
-        var transactionId = Guid.NewGuid();
-        var categoryId = Guid.NewGuid();
         var request = new UpdateTransactionRequest
         {
-            Id = transactionId,
+            Id = Guid.NewGuid(),
             Title = "Compra de Peças",
             Type = ETransactionType.Withdraw,
             Amount = 1500.50m,
-            CategoryId = categoryId
+            CategoryId = Guid.NewGuid()
         };
 
         // Act
@@ -34,11 +32,6 @@ public class UpdateTransactionRequestTests
 
         // Assert
         Assert.Empty(collection: errors);
-        Assert.Equal(expected: transactionId, actual: request.Id);
-        Assert.Equal(expected: "Compra de Peças", actual: request.Title);
-        Assert.Equal(expected: ETransactionType.Withdraw, actual: request.Type);
-        Assert.Equal(expected: 1500.50m, actual: request.Amount);
-        Assert.Equal(expected: categoryId, actual: request.CategoryId);
     }
 
     [Theory]

@@ -1,7 +1,7 @@
 namespace Autogestor.IntegrationTests;
 
-public class SmokeTests
+public sealed class SmokeTests
 {
     [Fact]
-    public void IntegrationTests_Harness_ShouldBeConfigured() => Assert.True(true);
+    public void IntegrationTests_Harness_ShouldBeConfigured() => Assert.True(condition: true);
 }

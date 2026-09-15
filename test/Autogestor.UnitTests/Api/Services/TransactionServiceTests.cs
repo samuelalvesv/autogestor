@@ -7,7 +7,7 @@ using Autogestor.Contract.Responses.Transactions;
 
 namespace Autogestor.UnitTests.Api.Services;
 
-public class TransactionServiceTests
+public sealed class TransactionServiceTests
 {
     private sealed class CreateTransactionUseCaseFake : ICreateTransactionUseCase
     {

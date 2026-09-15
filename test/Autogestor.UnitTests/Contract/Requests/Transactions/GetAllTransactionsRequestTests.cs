@@ -3,7 +3,7 @@ using Autogestor.Contract.Requests.Transactions;
 
 namespace Autogestor.UnitTests.Contract.Requests.Transactions;
 
-public class GetAllTransactionsRequestTests
+public sealed class GetAllTransactionsRequestTests
 {
     private static IList<ValidationResult> ValidateModel(object model)
     {
@@ -28,7 +28,27 @@ public class GetAllTransactionsRequestTests
 
         // Assert
         Assert.Empty(collection: errors);
-        Assert.Equal(expected: 1, actual: request.PageNumber);
-        Assert.Equal(expected: 25, actual: request.PageSize);
+    }
+
+    [Theory]
+    [InlineData(0, 25)]
+    [InlineData(-1, 25)]
+    [InlineData(1, 0)]
+    [InlineData(1, -5)]
+    [InlineData(1, 1001)]
+    public void GetAllTransactionsRequest_WithInvalidPagination_FailsValidation(int pageNumber, int pageSize)
+    {
+        // Arrange
+        var request = new GetAllTransactionsRequest
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        // Act
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
+        // Assert
+        Assert.NotEmpty(collection: errors);
     }
 }

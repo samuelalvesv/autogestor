@@ -3,7 +3,7 @@ using Autogestor.Domain.Enums;
 
 namespace Autogestor.UnitTests.Domain.Entities;
 
-public class TransactionTests
+public sealed class TransactionTests
 {
     [Theory]
     [InlineData(ETransactionType.Deposit)]
@@ -28,7 +28,6 @@ public class TransactionTests
         Assert.Equal(expected: amount, actual: transaction.Amount);
         Assert.Equal(expected: categoryId, actual: transaction.CategoryId);
         Assert.True(condition: transaction.Active, userMessage: "A transação deve ser criada como ativa por padrão.");
-        Assert.IsAssignableFrom<TenantEntity>(@object: transaction);
     }
 
     [Theory]

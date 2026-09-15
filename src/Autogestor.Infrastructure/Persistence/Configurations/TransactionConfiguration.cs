@@ -32,5 +32,8 @@ public sealed class TransactionConfiguration : TenantEntityConfiguration<Transac
             .WithMany()
             .HasForeignKey(foreignKeyExpression: t => t.CategoryId)
             .OnDelete(deleteBehavior: DeleteBehavior.Restrict);
+
+        builder.HasIndex(indexExpression: t => new { t.TenantId, t.CategoryId })
+            .HasDatabaseName(name: "ix_transactions_tenant_id_category_id");
     }
 }

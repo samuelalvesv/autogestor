@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Autogestor.IntegrationTests.Persistence;
 
 [Collection(name: "PostgreSql")]
-public class TransactionRepositoryTests(PostgreSqlFixture fixture)
+public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
 {
     [Fact]
     public async Task AddAsync_PersistsTransactionToPostgreSqlDatabase()
@@ -55,7 +55,7 @@ public class TransactionRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsPersistedTransactionsFromDatabase()
+    public async Task GetPagedAsync_ReturnsPersistedTransactionsFromDatabase()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -80,7 +80,7 @@ public class TransactionRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta em novo contexto com o mesmo tenant
         await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var queryRepo = new TransactionRepository(context: queryContext);
-        IReadOnlyList<Transaction> all = await queryRepo.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+        IReadOnlyList<Transaction> all = await queryRepo.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Contains(collection: all, filter: t => t.Id == tx1.Id);
@@ -88,7 +88,43 @@ public class TransactionRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task GetAllAsync_WhenQueriedByDifferentTenant_DoesNotReturnTransactionsFromOtherTenant()
+    public async Task GetPagedAsync_WithMultiplePages_RespectsPageSizeAndSkip()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var userContext = new UserContextFake(userId: userId);
+        var tenantContext = new TenantContextFake(tenantId: tenantId);
+        await using AppDbContext context = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var categoryRepo = new CategoryRepository(context: context);
+        var transactionRepo = new TransactionRepository(context: context);
+
+        var category = Category.Create(title: "Operacional Paginação", description: "Custos operacionais");
+        await categoryRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        var tx1 = Transaction.Create(title: "Tx Page 1", type: ETransactionType.Deposit, amount: 10.00m, categoryId: category.Id);
+        var tx2 = Transaction.Create(title: "Tx Page 2", type: ETransactionType.Withdraw, amount: 20.00m, categoryId: category.Id);
+        var tx3 = Transaction.Create(title: "Tx Page 3", type: ETransactionType.Deposit, amount: 30.00m, categoryId: category.Id);
+
+        await transactionRepo.AddAsync(transaction: tx1, cancellationToken: TestContext.Current.CancellationToken);
+        await transactionRepo.AddAsync(transaction: tx2, cancellationToken: TestContext.Current.CancellationToken);
+        await transactionRepo.AddAsync(transaction: tx3, cancellationToken: TestContext.Current.CancellationToken);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        // Act
+        await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var queryRepo = new TransactionRepository(context: queryContext);
+        IReadOnlyList<Transaction> page1 = await queryRepo.GetPagedAsync(pageNumber: 1, pageSize: 2, cancellationToken: TestContext.Current.CancellationToken);
+        IReadOnlyList<Transaction> page2 = await queryRepo.GetPagedAsync(pageNumber: 2, pageSize: 2, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(expected: 2, actual: page1.Count);
+        Assert.True(condition: page2.Count >= 1, userMessage: "A segunda página deve conter ao menos o registro restante.");
+    }
+
+    [Fact]
+    public async Task GetPagedAsync_WhenQueriedByDifferentTenant_DoesNotReturnTransactionsFromOtherTenant()
     {
         // Arrange
         var tenant1 = Guid.NewGuid();
@@ -111,11 +147,11 @@ public class TransactionRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta com o contexto do Tenant 2
         await using AppDbContext contextTenant2 = fixture.CreateContext(tenantContext: tenantContext2);
         var txRepoTenant2 = new TransactionRepository(context: contextTenant2);
-        IReadOnlyList<Transaction> transactionsTenant2 = await txRepoTenant2.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+        IReadOnlyList<Transaction> transactionsTenant2 = await txRepoTenant2.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
         Transaction? transactionById = await txRepoTenant2.GetByIdAsync(id: txTenant1.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - isolamento absoluto garantido por Global Query Filter
-        Assert.DoesNotContain(collection: transactionsTenant2, filter: t => t.Id == txTenant1.Id);
+        Assert.Empty(collection: transactionsTenant2);
         Assert.Null(@object: transactionById);
     }
 
@@ -133,7 +169,7 @@ public class TransactionRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task GetAllAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    public async Task GetPagedAsync_WithCancelledToken_ThrowsOperationCanceledException()
     {
         await using AppDbContext context = fixture.CreateContext();
         var repository = new TransactionRepository(context: context);
@@ -142,7 +178,7 @@ public class TransactionRepositoryTests(PostgreSqlFixture fixture)
         cts.Cancel();
 
         await Assert.ThrowsAsync<OperationCanceledException>(
-            testCode: () => repository.GetAllAsync(cancellationToken: cts.Token));
+            testCode: () => repository.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: cts.Token));
     }
 
     [Fact]

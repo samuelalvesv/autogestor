@@ -2,11 +2,10 @@ using Autogestor.Domain.Entities;
 
 namespace Autogestor.UnitTests.Domain.Entities;
 
-public class EntityTests
+public sealed class EntityTests
 {
-    private class TestEntity : Entity
+    private sealed class TestEntity : Entity
     {
-        // Simple concrete implementation to test the abstract Entity class
     }
 
     [Fact]
@@ -16,7 +15,7 @@ public class EntityTests
         var entity = new TestEntity();
 
         // Assert
-        Assert.NotEqual(Guid.Empty, entity.Id);
+        Assert.NotEqual(expected: Guid.Empty, actual: entity.Id);
     }
 
     [Fact]
@@ -27,7 +26,7 @@ public class EntityTests
         var entity2 = new TestEntity();
 
         // Assert
-        Assert.NotEqual(entity1.Id, entity2.Id);
+        Assert.NotEqual(expected: entity1.Id, actual: entity2.Id);
     }
 
     [Fact]
@@ -37,6 +36,6 @@ public class EntityTests
         var entity = new TestEntity();
 
         // Assert
-        Assert.Equal(7, entity.Id.Version);
+        Assert.Equal(expected: 7, actual: entity.Id.Version);
     }
 }

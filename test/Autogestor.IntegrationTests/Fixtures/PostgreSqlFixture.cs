@@ -39,6 +39,7 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
     {
         DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(connectionString: ConnectionString)
+            .UseSnakeCaseNamingConvention()
             .AddInterceptors(
                 interceptors:
                 [

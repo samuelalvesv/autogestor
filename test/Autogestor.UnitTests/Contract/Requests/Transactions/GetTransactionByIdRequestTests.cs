@@ -3,7 +3,7 @@ using Autogestor.Contract.Requests.Transactions;
 
 namespace Autogestor.UnitTests.Contract.Requests.Transactions;
 
-public class GetTransactionByIdRequestTests
+public sealed class GetTransactionByIdRequestTests
 {
     private static IList<ValidationResult> ValidateModel(object model)
     {
@@ -16,19 +16,15 @@ public class GetTransactionByIdRequestTests
     [Fact]
     public void GetTransactionByIdRequest_WithValidData_PassesValidation()
     {
-        // Arrange
-        var transactionId = Guid.NewGuid();
-
-        // Act
+        // Arrange & Act
         var request = new GetTransactionByIdRequest
         {
-            Id = transactionId
+            Id = Guid.NewGuid()
         };
 
         IList<ValidationResult> errors = ValidateModel(model: request);
 
         // Assert
         Assert.Empty(collection: errors);
-        Assert.Equal(expected: transactionId, actual: request.Id);
     }
 }

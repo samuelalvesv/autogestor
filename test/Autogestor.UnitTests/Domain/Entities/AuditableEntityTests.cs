@@ -2,11 +2,10 @@ using Autogestor.Domain.Entities;
 
 namespace Autogestor.UnitTests.Domain.Entities;
 
-public class AuditableEntityTests
+public sealed class AuditableEntityTests
 {
-    private class TestAuditableEntity : AuditableEntity
+    private sealed class TestAuditableEntity : AuditableEntity
     {
-        // Simple concrete implementation to test the abstract AuditableEntity class
     }
 
     [Fact]
@@ -16,7 +15,7 @@ public class AuditableEntityTests
         var entity = new TestAuditableEntity();
 
         // Assert
-        Assert.True(entity.Active);
+        Assert.True(condition: entity.Active, userMessage: "A entidade deve iniciar como ativa.");
     }
 
     [Fact]
@@ -30,7 +29,7 @@ public class AuditableEntityTests
         entity.Activate();
 
         // Assert
-        Assert.True(entity.Active);
+        Assert.True(condition: entity.Active, userMessage: "A entidade deve estar ativa.");
     }
 
     [Fact]
@@ -44,6 +43,6 @@ public class AuditableEntityTests
         entity.Deactivate();
 
         // Assert
-        Assert.False(entity.Active);
+        Assert.False(condition: entity.Active, userMessage: "A entidade deve estar inativa.");
     }
 }

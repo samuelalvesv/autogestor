@@ -6,26 +6,29 @@ namespace Autogestor.Infrastructure.Persistence.Repositories;
 
 public sealed class TransactionRepository(AppDbContext context) : ITransactionRepository
 {
-    public async Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default)
+    public Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default)
     {
-        await context.Transactions.AddAsync(
-            entity: transaction,
-            cancellationToken: cancellationToken);
+        context.Transactions.Add(entity: transaction);
+        return Task.CompletedTask;
     }
 
-    public async Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        return await context.Transactions
+    public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
+        context.Transactions
             .AsNoTracking()
             .FirstOrDefaultAsync(
                 predicate: t => t.Id == id,
                 cancellationToken: cancellationToken);
-    }
 
-    public async Task<IReadOnlyList<Transaction>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Transaction>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
         return await context.Transactions
             .AsNoTracking()
+            .OrderByDescending(keySelector: t => t.CreatedAt)
+            .Skip(count: (pageNumber - 1) * pageSize)
+            .Take(count: pageSize)
             .ToListAsync(cancellationToken: cancellationToken);
     }
 }

@@ -2,7 +2,7 @@ using Autogestor.Contract.Responses.Categories;
 
 namespace Autogestor.UnitTests.Contract.Responses.Categories;
 
-public class CategoryResponseTests
+public sealed class CategoryResponseTests
 {
     [Fact]
     public void CategoryResponse_WithValidData_SetsPropertiesCorrectly()
@@ -13,7 +13,7 @@ public class CategoryResponseTests
         var createdBy = Guid.NewGuid();
         var updatedBy = Guid.NewGuid();
         DateTime createdAt = DateTime.UtcNow;
-        DateTime updatedAt = DateTime.UtcNow.AddHours(1);
+        DateTime updatedAt = DateTime.UtcNow.AddHours(value: 1);
 
         // Act
         var response = new CategoryResponse

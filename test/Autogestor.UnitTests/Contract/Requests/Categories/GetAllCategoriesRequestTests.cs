@@ -1,37 +1,54 @@
-using Autogestor.Contract;
+using System.ComponentModel.DataAnnotations;
 using Autogestor.Contract.Requests.Categories;
 
 namespace Autogestor.UnitTests.Contract.Requests.Categories;
 
-public class GetAllCategoriesRequestTests
+public sealed class GetAllCategoriesRequestTests
 {
-    [Fact]
-    public void GetAllCategoriesRequest_InheritsPagedRequest_SetsPaginationDefaults()
+    private static IList<ValidationResult> ValidateModel(object model)
     {
-        // Act
-        var request = new GetAllCategoriesRequest
-        {
-            PageNumber = ContractDefaults.DefaultPageNumber,
-            PageSize = ContractDefaults.DefaultPageSize
-        };
-
-        // Assert
-        Assert.Equal(expected: ContractDefaults.DefaultPageNumber, actual: request.PageNumber);
-        Assert.Equal(expected: ContractDefaults.DefaultPageSize, actual: request.PageSize);
+        var validationResults = new List<ValidationResult>();
+        var validationContext = new ValidationContext(instance: model, serviceProvider: null, items: null);
+        Validator.TryValidateObject(instance: model, validationContext: validationContext, validationResults: validationResults, validateAllProperties: true);
+        return validationResults;
     }
 
     [Fact]
-    public void GetAllCategoriesRequest_AllowsCustomPaginationValues()
+    public void GetAllCategoriesRequest_WithValidPagination_PassesValidation()
     {
-        // Act
+        // Arrange
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 2,
-            PageSize = 50
+            PageNumber = 1,
+            PageSize = 25
         };
 
+        // Act
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
         // Assert
-        Assert.Equal(expected: 2, actual: request.PageNumber);
-        Assert.Equal(expected: 50, actual: request.PageSize);
+        Assert.Empty(collection: errors);
+    }
+
+    [Theory]
+    [InlineData(0, 25)]
+    [InlineData(-1, 25)]
+    [InlineData(1, 0)]
+    [InlineData(1, -5)]
+    [InlineData(1, 1001)]
+    public void GetAllCategoriesRequest_WithInvalidPagination_FailsValidation(int pageNumber, int pageSize)
+    {
+        // Arrange
+        var request = new GetAllCategoriesRequest
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        // Act
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
+        // Assert
+        Assert.NotEmpty(collection: errors);
     }
 }
