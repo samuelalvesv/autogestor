@@ -1,0 +1,72 @@
+using Autogestor.Api.Services;
+using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
+using Autogestor.Contract.Services;
+using Autogestor.Infrastructure;
+using Autogestor.Infrastructure.Persistence;
+using Autogestor.Infrastructure.Persistence.Interceptors;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
+using ProtoBuf.Grpc.Server;
+
+namespace Autogestor.Api.Extensions;
+
+public static class BuilderExtensions
+{
+    public static WebApplicationBuilder ConfigureKestrelProtocols(this WebApplicationBuilder builder)
+    {
+        builder.WebHost.ConfigureKestrel(options: options => options.ConfigureEndpointDefaults(configureOptions: listenOptions => listenOptions.Protocols = HttpProtocols.Http1AndHttp2));
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddDatabasePersistence(this WebApplicationBuilder builder)
+    {
+        string connectionString = builder.Configuration.GetConnectionString(name: "DefaultConnection")
+            ?? throw new ArgumentException(message: "String de conexão não encontrada");
+
+        builder.Services.AddInfrastructure();
+
+        builder.Services.AddDbContext<AppDbContext>(optionsAction: (serviceProvider, options) =>
+        {
+            options.UseNpgsql(
+                connectionString: connectionString,
+                npgsqlOptionsAction: b => b.MigrationsAssembly(assemblyName: "Autogestor.Infrastructure"));
+            options.AddInterceptors(interceptors:
+            [
+                serviceProvider.GetRequiredService<AuditableEntityInterceptor>(),
+                serviceProvider.GetRequiredService<TenantEntityInterceptor>()
+            ]);
+        });
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
+        builder.Services.AddScoped<ICategoryService, CategoryService>();
+        builder.Services.AddScoped<ICreateTransactionUseCase, CreateTransactionUseCase>();
+        builder.Services.AddScoped<ITransactionService, TransactionService>();
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddGrpcConfiguration(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCodeFirstGrpc();
+        builder.Services.AddCodeFirstGrpcReflection();
+
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddCorsPolicy(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(setupAction: options => options.AddDefaultPolicy(configurePolicy: policy => policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding")));
+
+        return builder;
+    }
+}

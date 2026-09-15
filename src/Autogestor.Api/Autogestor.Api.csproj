@@ -7,10 +7,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore.Web" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="protobuf-net.Grpc.AspNetCore" />
+    <PackageReference Include="protobuf-net.Grpc.AspNetCore.Reflection" />
   </ItemGroup>
 
   <PropertyGroup>
