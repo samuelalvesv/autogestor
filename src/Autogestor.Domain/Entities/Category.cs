@@ -15,12 +15,24 @@ public sealed class Category : TenantEntity
 
     public static Category Create(string title, string description)
     {
+        Validate(title: title, description: description);
+        return new Category(title: title, description: description);
+    }
+
+    public void Update(string title, string description)
+    {
+        Validate(title: title, description: description);
+
+        Title = title;
+        Description = description;
+    }
+
+    private static void Validate(string title, string description)
+    {
         if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("O título da categoria não pode ser vazio.", nameof(title));
+            throw new ArgumentException(message: "O título da categoria não pode ser vazio.", paramName: nameof(title));
 
         if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("A descrição da categoria não pode ser vazia.", nameof(description));
-
-        return new Category(title, description);
+            throw new ArgumentException(message: "A descrição da categoria não pode ser vazia.", paramName: nameof(description));
     }
 }

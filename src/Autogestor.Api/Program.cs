@@ -1,5 +1,6 @@
 using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 using Autogestor.Contract.Services;
 using Autogestor.Infrastructure;
 using Autogestor.Infrastructure.Persistence;
@@ -27,6 +28,8 @@ builder.Services.AddDbContext<AppDbContext>(optionsAction: (serviceProvider, opt
 
 builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICreateTransactionUseCase, CreateTransactionUseCase>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 WebApplication app = builder.Build();
 

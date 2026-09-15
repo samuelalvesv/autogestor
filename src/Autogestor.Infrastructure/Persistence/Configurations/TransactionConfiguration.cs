@@ -4,33 +4,33 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Autogestor.Infrastructure.Persistence.Configurations;
 
-public class TransactionConfiguration : TenantEntityConfiguration<Transaction>
+public sealed class TransactionConfiguration : TenantEntityConfiguration<Transaction>
 {
     public override void Configure(EntityTypeBuilder<Transaction> builder)
     {
-        base.Configure(builder);
+        base.Configure(builder: builder);
 
-        builder.Property(t => t.Title)
+        builder.Property(propertyExpression: t => t.Title)
             .IsRequired()
-            .HasColumnType("text");
+            .HasColumnType(typeName: "text");
 
-        builder.Property(t => t.Type)
+        builder.Property(propertyExpression: t => t.Type)
             .IsRequired()
             .HasConversion<int>()
-            .HasColumnType("integer");
+            .HasColumnType(typeName: "integer");
 
-        builder.Property(t => t.Amount)
+        builder.Property(propertyExpression: t => t.Amount)
             .IsRequired()
-            .HasColumnType("numeric(18,2)");
+            .HasColumnType(typeName: "numeric(18,2)");
 
-        builder.Property(t => t.CategoryId)
+        builder.Property(propertyExpression: t => t.CategoryId)
             .IsRequired()
-            .HasColumnType("uuid");
+            .HasColumnType(typeName: "uuid");
 
         // relationships
-        builder.HasOne(t => t.Category)
+        builder.HasOne(navigationExpression: t => t.Category)
             .WithMany()
-            .HasForeignKey(t => t.CategoryId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasForeignKey(foreignKeyExpression: t => t.CategoryId)
+            .OnDelete(deleteBehavior: DeleteBehavior.Restrict);
     }
 }

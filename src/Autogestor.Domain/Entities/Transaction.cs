@@ -8,7 +8,7 @@ public sealed class Transaction : TenantEntity
     public ETransactionType Type { get; private set; }
     public decimal Amount { get; private set; }
     public Guid CategoryId { get; private set; }
-    public Category Category { get; private set; } = null!;
+    public Category? Category { get; private set; }
 
     private Transaction() { }
 
@@ -22,15 +22,32 @@ public sealed class Transaction : TenantEntity
 
     public static Transaction Create(string title, ETransactionType type, decimal amount, Guid categoryId)
     {
+        Validate(title: title, type: type, amount: amount, categoryId: categoryId);
+        return new Transaction(title: title, type: type, amount: amount, categoryId: categoryId);
+    }
+
+    public void Update(string title, ETransactionType type, decimal amount, Guid categoryId)
+    {
+        Validate(title: title, type: type, amount: amount, categoryId: categoryId);
+
+        Title = title;
+        Type = type;
+        Amount = amount;
+        CategoryId = categoryId;
+    }
+
+    private static void Validate(string title, ETransactionType type, decimal amount, Guid categoryId)
+    {
         if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("O título da transação não pode ser vazio.", nameof(title));
+            throw new ArgumentException(message: "O título da transação não pode ser vazio.", paramName: nameof(title));
+
+        if (!Enum.IsDefined(type))
+            throw new ArgumentException(message: "Tipo de transação inválido.", paramName: nameof(type));
 
         if (amount <= 0)
-            throw new ArgumentException("O valor da transação deve ser maior que zero.", nameof(amount));
+            throw new ArgumentException(message: "O valor da transação deve ser maior que zero.", paramName: nameof(amount));
 
         if (categoryId == Guid.Empty)
-            throw new ArgumentException("Categoria inválida.", nameof(categoryId));
-
-        return new Transaction(title, type, amount, categoryId);
+            throw new ArgumentException(message: "Categoria inválida.", paramName: nameof(categoryId));
     }
 }
