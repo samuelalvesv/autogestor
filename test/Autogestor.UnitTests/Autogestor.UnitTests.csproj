@@ -5,6 +5,7 @@
     <ProjectReference Include="../../src/Autogestor.Application/Autogestor.Application.csproj" />
     <ProjectReference Include="../../src/Autogestor.Contract/Autogestor.Contract.csproj" />
     <ProjectReference Include="../../src/Autogestor.Api/Autogestor.Api.csproj" />
+    <ProjectReference Include="../../src/Autogestor.AppHost/Autogestor.AppHost.csproj" />
   </ItemGroup>
 
 </Project>

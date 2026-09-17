@@ -18,7 +18,7 @@ public static class AppExtensions
     {
         app.MapGrpcService<CategoryService>().EnableGrpcWeb();
         app.MapGrpcService<TransactionService>().EnableGrpcWeb();
-        app.MapCodeFirstGrpcReflectionService();
+        app.MapCodeFirstGrpcReflectionService().EnableGrpcWeb();
 
         app.MapGet(pattern: "/", handler: () => "Comunicação com endpoints gRPC deve ser realizada através de um cliente gRPC.");
 

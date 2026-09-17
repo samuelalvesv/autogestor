@@ -19,10 +19,10 @@ public static class BuilderExtensions
         builder.WebHost.ConfigureKestrel(configureOptions: (_, options) =>
         {
             // gRPC-Web (HTTP/1.1) — Blazor WASM
-            options.ListenLocalhost(port: 5132, configure: o => o.Protocols = HttpProtocols.Http1);
+            options.ListenAnyIP(port: 5132, configure: o => o.Protocols = HttpProtocols.Http1);
 
             // gRPC Native (HTTP/2 h2c) — Blazor Hybrid, Postman, grpcui, grpcurl
-            options.ListenLocalhost(port: 5133, configure: o => o.Protocols = HttpProtocols.Http2);
+            options.ListenAnyIP(port: 5133, configure: o => o.Protocols = HttpProtocols.Http2);
         });
 
         return builder;
