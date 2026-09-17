@@ -8,7 +8,7 @@ public static class AppExtensions
     public static WebApplication UseApiPipeline(this WebApplication app)
     {
         app.UseRouting();
-        app.UseGrpcWeb(options: new GrpcWebOptions { DefaultEnabled = true });
+        app.UseGrpcWeb();
         app.UseCors();
 
         return app;

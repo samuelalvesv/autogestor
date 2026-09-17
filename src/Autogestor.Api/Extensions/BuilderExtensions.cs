@@ -16,7 +16,14 @@ public static class BuilderExtensions
 {
     public static WebApplicationBuilder ConfigureKestrelProtocols(this WebApplicationBuilder builder)
     {
-        builder.WebHost.ConfigureKestrel(options: options => options.ConfigureEndpointDefaults(configureOptions: listenOptions => listenOptions.Protocols = HttpProtocols.Http1AndHttp2));
+        builder.WebHost.ConfigureKestrel(configureOptions: (_, options) =>
+        {
+            // gRPC-Web (HTTP/1.1) — Blazor WASM
+            options.ListenLocalhost(port: 5132, configure: o => o.Protocols = HttpProtocols.Http1);
+
+            // gRPC Native (HTTP/2 h2c) — Blazor Hybrid, Postman, grpcui, grpcurl
+            options.ListenLocalhost(port: 5133, configure: o => o.Protocols = HttpProtocols.Http2);
+        });
 
         return builder;
     }
