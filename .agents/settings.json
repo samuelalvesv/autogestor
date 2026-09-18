@@ -3,6 +3,8 @@
     "allow": [
       "read_url(https://antigravity.google/docs)",
       "read_url(https://learn.microsoft.com/en-us/docs)",
+      "command(rtk cat)",
+      "command(rtk cat *)",
       "command(rtk discover)",
       "command(rtk discover *)",
       "command(rtk dotnet --info)",
@@ -45,6 +47,8 @@
       "command(rtk rm *)"
     ],
     "deny": [
+      "command(cat)",
+      "command(cat *)",
       "command(dotnet --info)",
       "command(dotnet --info *)",
       "command(dotnet build)",
