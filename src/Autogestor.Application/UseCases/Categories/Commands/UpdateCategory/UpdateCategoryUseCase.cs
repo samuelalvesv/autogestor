@@ -15,22 +15,23 @@ public sealed class UpdateCategoryUseCase(
         UpdateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
-        Category? category = await categoryRepository.GetByIdAsync(request.Id, cancellationToken);
+        Category? category = await categoryRepository.GetByIdAsync(
+            id: request.Id,
+            cancellationToken: cancellationToken);
 
         if (category is null)
+        {
             return new Response<CategoryResponse>
             {
                 Data = null,
                 Message = "Categoria não encontrada."
             };
+        }
 
         category.Update(
             title: request.Title,
             description: request.Description);
 
-        await categoryRepository.UpdateAsync(
-            category: category,
-            cancellationToken: cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
         var response = new CategoryResponse

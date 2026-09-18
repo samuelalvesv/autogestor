@@ -28,6 +28,12 @@ applyTo: "src/Autogestor.Infrastructure/**/*.cs"
 - **Desacoplamento de Entidades em Interceptadores**: Interceptadores de infraestrutura devem operar exclusivamente sobre contratos ou classes base genéricas de domínio. É estritamente proibido acoplar a execução a tipos concretos, verificações de tipos derivados ou condicionais específicos para entidades individuais.
 - **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](identity-multitenancy.md).
 
+### Rastreamento (Change Tracking) e Persistência no EF Core
+
+- **Consultas de Leitura**: Usar `.AsNoTracking()` em consultas que não sofrerão alteração ou que servem apenas para leitura/exibição.
+- **Mutações**: Buscar a entidade rastreada, invocar os métodos de domínio e persistir via `unitOfWork.CommitAsync()`.
+- **Validação de Existência**: Usar `AnyAsync()` para checar chaves estrangeiras sem trafegar a entidade inteira pela rede.
+
 ## Ferramentas
 
 - **Plugin `dotnet-data`**: skill `optimizing-ef-core-queries`

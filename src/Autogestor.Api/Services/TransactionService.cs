@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
+using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
@@ -6,7 +7,9 @@ using Autogestor.Contract.Services;
 
 namespace Autogestor.Api.Services;
 
-public sealed class TransactionService(ICreateTransactionUseCase createTransactionUseCase) : ITransactionService
+public sealed class TransactionService(
+    ICreateTransactionUseCase createTransactionUseCase,
+    IUpdateTransactionUseCase updateTransactionUseCase) : ITransactionService
 {
     public Task<Response<TransactionResponse>> CreateAsync(
         CreateTransactionRequest request,
@@ -48,9 +51,7 @@ public sealed class TransactionService(ICreateTransactionUseCase createTransacti
     public Task<Response<TransactionResponse>> UpdateAsync(
         UpdateTransactionRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(result: new Response<TransactionResponse>
-        {
-            Data = null,
-            Message = "Implementação pendente."
-        });
+        updateTransactionUseCase.ExecuteAsync(
+            request: request,
+            cancellationToken: cancellationToken);
 }

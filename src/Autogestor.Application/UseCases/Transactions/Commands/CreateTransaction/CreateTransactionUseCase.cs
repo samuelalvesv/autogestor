@@ -22,14 +22,20 @@ public sealed class CreateTransactionUseCase(
             amount: request.Amount,
             categoryId: request.CategoryId);
 
-        _ = await categoryRepository.GetByIdAsync(
+        bool categoryExists = await categoryRepository.ExistsAsync(
             id: request.CategoryId,
-            cancellationToken: cancellationToken)
-        ?? throw new ArgumentException(
-            message: "Categoria não encontrada para o tenant atual.",
-            paramName: nameof(request.CategoryId));
+            cancellationToken: cancellationToken);
 
-        await transactionRepository.CreateAsync(
+        if (!categoryExists)
+        {
+            return new Response<TransactionResponse>
+            {
+                Data = null,
+                Message = "Categoria não encontrada para o tenant atual."
+            };
+        }
+
+        await transactionRepository.AddAsync(
             transaction: transaction,
             cancellationToken: cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);

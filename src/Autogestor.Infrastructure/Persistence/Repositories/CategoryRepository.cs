@@ -6,16 +6,17 @@ namespace Autogestor.Infrastructure.Persistence.Repositories;
 
 public sealed class CategoryRepository(AppDbContext context) : ICategoryRepository
 {
-    public Task CreateAsync(Category category, CancellationToken cancellationToken = default)
+    public Task AddAsync(Category category, CancellationToken cancellationToken = default)
     {
         context.Categories.Add(entity: category);
         return Task.CompletedTask;
     }
-    public Task UpdateAsync(Category category, CancellationToken cancellationToken = default)
-    {
-        context.Categories.Update(entity: category);
-        return Task.CompletedTask;
-    }
+
+    public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
+        context.Categories
+            .AnyAsync(
+                predicate: c => c.Id == id,
+                cancellationToken: cancellationToken);
 
     public Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.Categories

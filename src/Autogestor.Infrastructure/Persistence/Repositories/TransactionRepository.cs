@@ -6,16 +6,17 @@ namespace Autogestor.Infrastructure.Persistence.Repositories;
 
 public sealed class TransactionRepository(AppDbContext context) : ITransactionRepository
 {
-    public Task CreateAsync(Transaction transaction, CancellationToken cancellationToken = default)
+    public Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default)
     {
         context.Transactions.Add(entity: transaction);
         return Task.CompletedTask;
     }
-    public Task UpdateAsync(Transaction transaction, CancellationToken cancellationToken = default)
-    {
-        context.Transactions.Update(entity: transaction);
-        return Task.CompletedTask;
-    }
+
+    public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
+        context.Transactions
+            .AnyAsync(
+                predicate: t => t.Id == id,
+                cancellationToken: cancellationToken);
 
     public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.Transactions

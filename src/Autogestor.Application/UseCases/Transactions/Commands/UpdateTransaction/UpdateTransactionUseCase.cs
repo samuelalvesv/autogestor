@@ -16,21 +16,18 @@ public sealed class UpdateTransactionUseCase(
         UpdateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        Transaction? transaction = await transactionRepository.GetByIdAsync(request.Id, cancellationToken);
+        Transaction? transaction = await transactionRepository.GetByIdAsync(
+            id: request.Id,
+            cancellationToken: cancellationToken);
 
         if (transaction is null)
+        {
             return new Response<TransactionResponse>
             {
                 Data = null,
                 Message = "Transação não encontrada."
             };
-
-        _ = await categoryRepository.GetByIdAsync(
-            id: request.CategoryId,
-            cancellationToken: cancellationToken) ??
-        throw new ArgumentException(
-            message: "Categoria não encontrada para o tenant atual.",
-            paramName: nameof(request.CategoryId));
+        }
 
         transaction.Update(
             title: request.Title,
@@ -38,9 +35,19 @@ public sealed class UpdateTransactionUseCase(
             amount: request.Amount,
             categoryId: request.CategoryId);
 
-        await transactionRepository.UpdateAsync(
-            transaction: transaction,
+        bool categoryExists = await categoryRepository.ExistsAsync(
+            id: request.CategoryId,
             cancellationToken: cancellationToken);
+
+        if (!categoryExists)
+        {
+            return new Response<TransactionResponse>
+            {
+                Data = null,
+                Message = "Categoria não encontrada para o tenant atual."
+            };
+        }
+
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
         var response = new TransactionResponse
