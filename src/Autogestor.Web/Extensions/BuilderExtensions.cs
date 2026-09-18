@@ -20,20 +20,22 @@ public static class BuilderExtensions
 
     public static WebAssemblyHostBuilder ConfigureServices(this WebAssemblyHostBuilder builder)
     {
-        var baseAddress = new Uri(uriString: builder.HostEnvironment.BaseAddress);
+        string apiBaseUrl = builder.Configuration[key: "services:api:grpc-web:0"]
+            ?? throw new InvalidOperationException(message: "A configuração de endpoint 'services:api:grpc-web:0' é obrigatória e não foi informada.");
+        var apiAddress = new Uri(uriString: apiBaseUrl);
 
         builder.Services.AddMudServices();
 
         builder.Services.AddScoped(implementationFactory: _ => new HttpClient
         {
-            BaseAddress = baseAddress
+            BaseAddress = apiAddress
         });
 
         builder.Services.AddScoped(implementationFactory: _ =>
         {
             var handler = new GrpcWebHandler(mode: GrpcWebMode.GrpcWebText, innerHandler: new HttpClientHandler());
             return GrpcChannel.ForAddress(
-                address: baseAddress,
+                address: apiAddress,
                 channelOptions: new GrpcChannelOptions
                 {
                     HttpHandler = handler

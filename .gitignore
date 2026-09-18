@@ -13,6 +13,8 @@ TestResults/
 # Arquivos de sistema do macOS e Windows
 .DS_Store
 Thumbs.db
+Library/
+.dotnet/
 
 ## [Logs]
 # Arquivos de log gerados em tempo de execução

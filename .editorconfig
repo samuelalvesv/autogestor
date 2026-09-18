@@ -121,7 +121,7 @@ dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
 
 # IDE0046 — Retorno condicional (ternário)
 dotnet_diagnostic.IDE0046.severity = none
-dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+dotnet_style_prefer_conditional_expression_over_return = false:silent
 
 # IDE0054 / IDE0074 — Atribuição composta
 dotnet_style_prefer_compound_assignment = true:warning
@@ -284,7 +284,7 @@ dotnet_diagnostic.IDE0052.severity = warning
 
 # IDE0058 — Remover valor de expressão não utilizado
 dotnet_diagnostic.IDE0058.severity = none
-csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # IDE0059 — Remover atribuição desnecessária
 csharp_style_unused_value_assignment_preference = discard_variable:warning
@@ -665,11 +665,10 @@ dotnet_diagnostic.CA1310.severity = warning    # Especificar StringComparison pa
 dotnet_diagnostic.CA1311.severity = warning    # Especificar cultura ou usar versão invariant
 
 # ==========================================================================
-# 22. DESABILITAR CA2007 PARA PROJETOS DE APLICAÇÃO (não-library)
+# 22. OBSERVAÇÕES SOBRE CA2007 (CONFIGUREAWAIT)
 # ==========================================================================
-# CA2007 (ConfigureAwait) é relevante apenas para libraries.
-# Pode ser desabilitado individualmente em projetos de aplicação via .editorconfig
-# local ou via <NoWarn> no .csproj. Mantido como warning aqui para libraries.
+# CA2007 (ConfigureAwait) está desabilitado globalmente (linha 539) porque as
+# aplicações e serviços modernos em .NET 10 / ASP.NET Core não possuem SynchronizationContext.
 
 # ==========================================================================
 # 23. MIGRATIONS (EF CORE)
@@ -687,3 +686,10 @@ charset = unset
 [test/**.cs]
 dotnet_diagnostic.IDE1006.severity = none
 
+
+# ==========================================================================
+# 25. SERVICE DEFAULTS (EXTENSIONS)
+# ==========================================================================
+# Permite o namespace Microsoft.Extensions.Hosting para métodos de extensão do Host
+[**/Autogestor.ServiceDefaults/Extensions.cs]
+dotnet_diagnostic.IDE0130.severity = none

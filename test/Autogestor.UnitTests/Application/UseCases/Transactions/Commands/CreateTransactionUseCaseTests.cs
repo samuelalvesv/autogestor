@@ -1,85 +1,16 @@
-using Autogestor.Application.Interfaces;
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
-using Autogestor.Domain.Interfaces;
+using Autogestor.UnitTests.Common.Fakes;
 using DomainTransactionType = Autogestor.Domain.Enums.ETransactionType;
 
 namespace Autogestor.UnitTests.Application.UseCases.Transactions.Commands;
 
 public sealed class CreateTransactionUseCaseTests
 {
-    private static void SetPersistenceFields(TenantEntity entity, Guid userId, Guid tenantId, DateTime timestamp)
-    {
-        typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.CreatedBy))!
-            .SetValue(obj: entity, value: userId);
-        typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.CreatedAt))!
-            .SetValue(obj: entity, value: timestamp);
-        typeof(TenantEntity).GetProperty(name: nameof(TenantEntity.TenantId))!
-            .SetValue(obj: entity, value: tenantId);
-    }
-
-    private sealed class TransactionRepositoryFake : ITransactionRepository
-    {
-        public List<Transaction> Transactions { get; } = [];
-        public CancellationToken PassedCancellationToken { get; private set; }
-
-        public Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default)
-        {
-            PassedCancellationToken = cancellationToken;
-            SetPersistenceFields(
-                entity: transaction,
-                userId: Guid.NewGuid(),
-                tenantId: Guid.NewGuid(),
-                timestamp: DateTime.UtcNow);
-            Transactions.Add(item: transaction);
-            return Task.CompletedTask;
-        }
-
-        public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
-            Task.FromResult(result: Transactions.FirstOrDefault(predicate: t => t.Id == id));
-
-        public Task<IReadOnlyList<Transaction>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<Transaction>>(result: Transactions.Skip(count: (pageNumber - 1) * pageSize).Take(count: pageSize).ToList().AsReadOnly());
-    }
-
-    private sealed class CategoryRepositoryFake : ICategoryRepository
-    {
-        public List<Category> Categories { get; } = [];
-        public CancellationToken PassedCancellationToken { get; private set; }
-
-        public Task AddAsync(Category category, CancellationToken cancellationToken = default)
-        {
-            PassedCancellationToken = cancellationToken;
-            Categories.Add(item: category);
-            return Task.CompletedTask;
-        }
-
-        public Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        {
-            PassedCancellationToken = cancellationToken;
-            return Task.FromResult(result: Categories.FirstOrDefault(predicate: c => c.Id == id));
-        }
-
-        public Task<IReadOnlyList<Category>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyList<Category>>(result: Categories.Skip(count: (pageNumber - 1) * pageSize).Take(count: pageSize).ToList().AsReadOnly());
-    }
-
-    private sealed class UnitOfWorkFake : IUnitOfWork
-    {
-        public int CommitCount { get; private set; }
-        public CancellationToken PassedCancellationToken { get; private set; }
-
-        public Task CommitAsync(CancellationToken cancellationToken = default)
-        {
-            PassedCancellationToken = cancellationToken;
-            CommitCount++;
-            return Task.CompletedTask;
-        }
-    }
 
     [Theory]
     [InlineData(ETransactionType.Deposit)]
@@ -135,7 +66,7 @@ public sealed class CreateTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithNonExistentCategoryId_ThrowsArgumentException()
+    public async Task ExecuteAsync_WithNonExistentCategoryId_ReturnsFailureResponse()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -154,13 +85,15 @@ public sealed class CreateTransactionUseCaseTests
             CategoryId = Guid.NewGuid()
         };
 
-        // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
-            testCode: () => useCase.ExecuteAsync(
-                request: request,
-                cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "CategoryId", actual: exception.ParamName);
-        Assert.Contains(expectedSubstring: "Categoria não encontrada para o tenant atual.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+        // Act
+        Response<TransactionResponse> response = await useCase.ExecuteAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(@object: response);
+        Assert.Null(@object: response.Data);
+        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: response.Message);
         Assert.Empty(collection: transactionRepository.Transactions);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }

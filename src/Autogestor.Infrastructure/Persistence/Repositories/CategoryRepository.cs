@@ -12,9 +12,14 @@ public sealed class CategoryRepository(AppDbContext context) : ICategoryReposito
         return Task.CompletedTask;
     }
 
+    public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
+        context.Categories
+            .AnyAsync(
+                predicate: c => c.Id == id,
+                cancellationToken: cancellationToken);
+
     public Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.Categories
-            .AsNoTracking()
             .FirstOrDefaultAsync(
                 predicate: c => c.Id == id,
                 cancellationToken: cancellationToken);

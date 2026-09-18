@@ -22,6 +22,11 @@ As diretrizes técnicas detalhadas, padrões de arquitetura por camada e suas re
 - **Regras por Camada Técnica**: Seguir os respectivos arquivos em `.agents/rules/` conforme o escopo editado (`domain`, `application`, `infrastructure`, `contracts`, `api`, `ui`, `web`, `database`, `service-defaults`, `tests`).
 - **Controle de Versão & Git**: Seguir [.agents/rules/git.md](.agents/rules/git.md).
 
+## Escopo de Terminal e Configurações Globais
+
+- **Comandos restritos ao repositório**: Nunca executar comandos de terminal fora da raiz do workspace (`Cwd` sempre dentro do projeto).
+- **Sem alterações globais**: Proibido instalar ferramentas/pacotes globais (`-g`, `brew`, `python`, `node`, etc.) ou modificar arquivos fora do repositório (`~/.`, configurações do SO, variáveis de ambiente). Toda solução deve ser estritamente local ao projeto.
+
 ## Hierarquia de Delegação e Não-Sobreposição (.agents)
 
 Para assegurar governança estrita, rastreabilidade e zero sobreposição de responsabilidades, o ecossistema do Autogestor adota uma cadeia estrita de autoridade em camadas:

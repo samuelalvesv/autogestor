@@ -1,5 +1,6 @@
 using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
@@ -28,12 +29,35 @@ public sealed class CategoryServiceTests
         }
     }
 
+    private sealed class UpdateCategoryUseCaseFake : IUpdateCategoryUseCase
+    {
+        public UpdateCategoryRequest? ReceivedRequest { get; private set; }
+        public CancellationToken ReceivedCancellationToken { get; private set; }
+        public Response<CategoryResponse> ResponseToReturn { get; set; } = new()
+        {
+            Data = null,
+            Message = string.Empty
+        };
+
+        public Task<Response<CategoryResponse>> ExecuteAsync(
+            UpdateCategoryRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            ReceivedRequest = request;
+            ReceivedCancellationToken = cancellationToken;
+            return Task.FromResult(result: ResponseToReturn);
+        }
+    }
+
     [Fact]
     public async Task CreateAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var useCaseFake = new CreateCategoryUseCaseFake();
-        var service = new CategoryService(createCategoryUseCase: useCaseFake);
+        var createUseCaseFake = new CreateCategoryUseCaseFake();
+        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var service = new CategoryService(
+            createCategoryUseCase: createUseCaseFake,
+            updateCategoryUseCase: updateUseCaseFake);
 
         var request = new CreateCategoryRequest
         {
@@ -58,7 +82,7 @@ public sealed class CategoryServiceTests
             Message = "Categoria criada com sucesso."
         };
 
-        useCaseFake.ResponseToReturn = expectedResponse;
+        createUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
         Response<CategoryResponse> response = await service.CreateAsync(
@@ -67,15 +91,18 @@ public sealed class CategoryServiceTests
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: useCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: createUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task CreateAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var useCaseFake = new CreateCategoryUseCaseFake();
-        var service = new CategoryService(createCategoryUseCase: useCaseFake);
+        var createUseCaseFake = new CreateCategoryUseCaseFake();
+        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var service = new CategoryService(
+            createCategoryUseCase: createUseCaseFake,
+            updateCategoryUseCase: updateUseCaseFake);
 
         var request = new CreateCategoryRequest
         {
@@ -83,7 +110,7 @@ public sealed class CategoryServiceTests
             Description = "Farmácia e consultas"
         };
 
-        useCaseFake.ResponseToReturn = new Response<CategoryResponse>
+        createUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -96,15 +123,97 @@ public sealed class CategoryServiceTests
         await service.CreateAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: useCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: createUseCaseFake.ReceivedCancellationToken);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_DelegatesToUseCase_AndReturnsResponse()
+    {
+        // Arrange
+        var createUseCaseFake = new CreateCategoryUseCaseFake();
+        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var service = new CategoryService(
+            createCategoryUseCase: createUseCaseFake,
+            updateCategoryUseCase: updateUseCaseFake);
+
+        var request = new UpdateCategoryRequest
+        {
+            Id = Guid.NewGuid(),
+            Title = "Educação Superior",
+            Description = "Pós-graduação"
+        };
+
+        var expectedResponse = new Response<CategoryResponse>
+        {
+            Data = new CategoryResponse
+            {
+                Id = request.Id,
+                Active = true,
+                CreatedBy = Guid.NewGuid(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedBy = Guid.NewGuid(),
+                UpdatedAt = DateTime.UtcNow,
+                Title = request.Title,
+                Description = request.Description,
+                TenantId = Guid.NewGuid()
+            },
+            Message = "Categoria atualizada com sucesso."
+        };
+
+        updateUseCaseFake.ResponseToReturn = expectedResponse;
+
+        // Act
+        Response<CategoryResponse> response = await service.UpdateAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Same(expected: expectedResponse, actual: response);
+        Assert.Same(expected: request, actual: updateUseCaseFake.ReceivedRequest);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_PropagatesCancellationToken()
+    {
+        // Arrange
+        var createUseCaseFake = new CreateCategoryUseCaseFake();
+        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var service = new CategoryService(
+            createCategoryUseCase: createUseCaseFake,
+            updateCategoryUseCase: updateUseCaseFake);
+
+        var request = new UpdateCategoryRequest
+        {
+            Id = Guid.NewGuid(),
+            Title = "Educação Superior",
+            Description = "Pós-graduação"
+        };
+
+        updateUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
+        {
+            Data = null,
+            Message = "Sucesso"
+        };
+
+        using var cts = new CancellationTokenSource();
+        CancellationToken token = cts.Token;
+
+        // Act
+        await service.UpdateAsync(request: request, cancellationToken: token);
+
+        // Assert
+        Assert.Equal(expected: token, actual: updateUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task PendingMethods_ReturnPendingImplementationResponse()
     {
         // Arrange
-        var useCaseFake = new CreateCategoryUseCaseFake();
-        var service = new CategoryService(createCategoryUseCase: useCaseFake);
+        var createUseCaseFake = new CreateCategoryUseCaseFake();
+        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var service = new CategoryService(
+            createCategoryUseCase: createUseCaseFake,
+            updateCategoryUseCase: updateUseCaseFake);
 
         // Act
         Response<DeleteResponse> deleteResponse = await service.DeleteAsync(
@@ -129,19 +238,9 @@ public sealed class CategoryServiceTests
             },
             cancellationToken: TestContext.Current.CancellationToken);
 
-        Response<CategoryResponse> updateResponse = await service.UpdateAsync(
-            request: new UpdateCategoryRequest
-            {
-                Id = Guid.NewGuid(),
-                Title = "Educação",
-                Description = "Livros"
-            },
-            cancellationToken: TestContext.Current.CancellationToken);
-
         // Assert
         Assert.Equal(expected: "Implementação pendente.", actual: deleteResponse.Message);
         Assert.Equal(expected: "Implementação pendente.", actual: getAllResponse.Message);
         Assert.Equal(expected: "Implementação pendente.", actual: getByIdResponse.Message);
-        Assert.Equal(expected: "Implementação pendente.", actual: updateResponse.Message);
     }
 }

@@ -12,9 +12,14 @@ public sealed class TransactionRepository(AppDbContext context) : ITransactionRe
         return Task.CompletedTask;
     }
 
+    public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
+        context.Transactions
+            .AnyAsync(
+                predicate: t => t.Id == id,
+                cancellationToken: cancellationToken);
+
     public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.Transactions
-            .AsNoTracking()
             .FirstOrDefaultAsync(
                 predicate: t => t.Id == id,
                 cancellationToken: cancellationToken);

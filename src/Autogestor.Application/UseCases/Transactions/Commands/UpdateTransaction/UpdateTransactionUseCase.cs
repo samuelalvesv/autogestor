@@ -5,18 +5,31 @@ using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Interfaces;
 
-namespace Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
+namespace Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
 
-public sealed class CreateTransactionUseCase(
+public sealed class UpdateTransactionUseCase(
     ITransactionRepository transactionRepository,
     ICategoryRepository categoryRepository,
-    IUnitOfWork unitOfWork) : ICreateTransactionUseCase
+    IUnitOfWork unitOfWork) : IUpdateTransactionUseCase
 {
     public async Task<Response<TransactionResponse>> ExecuteAsync(
-        CreateTransactionRequest request,
+        UpdateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var transaction = Transaction.Create(
+        Transaction? transaction = await transactionRepository.GetByIdAsync(
+            id: request.Id,
+            cancellationToken: cancellationToken);
+
+        if (transaction is null)
+        {
+            return new Response<TransactionResponse>
+            {
+                Data = null,
+                Message = "Transação não encontrada."
+            };
+        }
+
+        transaction.Update(
             title: request.Title,
             type: (Domain.Enums.ETransactionType)request.Type,
             amount: request.Amount,
@@ -35,9 +48,6 @@ public sealed class CreateTransactionUseCase(
             };
         }
 
-        await transactionRepository.AddAsync(
-            transaction: transaction,
-            cancellationToken: cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
         var response = new TransactionResponse
@@ -58,7 +68,7 @@ public sealed class CreateTransactionUseCase(
         return new Response<TransactionResponse>
         {
             Data = response,
-            Message = "Transação criada com sucesso."
+            Message = "Transação atualizada com sucesso."
         };
     }
 }

@@ -1,7 +1,9 @@
 using Autogestor.Api.Middlewares;
 using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
+using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
 using Autogestor.Contract.Services;
 using Autogestor.Infrastructure;
 using Autogestor.Infrastructure.Persistence;
@@ -16,7 +18,14 @@ public static class BuilderExtensions
 {
     public static WebApplicationBuilder ConfigureKestrelProtocols(this WebApplicationBuilder builder)
     {
-        builder.WebHost.ConfigureKestrel(options: options => options.ConfigureEndpointDefaults(configureOptions: listenOptions => listenOptions.Protocols = HttpProtocols.Http1AndHttp2));
+        builder.WebHost.ConfigureKestrel(configureOptions: (_, options) =>
+        {
+            // gRPC-Web (HTTP/1.1) — Blazor WASM
+            options.ListenAnyIP(port: 5132, configure: o => o.Protocols = HttpProtocols.Http1);
+
+            // gRPC Native (HTTP/2 h2c) — Blazor Hybrid, Postman, grpcui, grpcurl
+            options.ListenAnyIP(port: 5133, configure: o => o.Protocols = HttpProtocols.Http2);
+        });
 
         return builder;
     }
@@ -47,8 +56,10 @@ public static class BuilderExtensions
     public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
+        builder.Services.AddScoped<IUpdateCategoryUseCase, UpdateCategoryUseCase>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<ICreateTransactionUseCase, CreateTransactionUseCase>();
+        builder.Services.AddScoped<IUpdateTransactionUseCase, UpdateTransactionUseCase>();
         builder.Services.AddScoped<ITransactionService, TransactionService>();
 
         return builder;
