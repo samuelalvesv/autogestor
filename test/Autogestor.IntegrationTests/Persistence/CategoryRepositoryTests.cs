@@ -24,7 +24,7 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
             description: "Supermercados e restaurantes");
 
         // Act
-        await repository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        await repository.CreateAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - consulta em novo contexto sem cache com o mesmo tenant
@@ -55,8 +55,8 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         var cat1 = Category.Create(title: "Cat 1", description: "Desc 1");
         var cat2 = Category.Create(title: "Cat 2", description: "Desc 2");
 
-        await repository.AddAsync(category: cat1, cancellationToken: TestContext.Current.CancellationToken);
-        await repository.AddAsync(category: cat2, cancellationToken: TestContext.Current.CancellationToken);
+        await repository.CreateAsync(category: cat1, cancellationToken: TestContext.Current.CancellationToken);
+        await repository.CreateAsync(category: cat2, cancellationToken: TestContext.Current.CancellationToken);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta em novo contexto com o mesmo tenant
@@ -81,7 +81,7 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         await using AppDbContext contextTenant1 = fixture.CreateContext(tenantContext: tenantContext1);
         var repoTenant1 = new CategoryRepository(context: contextTenant1);
         var catTenant1 = Category.Create(title: "Cat Tenant 1", description: "Desc");
-        await repoTenant1.AddAsync(category: catTenant1, cancellationToken: TestContext.Current.CancellationToken);
+        await repoTenant1.CreateAsync(category: catTenant1, cancellationToken: TestContext.Current.CancellationToken);
         await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta com o contexto do Tenant 2

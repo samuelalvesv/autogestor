@@ -27,7 +27,7 @@ public sealed class CreateTransactionUseCaseTests
         public List<Transaction> Transactions { get; } = [];
         public CancellationToken PassedCancellationToken { get; private set; }
 
-        public Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default)
+        public Task CreateAsync(Transaction transaction, CancellationToken cancellationToken = default)
         {
             PassedCancellationToken = cancellationToken;
             SetPersistenceFields(
@@ -38,6 +38,9 @@ public sealed class CreateTransactionUseCaseTests
             Transactions.Add(item: transaction);
             return Task.CompletedTask;
         }
+
+        public Task UpdateAsync(Transaction transaction, CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
 
         public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(result: Transactions.FirstOrDefault(predicate: t => t.Id == id));
@@ -51,12 +54,15 @@ public sealed class CreateTransactionUseCaseTests
         public List<Category> Categories { get; } = [];
         public CancellationToken PassedCancellationToken { get; private set; }
 
-        public Task AddAsync(Category category, CancellationToken cancellationToken = default)
+        public Task CreateAsync(Category category, CancellationToken cancellationToken = default)
         {
             PassedCancellationToken = cancellationToken;
             Categories.Add(item: category);
             return Task.CompletedTask;
         }
+
+        public Task UpdateAsync(Category category, CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
 
         public Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
@@ -96,7 +102,7 @@ public sealed class CreateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Serviços", description: "Descrição de serviços");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        await categoryRepository.CreateAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
 
         var request = new CreateTransactionRequest
         {
@@ -277,7 +283,7 @@ public sealed class CreateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Transporte", description: "Descrição de transporte");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        await categoryRepository.CreateAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
 
         var request = new CreateTransactionRequest
         {

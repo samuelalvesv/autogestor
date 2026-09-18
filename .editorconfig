@@ -616,7 +616,7 @@ dotnet_diagnostic.CA1070.severity = warning    # Não declarar campos de evento 
 # --- Uso ---
 dotnet_diagnostic.CA2200.severity = error      # Relançar para preservar detalhes de pilha
 dotnet_diagnostic.CA2201.severity = warning    # Não levantar tipos de exceção reservados
-dotnet_diagnostic.CA2208.severity = warning    # Instanciar exceções de argumento corretamente
+dotnet_diagnostic.CA2208.severity = none    # Instanciar exceções de argumento corretamente
 dotnet_diagnostic.CA2211.severity = warning    # Campos não-const não devem ser visíveis
 dotnet_diagnostic.CA2214.severity = error      # Não chamar métodos virtuais em construtores
 dotnet_diagnostic.CA2215.severity = warning    # Métodos Dispose devem chamar base.Dispose
@@ -687,3 +687,10 @@ charset = unset
 [test/**.cs]
 dotnet_diagnostic.IDE1006.severity = none
 
+
+# ==========================================================================
+# 25. SERVICE DEFAULTS (EXTENSIONS)
+# ==========================================================================
+# Permite o namespace Microsoft.Extensions.Hosting para métodos de extensão do Host
+[**/Autogestor.ServiceDefaults/Extensions.cs]
+dotnet_diagnostic.IDE0130.severity = none

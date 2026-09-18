@@ -5,31 +5,40 @@ using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Interfaces;
 
-namespace Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
+namespace Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
 
-public sealed class CreateTransactionUseCase(
+public sealed class UpdateTransactionUseCase(
     ITransactionRepository transactionRepository,
     ICategoryRepository categoryRepository,
-    IUnitOfWork unitOfWork) : ICreateTransactionUseCase
+    IUnitOfWork unitOfWork) : IUpdateTransactionUseCase
 {
     public async Task<Response<TransactionResponse>> ExecuteAsync(
-        CreateTransactionRequest request,
+        UpdateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var transaction = Transaction.Create(
+        Transaction? transaction = await transactionRepository.GetByIdAsync(request.Id, cancellationToken);
+
+        if (transaction is null)
+            return new Response<TransactionResponse>
+            {
+                Data = null,
+                Message = "Transação não encontrada."
+            };
+
+        _ = await categoryRepository.GetByIdAsync(
+            id: request.CategoryId,
+            cancellationToken: cancellationToken) ??
+        throw new ArgumentException(
+            message: "Categoria não encontrada para o tenant atual.",
+            paramName: nameof(request.CategoryId));
+
+        transaction.Update(
             title: request.Title,
             type: (Domain.Enums.ETransactionType)request.Type,
             amount: request.Amount,
             categoryId: request.CategoryId);
 
-        _ = await categoryRepository.GetByIdAsync(
-            id: request.CategoryId,
-            cancellationToken: cancellationToken)
-        ?? throw new ArgumentException(
-            message: "Categoria não encontrada para o tenant atual.",
-            paramName: nameof(request.CategoryId));
-
-        await transactionRepository.CreateAsync(
+        await transactionRepository.UpdateAsync(
             transaction: transaction,
             cancellationToken: cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
@@ -52,7 +61,7 @@ public sealed class CreateTransactionUseCase(
         return new Response<TransactionResponse>
         {
             Data = response,
-            Message = "Transação criada com sucesso."
+            Message = "Transação atualizada com sucesso."
         };
     }
 }

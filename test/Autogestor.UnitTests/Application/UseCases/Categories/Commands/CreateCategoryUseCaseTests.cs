@@ -25,7 +25,7 @@ public sealed class CreateCategoryUseCaseTests
         public List<Category> Categories { get; } = [];
         public CancellationToken PassedCancellationToken { get; private set; }
 
-        public Task AddAsync(Category category, CancellationToken cancellationToken = default)
+        public Task CreateAsync(Category category, CancellationToken cancellationToken = default)
         {
             PassedCancellationToken = cancellationToken;
             SetPersistenceFields(
@@ -36,6 +36,9 @@ public sealed class CreateCategoryUseCaseTests
             Categories.Add(item: category);
             return Task.CompletedTask;
         }
+
+        public Task UpdateAsync(Category category, CancellationToken cancellationToken = default)
+            => throw new NotSupportedException();
 
         public Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(result: Categories.FirstOrDefault(predicate: c => c.Id == id));
