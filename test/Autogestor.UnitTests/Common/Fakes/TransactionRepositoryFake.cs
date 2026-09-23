@@ -22,6 +22,23 @@ public sealed class TransactionRepositoryFake : ITransactionRepository
         return Task.CompletedTask;
     }
 
+    public Task RemoveAsync(Transaction transaction, CancellationToken cancellationToken = default)
+    {
+        PassedCancellationToken = cancellationToken;
+        if (!_transactions.Remove(item: transaction))
+        {
+            _transactions.RemoveAll(match: t => t.Id == transaction.Id);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task<bool> ExistsByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken = default)
+    {
+        PassedCancellationToken = cancellationToken;
+        return Task.FromResult(result: _transactions.Any(predicate: t => t.CategoryId == categoryId));
+    }
+
     public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;

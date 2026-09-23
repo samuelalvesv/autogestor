@@ -1,8 +1,10 @@
 using Autogestor.Api.Middlewares;
 using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
+using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
 using Autogestor.Contract.Services;
 using Autogestor.Infrastructure;
@@ -57,9 +59,11 @@ public static class BuilderExtensions
     {
         builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
         builder.Services.AddScoped<IUpdateCategoryUseCase, UpdateCategoryUseCase>();
+        builder.Services.AddScoped<IDeleteCategoryUseCase, DeleteCategoryUseCase>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<ICreateTransactionUseCase, CreateTransactionUseCase>();
         builder.Services.AddScoped<IUpdateTransactionUseCase, UpdateTransactionUseCase>();
+        builder.Services.AddScoped<IDeleteTransactionUseCase, DeleteTransactionUseCase>();
         builder.Services.AddScoped<ITransactionService, TransactionService>();
 
         return builder;

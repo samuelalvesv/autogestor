@@ -1,5 +1,6 @@
 using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
@@ -49,15 +50,37 @@ public sealed class CategoryServiceTests
         }
     }
 
+    private sealed class DeleteCategoryUseCaseFake : IDeleteCategoryUseCase
+    {
+        public DeleteCategoryRequest? ReceivedRequest { get; private set; }
+        public CancellationToken ReceivedCancellationToken { get; private set; }
+        public Response<DeleteResponse> ResponseToReturn { get; set; } = new()
+        {
+            Data = null,
+            Message = string.Empty
+        };
+
+        public Task<Response<DeleteResponse>> ExecuteAsync(
+            DeleteCategoryRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            ReceivedRequest = request;
+            ReceivedCancellationToken = cancellationToken;
+            return Task.FromResult(result: ResponseToReturn);
+        }
+    }
+
     [Fact]
     public async Task CreateAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
         var createUseCaseFake = new CreateCategoryUseCaseFake();
         var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
         var service = new CategoryService(
             createCategoryUseCase: createUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
+            updateCategoryUseCase: updateUseCaseFake,
+            deleteCategoryUseCase: deleteUseCaseFake);
 
         var request = new CreateCategoryRequest
         {
@@ -100,9 +123,11 @@ public sealed class CategoryServiceTests
         // Arrange
         var createUseCaseFake = new CreateCategoryUseCaseFake();
         var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
         var service = new CategoryService(
             createCategoryUseCase: createUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
+            updateCategoryUseCase: updateUseCaseFake,
+            deleteCategoryUseCase: deleteUseCaseFake);
 
         var request = new CreateCategoryRequest
         {
@@ -132,9 +157,11 @@ public sealed class CategoryServiceTests
         // Arrange
         var createUseCaseFake = new CreateCategoryUseCaseFake();
         var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
         var service = new CategoryService(
             createCategoryUseCase: createUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
+            updateCategoryUseCase: updateUseCaseFake,
+            deleteCategoryUseCase: deleteUseCaseFake);
 
         var request = new UpdateCategoryRequest
         {
@@ -178,9 +205,11 @@ public sealed class CategoryServiceTests
         // Arrange
         var createUseCaseFake = new CreateCategoryUseCaseFake();
         var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
         var service = new CategoryService(
             createCategoryUseCase: createUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
+            updateCategoryUseCase: updateUseCaseFake,
+            deleteCategoryUseCase: deleteUseCaseFake);
 
         var request = new UpdateCategoryRequest
         {
@@ -206,23 +235,89 @@ public sealed class CategoryServiceTests
     }
 
     [Fact]
+    public async Task DeleteAsync_DelegatesToUseCase_AndReturnsResponse()
+    {
+        // Arrange
+        var createUseCaseFake = new CreateCategoryUseCaseFake();
+        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
+        var service = new CategoryService(
+            createCategoryUseCase: createUseCaseFake,
+            updateCategoryUseCase: updateUseCaseFake,
+            deleteCategoryUseCase: deleteUseCaseFake);
+
+        var request = new DeleteCategoryRequest
+        {
+            Id = Guid.NewGuid()
+        };
+
+        var expectedResponse = new Response<DeleteResponse>
+        {
+            Data = new DeleteResponse
+            {
+                Id = request.Id
+            },
+            Message = "Categoria excluída com sucesso."
+        };
+
+        deleteUseCaseFake.ResponseToReturn = expectedResponse;
+
+        // Act
+        Response<DeleteResponse> response = await service.DeleteAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Same(expected: expectedResponse, actual: response);
+        Assert.Same(expected: request, actual: deleteUseCaseFake.ReceivedRequest);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_PropagatesCancellationToken()
+    {
+        // Arrange
+        var createUseCaseFake = new CreateCategoryUseCaseFake();
+        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
+        var service = new CategoryService(
+            createCategoryUseCase: createUseCaseFake,
+            updateCategoryUseCase: updateUseCaseFake,
+            deleteCategoryUseCase: deleteUseCaseFake);
+
+        var request = new DeleteCategoryRequest
+        {
+            Id = Guid.NewGuid()
+        };
+
+        deleteUseCaseFake.ResponseToReturn = new Response<DeleteResponse>
+        {
+            Data = null,
+            Message = "Sucesso"
+        };
+
+        using var cts = new CancellationTokenSource();
+        CancellationToken token = cts.Token;
+
+        // Act
+        await service.DeleteAsync(request: request, cancellationToken: token);
+
+        // Assert
+        Assert.Equal(expected: token, actual: deleteUseCaseFake.ReceivedCancellationToken);
+    }
+
+    [Fact]
     public async Task PendingMethods_ReturnPendingImplementationResponse()
     {
         // Arrange
         var createUseCaseFake = new CreateCategoryUseCaseFake();
         var updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
         var service = new CategoryService(
             createCategoryUseCase: createUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
+            updateCategoryUseCase: updateUseCaseFake,
+            deleteCategoryUseCase: deleteUseCaseFake);
 
         // Act
-        Response<DeleteResponse> deleteResponse = await service.DeleteAsync(
-            request: new DeleteCategoryRequest
-            {
-                Id = Guid.NewGuid()
-            },
-            cancellationToken: TestContext.Current.CancellationToken);
-
         PagedResponse<CategoryResponse> getAllResponse = await service.GetAllAsync(
             request: new GetAllCategoriesRequest
             {
@@ -239,7 +334,6 @@ public sealed class CategoryServiceTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(expected: "Implementação pendente.", actual: deleteResponse.Message);
         Assert.Equal(expected: "Implementação pendente.", actual: getAllResponse.Message);
         Assert.Equal(expected: "Implementação pendente.", actual: getByIdResponse.Message);
     }

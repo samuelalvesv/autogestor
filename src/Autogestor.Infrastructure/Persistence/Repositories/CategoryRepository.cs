@@ -12,6 +12,12 @@ public sealed class CategoryRepository(AppDbContext context) : ICategoryReposito
         return Task.CompletedTask;
     }
 
+    public Task RemoveAsync(Category category, CancellationToken cancellationToken = default)
+    {
+        context.Categories.Remove(entity: category);
+        return Task.CompletedTask;
+    }
+
     public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.Categories
             .AnyAsync(

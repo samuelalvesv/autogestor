@@ -122,6 +122,19 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
+    public async Task ExistsAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    {
+        await using AppDbContext context = fixture.CreateContext();
+        var repository = new CategoryRepository(context: context);
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            testCode: () => repository.ExistsAsync(id: Guid.NewGuid(), cancellationToken: cts.Token));
+    }
+
+    [Fact]
     public async Task Update_ViaChangeTracking_PersistsUpdatedCategoryToPostgreSqlDatabase()
     {
         // Arrange
@@ -219,5 +232,44 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         // Assert
         Assert.False(condition: existsForOtherTenant, userMessage: "A categoria de outro tenant não deve ser encontrada.");
         Assert.False(condition: existsForRandomId, userMessage: "Um id inexistente deve retornar false.");
+    }
+
+    [Fact]
+    public async Task RemoveAsync_RemovesCategoryFromPostgreSqlDatabase()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var userContext = new UserContextFake(userId: userId);
+        var tenantContext = new TenantContextFake(tenantId: tenantId);
+
+        var category = Category.Create(title: "Assinaturas", description: "Serviços mensais");
+
+        await using (AppDbContext setupContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
+        {
+            var setupRepo = new CategoryRepository(context: setupContext);
+            await setupRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+            await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+        }
+
+        // Act - carregar no repositório, chamar RemoveAsync e salvar alterações
+        await using (AppDbContext removeContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
+        {
+            var removeRepo = new CategoryRepository(context: removeContext);
+            Category? categoryToRemove = await removeRepo.GetByIdAsync(id: category.Id, cancellationToken: TestContext.Current.CancellationToken);
+            Assert.NotNull(@object: categoryToRemove);
+
+            await removeRepo.RemoveAsync(category: categoryToRemove, cancellationToken: TestContext.Current.CancellationToken);
+            await removeContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+        }
+
+        // Assert - consultar em novo contexto e verificar que não existe mais
+        await using AppDbContext verifyContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var verifyRepo = new CategoryRepository(context: verifyContext);
+        Category? deletedCategory = await verifyRepo.GetByIdAsync(id: category.Id, cancellationToken: TestContext.Current.CancellationToken);
+        bool exists = await verifyRepo.ExistsAsync(id: category.Id, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Null(@object: deletedCategory);
+        Assert.False(condition: exists, userMessage: "A categoria removida não deve mais existir.");
     }
 }

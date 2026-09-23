@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
@@ -9,7 +10,8 @@ namespace Autogestor.Api.Services;
 
 public sealed class CategoryService(
     ICreateCategoryUseCase createCategoryUseCase,
-    IUpdateCategoryUseCase updateCategoryUseCase) : ICategoryService
+    IUpdateCategoryUseCase updateCategoryUseCase,
+    IDeleteCategoryUseCase deleteCategoryUseCase) : ICategoryService
 {
     public Task<Response<CategoryResponse>> CreateAsync(
         CreateCategoryRequest request,
@@ -21,11 +23,9 @@ public sealed class CategoryService(
     public Task<Response<DeleteResponse>> DeleteAsync(
         DeleteCategoryRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(result: new Response<DeleteResponse>
-        {
-            Data = null,
-            Message = "Implementação pendente."
-        });
+        deleteCategoryUseCase.ExecuteAsync(
+            request: request,
+            cancellationToken: cancellationToken);
 
     public Task<PagedResponse<CategoryResponse>> GetAllAsync(
         GetAllCategoriesRequest request,

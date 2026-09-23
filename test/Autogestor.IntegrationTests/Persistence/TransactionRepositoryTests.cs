@@ -182,6 +182,32 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
+    public async Task ExistsAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    {
+        await using AppDbContext context = fixture.CreateContext();
+        var repository = new TransactionRepository(context: context);
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            testCode: () => repository.ExistsAsync(id: Guid.NewGuid(), cancellationToken: cts.Token));
+    }
+
+    [Fact]
+    public async Task ExistsByCategoryIdAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    {
+        await using AppDbContext context = fixture.CreateContext();
+        var repository = new TransactionRepository(context: context);
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            testCode: () => repository.ExistsByCategoryIdAsync(categoryId: Guid.NewGuid(), cancellationToken: cts.Token));
+    }
+
+    [Fact]
     public async Task GetByIdAsync_WhenTransactionDoesNotExist_ReturnsNull()
     {
         await using AppDbContext context = fixture.CreateContext();
@@ -360,5 +386,146 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         // Assert
         Assert.False(condition: existsForOtherTenant, userMessage: "A transação de outro tenant não deve ser encontrada.");
         Assert.False(condition: existsForRandomId, userMessage: "Um id inexistente deve retornar false.");
+    }
+
+    [Fact]
+    public async Task RemoveAsync_RemovesTransactionFromPostgreSqlDatabase()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var userContext = new UserContextFake(userId: userId);
+        var tenantContext = new TenantContextFake(tenantId: tenantId);
+
+        Guid transactionId;
+
+        await using (AppDbContext setupContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
+        {
+            var catRepo = new CategoryRepository(context: setupContext);
+            var txRepo = new TransactionRepository(context: setupContext);
+
+            var category = Category.Create(title: "Transporte", description: "Gastos com locomoção");
+            await catRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+            await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+            var transaction = Transaction.Create(
+                title: "Combustível",
+                type: ETransactionType.Withdraw,
+                amount: 180.00m,
+                categoryId: category.Id);
+            await txRepo.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+            await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+            transactionId = transaction.Id;
+        }
+
+        // Act - carregar no repositório, chamar RemoveAsync e salvar alterações
+        await using (AppDbContext removeContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
+        {
+            var removeRepo = new TransactionRepository(context: removeContext);
+            Transaction? transactionToRemove = await removeRepo.GetByIdAsync(id: transactionId, cancellationToken: TestContext.Current.CancellationToken);
+            Assert.NotNull(@object: transactionToRemove);
+
+            await removeRepo.RemoveAsync(transaction: transactionToRemove, cancellationToken: TestContext.Current.CancellationToken);
+            await removeContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+        }
+
+        // Assert - consultar em novo contexto e verificar que não existe mais
+        await using AppDbContext verifyContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var verifyRepo = new TransactionRepository(context: verifyContext);
+        Transaction? deletedTransaction = await verifyRepo.GetByIdAsync(id: transactionId, cancellationToken: TestContext.Current.CancellationToken);
+        bool exists = await verifyRepo.ExistsAsync(id: transactionId, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Null(@object: deletedTransaction);
+        Assert.False(condition: exists, userMessage: "A transação removida não deve mais existir.");
+    }
+
+    [Fact]
+    public async Task ExistsByCategoryIdAsync_WhenTransactionExistsForCategory_ReturnsTrue()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var userContext = new UserContextFake(userId: userId);
+        var tenantContext = new TenantContextFake(tenantId: tenantId);
+
+        Guid categoryId;
+
+        await using (AppDbContext setupContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
+        {
+            var catRepo = new CategoryRepository(context: setupContext);
+            var txRepo = new TransactionRepository(context: setupContext);
+
+            var category = Category.Create(title: "Alimentação", description: "Gastos com mercado");
+            await catRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+            await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+            var transaction = Transaction.Create(
+                title: "Feira Semanal",
+                type: ETransactionType.Withdraw,
+                amount: 120.00m,
+                categoryId: category.Id);
+            await txRepo.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+            await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+            categoryId = category.Id;
+        }
+
+        // Act
+        await using AppDbContext verifyContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var verifyRepo = new TransactionRepository(context: verifyContext);
+        bool exists = await verifyRepo.ExistsByCategoryIdAsync(categoryId: categoryId, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.True(condition: exists, userMessage: "Deve retornar true quando existirem transações vinculadas à categoria.");
+    }
+
+    [Fact]
+    public async Task ExistsByCategoryIdAsync_WhenNoTransactionForCategoryOrDifferentTenant_ReturnsFalse()
+    {
+        // Arrange
+        var tenant1 = Guid.NewGuid();
+        var tenant2 = Guid.NewGuid();
+
+        Guid categoryIdWithTx;
+        Guid categoryIdWithoutTx;
+
+        await using (AppDbContext contextTenant1 = fixture.CreateContext(userContext: new UserContextFake(userId: Guid.NewGuid()), tenantContext: new TenantContextFake(tenantId: tenant1)))
+        {
+            var catRepoTenant1 = new CategoryRepository(context: contextTenant1);
+            var txRepoTenant1 = new TransactionRepository(context: contextTenant1);
+
+            var catWithTx = Category.Create(title: "Com Transação", description: "Desc");
+            var catWithoutTx = Category.Create(title: "Sem Transação", description: "Desc");
+            await catRepoTenant1.AddAsync(category: catWithTx, cancellationToken: TestContext.Current.CancellationToken);
+            await catRepoTenant1.AddAsync(category: catWithoutTx, cancellationToken: TestContext.Current.CancellationToken);
+            await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+            var transaction = Transaction.Create(
+                title: "Despesa",
+                type: ETransactionType.Withdraw,
+                amount: 90.00m,
+                categoryId: catWithTx.Id);
+            await txRepoTenant1.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+            await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+            categoryIdWithTx = catWithTx.Id;
+            categoryIdWithoutTx = catWithoutTx.Id;
+        }
+
+        // Act & Assert 1: categoria sem transações sob Tenant 1
+        await using (AppDbContext contextTenant1Verify = fixture.CreateContext(userContext: new UserContextFake(userId: Guid.NewGuid()), tenantContext: new TenantContextFake(tenantId: tenant1)))
+        {
+            var repoTenant1 = new TransactionRepository(context: contextTenant1Verify);
+            bool existsWithoutTx = await repoTenant1.ExistsByCategoryIdAsync(categoryId: categoryIdWithoutTx, cancellationToken: TestContext.Current.CancellationToken);
+            Assert.False(condition: existsWithoutTx, userMessage: "Não deve encontrar transações para categoria vazia.");
+        }
+
+        // Act & Assert 2: categoria com transação sob Tenant 1 consultada por Tenant 2 (isolamento multi-tenant)
+        await using AppDbContext contextTenant2Verify = fixture.CreateContext(userContext: new UserContextFake(userId: Guid.NewGuid()), tenantContext: new TenantContextFake(tenantId: tenant2));
+        var repoTenant2 = new TransactionRepository(context: contextTenant2Verify);
+        bool existsForOtherTenant = await repoTenant2.ExistsByCategoryIdAsync(categoryId: categoryIdWithTx, cancellationToken: TestContext.Current.CancellationToken);
+        bool existsForRandomId = await repoTenant2.ExistsByCategoryIdAsync(categoryId: Guid.NewGuid(), cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.False(condition: existsForOtherTenant, userMessage: "Não deve encontrar transações vinculadas sob outro tenant.");
+        Assert.False(condition: existsForRandomId, userMessage: "Um id aleatório de categoria deve retornar false.");
     }
 }

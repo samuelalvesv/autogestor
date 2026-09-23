@@ -27,13 +27,11 @@ public sealed class CreateTransactionUseCase(
             cancellationToken: cancellationToken);
 
         if (!categoryExists)
-        {
             return new Response<TransactionResponse>
             {
                 Data = null,
                 Message = "Categoria não encontrada para o tenant atual."
             };
-        }
 
         await transactionRepository.AddAsync(
             transaction: transaction,

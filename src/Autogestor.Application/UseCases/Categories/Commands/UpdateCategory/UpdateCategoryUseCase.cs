@@ -20,13 +20,11 @@ public sealed class UpdateCategoryUseCase(
             cancellationToken: cancellationToken);
 
         if (category is null)
-        {
             return new Response<CategoryResponse>
             {
                 Data = null,
                 Message = "Categoria não encontrada."
             };
-        }
 
         category.Update(
             title: request.Title,

@@ -22,6 +22,17 @@ public sealed class CategoryRepositoryFake : ICategoryRepository
         return Task.CompletedTask;
     }
 
+    public Task RemoveAsync(Category category, CancellationToken cancellationToken = default)
+    {
+        PassedCancellationToken = cancellationToken;
+        if (!_categories.Remove(item: category))
+        {
+            _categories.RemoveAll(match: c => c.Id == category.Id);
+        }
+
+        return Task.CompletedTask;
+    }
+
     public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;
