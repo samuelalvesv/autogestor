@@ -1,22 +1,21 @@
-using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Interfaces;
 
-namespace Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
+namespace Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
 
-public sealed class UpdateCategoryUseCase(
-    ICategoryRepository categoryRepository,
-    IUnitOfWork unitOfWork) : IUpdateCategoryUseCase
+public sealed class GetCategoryByIdUseCase(
+    ICategoryRepository categoryRepository) : IGetCategoryByIdUseCase
 {
     public async Task<Response<CategoryResponse>> ExecuteAsync(
-        UpdateCategoryRequest request,
+        GetCategoryByIdRequest request,
         CancellationToken cancellationToken = default)
     {
         Category? category = await categoryRepository.GetByIdAsync(
             id: request.Id,
+            asNoTracking: true,
             cancellationToken: cancellationToken);
 
         if (category is null)
@@ -25,12 +24,6 @@ public sealed class UpdateCategoryUseCase(
                 Data = null,
                 Message = "Categoria não encontrada."
             };
-
-        category.Update(
-            title: request.Title,
-            description: request.Description);
-
-        await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
         var response = new CategoryResponse
         {
@@ -48,7 +41,7 @@ public sealed class UpdateCategoryUseCase(
         return new Response<CategoryResponse>
         {
             Data = response,
-            Message = "Categoria atualizada com sucesso."
+            Message = "Categoria encontrada com sucesso."
         };
     }
 }

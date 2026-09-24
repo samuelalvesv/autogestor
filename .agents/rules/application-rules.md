@@ -20,6 +20,7 @@ applyTo: "src/Autogestor.Application/**/*.cs"
   - A camada de apresentação consome casos de uso através de injeção direta de dependência (`ICreate[Feature]UseCase`), dispensando mediadores dinâmicos e reflexão em tempo de execução, garantindo total compatibilidade com Native AOT.
   - Cada caso de uso deve ser uma classe isolada (`sealed`) com um único método público (`ExecuteAsync`).
 - **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](identity-multitenancy.md).
+- **Validação Preventiva de Integridade Referencial**: Operações orquestradas por casos de uso (como exclusões ou mutações de estado em entidades rastreadas) devem validar preventivamente dependências e integridade relacional antes da aplicação de alterações de domínio ou efetivação da remoção. Isso garante o retorno de mensagens de negócio expressivas, previne estados inconsistentes no rastreador de mudanças caso o fluxo seja abortado e impede exclusões em cascata indesejadas.
 
 ## Ferramentas
 

@@ -132,7 +132,6 @@ public sealed class CreateCategoryUseCaseTests
         await useCase.ExecuteAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: repository.PassedCancellationToken);
         Assert.Equal(expected: token, actual: unitOfWork.PassedCancellationToken);
     }
 }

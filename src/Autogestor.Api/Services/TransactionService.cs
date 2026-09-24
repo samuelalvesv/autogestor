@@ -1,5 +1,7 @@
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
+using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
+using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
@@ -9,6 +11,8 @@ namespace Autogestor.Api.Services;
 
 public sealed class TransactionService(
     ICreateTransactionUseCase createTransactionUseCase,
+    IDeleteTransactionUseCase deleteTransactionUseCase,
+    IGetTransactionByIdUseCase getTransactionByIdUseCase,
     IUpdateTransactionUseCase updateTransactionUseCase) : ITransactionService
 {
     public Task<Response<TransactionResponse>> CreateAsync(
@@ -21,11 +25,9 @@ public sealed class TransactionService(
     public Task<Response<DeleteResponse>> DeleteAsync(
         DeleteTransactionRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(result: new Response<DeleteResponse>
-        {
-            Data = null,
-            Message = "Implementação pendente."
-        });
+        deleteTransactionUseCase.ExecuteAsync(
+            request: request,
+            cancellationToken: cancellationToken);
 
     public Task<PagedResponse<TransactionResponse>> GetAllAsync(
         GetAllTransactionsRequest request,
@@ -42,11 +44,9 @@ public sealed class TransactionService(
     public Task<Response<TransactionResponse>> GetByIdAsync(
         GetTransactionByIdRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(result: new Response<TransactionResponse>
-        {
-            Data = null,
-            Message = "Implementação pendente."
-        });
+        getTransactionByIdUseCase.ExecuteAsync(
+            request: request,
+            cancellationToken: cancellationToken);
 
     public Task<Response<TransactionResponse>> UpdateAsync(
         UpdateTransactionRequest request,

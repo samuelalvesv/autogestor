@@ -19,9 +19,7 @@ public sealed class CreateCategoryUseCase(
             title: request.Title,
             description: request.Description);
 
-        await categoryRepository.AddAsync(
-            category: category,
-            cancellationToken: cancellationToken);
+        categoryRepository.Add(category: category);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
         var response = new CategoryResponse

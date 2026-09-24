@@ -9,7 +9,7 @@ namespace Autogestor.IntegrationTests.Persistence;
 public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
 {
     [Fact]
-    public async Task AddAsync_PersistsCategoryToPostgreSqlDatabase()
+    public async Task Add_PersistsCategoryToPostgreSqlDatabase()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -24,7 +24,7 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
             description: "Supermercados e restaurantes");
 
         // Act
-        await repository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(category: category);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - consulta em novo contexto sem cache com o mesmo tenant
@@ -55,8 +55,8 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         var cat1 = Category.Create(title: "Cat 1", description: "Desc 1");
         var cat2 = Category.Create(title: "Cat 2", description: "Desc 2");
 
-        await repository.AddAsync(category: cat1, cancellationToken: TestContext.Current.CancellationToken);
-        await repository.AddAsync(category: cat2, cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(category: cat1);
+        repository.Add(category: cat2);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta em novo contexto com o mesmo tenant
@@ -81,7 +81,7 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         await using AppDbContext contextTenant1 = fixture.CreateContext(tenantContext: tenantContext1);
         var repoTenant1 = new CategoryRepository(context: contextTenant1);
         var catTenant1 = Category.Create(title: "Cat Tenant 1", description: "Desc");
-        await repoTenant1.AddAsync(category: catTenant1, cancellationToken: TestContext.Current.CancellationToken);
+        repoTenant1.Add(category: catTenant1);
         await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta com o contexto do Tenant 2
@@ -122,6 +122,19 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
+    public async Task ExistsAsync_WithCancelledToken_ThrowsOperationCanceledException()
+    {
+        await using AppDbContext context = fixture.CreateContext();
+        var repository = new CategoryRepository(context: context);
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            testCode: () => repository.ExistsAsync(id: Guid.NewGuid(), cancellationToken: cts.Token));
+    }
+
+    [Fact]
     public async Task Update_ViaChangeTracking_PersistsUpdatedCategoryToPostgreSqlDatabase()
     {
         // Arrange
@@ -137,7 +150,7 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         await using (AppDbContext setupContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
         {
             var setupRepo = new CategoryRepository(context: setupContext);
-            await setupRepo.AddAsync(category: initialCategory, cancellationToken: TestContext.Current.CancellationToken);
+            setupRepo.Add(category: initialCategory);
             await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
         }
 
@@ -185,7 +198,7 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         var repository = new CategoryRepository(context: context);
 
         var category = Category.Create(title: "Saúde", description: "Farmácia e consultas");
-        await repository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(category: category);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
@@ -207,7 +220,7 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         var repoTenant1 = new CategoryRepository(context: contextTenant1);
 
         var category = Category.Create(title: "Lazer", description: "Viagens e passeios");
-        await repoTenant1.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        repoTenant1.Add(category: category);
         await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consultar sob Tenant 2
@@ -219,5 +232,75 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         // Assert
         Assert.False(condition: existsForOtherTenant, userMessage: "A categoria de outro tenant não deve ser encontrada.");
         Assert.False(condition: existsForRandomId, userMessage: "Um id inexistente deve retornar false.");
+    }
+
+    [Fact]
+    public async Task Remove_RemovesCategoryFromPostgreSqlDatabase()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var userContext = new UserContextFake(userId: userId);
+        var tenantContext = new TenantContextFake(tenantId: tenantId);
+
+        var category = Category.Create(title: "Assinaturas", description: "Serviços mensais");
+
+        await using (AppDbContext setupContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
+        {
+            var setupRepo = new CategoryRepository(context: setupContext);
+            setupRepo.Add(category: category);
+            await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+        }
+
+        // Act - carregar no repositório, chamar Remove e salvar alterações
+        await using (AppDbContext removeContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
+        {
+            var removeRepo = new CategoryRepository(context: removeContext);
+            Category? categoryToRemove = await removeRepo.GetByIdAsync(id: category.Id, cancellationToken: TestContext.Current.CancellationToken);
+            Assert.NotNull(@object: categoryToRemove);
+
+            removeRepo.Remove(category: categoryToRemove);
+            await removeContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+        }
+
+        // Assert - consultar em novo contexto e verificar que não existe mais
+        await using AppDbContext verifyContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var verifyRepo = new CategoryRepository(context: verifyContext);
+        Category? deletedCategory = await verifyRepo.GetByIdAsync(id: category.Id, cancellationToken: TestContext.Current.CancellationToken);
+        bool exists = await verifyRepo.ExistsAsync(id: category.Id, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Null(@object: deletedCategory);
+        Assert.False(condition: exists, userMessage: "A categoria removida não deve mais existir.");
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WithAsNoTracking_ReturnsUntrackedEntity()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var userContext = new UserContextFake(userId: userId);
+        var tenantContext = new TenantContextFake(tenantId: tenantId);
+        await using AppDbContext context = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var repository = new CategoryRepository(context: context);
+
+        var category = Category.Create(title: "Investimentos", description: "Ações e fundos");
+        repository.Add(category: category);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        // Act
+        await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var queryRepo = new CategoryRepository(context: queryContext);
+        Category? tracked = await queryRepo.GetByIdAsync(id: category.Id, asNoTracking: false, cancellationToken: TestContext.Current.CancellationToken);
+
+        await using AppDbContext noTrackingContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var noTrackingRepo = new CategoryRepository(context: noTrackingContext);
+        Category? untracked = await noTrackingRepo.GetByIdAsync(id: category.Id, asNoTracking: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(@object: tracked);
+        Assert.NotNull(@object: untracked);
+        Assert.Equal(expected: Microsoft.EntityFrameworkCore.EntityState.Unchanged, actual: queryContext.Entry(entity: tracked).State);
+        Assert.Equal(expected: Microsoft.EntityFrameworkCore.EntityState.Detached, actual: noTrackingContext.Entry(entity: untracked).State);
     }
 }

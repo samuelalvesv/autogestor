@@ -26,17 +26,17 @@ public sealed class UpdateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var initialCategory = Category.Create(title: "Serviços", description: "Serviços prestados");
-        await categoryRepository.AddAsync(category: initialCategory, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: initialCategory);
 
         var targetCategory = Category.Create(title: "Consultoria", description: "Serviços de consultoria");
-        await categoryRepository.AddAsync(category: targetCategory, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: targetCategory);
 
         var transaction = Transaction.Create(
             title: "Serviço A",
             type: DomainTransactionType.Deposit,
             amount: 500.00m,
             categoryId: initialCategory.Id);
-        await transactionRepository.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: transaction);
 
         var request = new UpdateTransactionRequest
         {
@@ -70,6 +70,7 @@ public sealed class UpdateTransactionUseCaseTests
         Assert.Equal(expected: request.Amount, actual: transactionRepository.Transactions[0].Amount);
         Assert.Equal(expected: request.CategoryId, actual: transactionRepository.Transactions[0].CategoryId);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 1, actual: categoryRepository.ExistsCallCount);
     }
 
     [Fact]
@@ -103,6 +104,7 @@ public sealed class UpdateTransactionUseCaseTests
         Assert.Null(@object: response.Data);
         Assert.Equal(expected: "Transação não encontrada.", actual: response.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 0, actual: categoryRepository.ExistsCallCount);
     }
 
     [Fact]
@@ -118,14 +120,14 @@ public sealed class UpdateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Operacional", description: "Despesas operacionais");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: category);
 
         var transaction = Transaction.Create(
             title: "Material de Escritório",
             type: DomainTransactionType.Withdraw,
             amount: 80.00m,
             categoryId: category.Id);
-        await transactionRepository.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: transaction);
 
         var request = new UpdateTransactionRequest
         {
@@ -146,6 +148,59 @@ public sealed class UpdateTransactionUseCaseTests
         Assert.Null(@object: response.Data);
         Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: response.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 1, actual: categoryRepository.ExistsCallCount);
+        Assert.Equal(expected: "Material de Escritório", actual: transaction.Title);
+        Assert.Equal(expected: DomainTransactionType.Withdraw, actual: transaction.Type);
+        Assert.Equal(expected: 80.00m, actual: transaction.Amount);
+        Assert.Equal(expected: category.Id, actual: transaction.CategoryId);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCategoryDoesNotExistAndDomainFieldsInvalid_ReturnsFailureResponseWithoutThrowingDomainException()
+    {
+        // Arrange
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
+        var useCase = new UpdateTransactionUseCase(
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
+            unitOfWork: unitOfWork);
+
+        var category = Category.Create(title: "Operacional", description: "Despesas operacionais");
+        categoryRepository.Add(category: category);
+
+        var transaction = Transaction.Create(
+            title: "Material de Escritório",
+            type: DomainTransactionType.Withdraw,
+            amount: 80.00m,
+            categoryId: category.Id);
+        transactionRepository.Add(transaction: transaction);
+
+        var request = new UpdateTransactionRequest
+        {
+            Id = transaction.Id,
+            Title = string.Empty,
+            Type = (ETransactionType)999,
+            Amount = -100.00m,
+            CategoryId = Guid.NewGuid()
+        };
+
+        // Act
+        Response<TransactionResponse> response = await useCase.ExecuteAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(@object: response);
+        Assert.Null(@object: response.Data);
+        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: response.Message);
+        Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 1, actual: categoryRepository.ExistsCallCount);
+        Assert.Equal(expected: "Material de Escritório", actual: transaction.Title);
+        Assert.Equal(expected: DomainTransactionType.Withdraw, actual: transaction.Type);
+        Assert.Equal(expected: 80.00m, actual: transaction.Amount);
+        Assert.Equal(expected: category.Id, actual: transaction.CategoryId);
     }
 
     [Theory]
@@ -164,14 +219,14 @@ public sealed class UpdateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Alimentação", description: "Gastos com comida");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: category);
 
         var transaction = Transaction.Create(
             title: "Almoço",
             type: DomainTransactionType.Withdraw,
             amount: 45.00m,
             categoryId: category.Id);
-        await transactionRepository.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: transaction);
 
         var request = new UpdateTransactionRequest
         {
@@ -208,14 +263,14 @@ public sealed class UpdateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Transporte", description: "Combustível");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: category);
 
         var transaction = Transaction.Create(
             title: "Gasolina",
             type: DomainTransactionType.Withdraw,
             amount: 200.00m,
             categoryId: category.Id);
-        await transactionRepository.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: transaction);
 
         var request = new UpdateTransactionRequest
         {
@@ -252,14 +307,14 @@ public sealed class UpdateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Lazer", description: "Cinema e viagens");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: category);
 
         var transaction = Transaction.Create(
             title: "Cinema",
             type: DomainTransactionType.Withdraw,
             amount: 60.00m,
             categoryId: category.Id);
-        await transactionRepository.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: transaction);
 
         var request = new UpdateTransactionRequest
         {
@@ -293,14 +348,14 @@ public sealed class UpdateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Salário", description: "Rendimentos mensais");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: category);
 
         var transaction = Transaction.Create(
             title: "Adiantamento",
             type: DomainTransactionType.Deposit,
             amount: 1000.00m,
             categoryId: category.Id);
-        await transactionRepository.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: transaction);
 
         var request = new UpdateTransactionRequest
         {
@@ -324,7 +379,7 @@ public sealed class UpdateTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithEmptyCategoryId_ThrowsArgumentException()
+    public async Task ExecuteAsync_WithEmptyCategoryId_ReturnsFailureResponse()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -336,14 +391,14 @@ public sealed class UpdateTransactionUseCaseTests
             unitOfWork: unitOfWork);
 
         var category = Category.Create(title: "Operacional", description: "Custos operacionais");
-        await categoryRepository.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: category);
 
         var transaction = Transaction.Create(
             title: "Material de Escritório",
             type: DomainTransactionType.Withdraw,
             amount: 80.00m,
             categoryId: category.Id);
-        await transactionRepository.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: transaction);
 
         var request = new UpdateTransactionRequest
         {
@@ -354,13 +409,15 @@ public sealed class UpdateTransactionUseCaseTests
             CategoryId = Guid.Empty
         };
 
-        // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
-            testCode: () => useCase.ExecuteAsync(
-                request: request,
-                cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "categoryId", actual: exception.ParamName);
-        Assert.Contains(expectedSubstring: "Categoria inválida.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+        // Act
+        Response<TransactionResponse> response = await useCase.ExecuteAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(@object: response);
+        Assert.Null(@object: response.Data);
+        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: response.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 }

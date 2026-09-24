@@ -1,5 +1,7 @@
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
+using Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
@@ -9,6 +11,8 @@ namespace Autogestor.Api.Services;
 
 public sealed class CategoryService(
     ICreateCategoryUseCase createCategoryUseCase,
+    IDeleteCategoryUseCase deleteCategoryUseCase,
+    IGetCategoryByIdUseCase getCategoryByIdUseCase,
     IUpdateCategoryUseCase updateCategoryUseCase) : ICategoryService
 {
     public Task<Response<CategoryResponse>> CreateAsync(
@@ -21,11 +25,9 @@ public sealed class CategoryService(
     public Task<Response<DeleteResponse>> DeleteAsync(
         DeleteCategoryRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(result: new Response<DeleteResponse>
-        {
-            Data = null,
-            Message = "Implementação pendente."
-        });
+        deleteCategoryUseCase.ExecuteAsync(
+            request: request,
+            cancellationToken: cancellationToken);
 
     public Task<PagedResponse<CategoryResponse>> GetAllAsync(
         GetAllCategoriesRequest request,
@@ -42,11 +44,9 @@ public sealed class CategoryService(
     public Task<Response<CategoryResponse>> GetByIdAsync(
         GetCategoryByIdRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(result: new Response<CategoryResponse>
-        {
-            Data = null,
-            Message = "Implementação pendente."
-        });
+        getCategoryByIdUseCase.ExecuteAsync(
+            request: request,
+            cancellationToken: cancellationToken);
 
     public Task<Response<CategoryResponse>> UpdateAsync(
         UpdateCategoryRequest request,
