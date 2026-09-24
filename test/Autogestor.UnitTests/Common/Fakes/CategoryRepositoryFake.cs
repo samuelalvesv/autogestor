@@ -47,13 +47,19 @@ public sealed class CategoryRepositoryFake : ICategoryRepository
         return Task.FromResult(result: _categories.FirstOrDefault(predicate: c => c.Id == id));
     }
 
-    public Task<IReadOnlyList<Category>> GetPagedAsync(
+    public Task<(IReadOnlyList<Category> categories, int count)> GetPagedAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;
-        return Task.FromResult<IReadOnlyList<Category>>(
-            result: _categories.Skip(count: (pageNumber - 1) * pageSize).Take(count: pageSize).ToList().AsReadOnly());
+        IReadOnlyList<Category> result = _categories
+            .Skip(count: (pageNumber - 1) * pageSize)
+            .Take(count: pageSize)
+            .ToList()
+            .AsReadOnly();
+
+        return Task.FromResult(
+            result: (categories: result, count: _categories.Count));
     }
 }

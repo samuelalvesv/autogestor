@@ -2,6 +2,7 @@ using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
+using Autogestor.Application.UseCases.Transactions.Queries.GetAllTransactions;
 using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
@@ -92,8 +93,32 @@ public sealed class TransactionServiceTests
         }
     }
 
+    private sealed class GetAllTransactionsUseCaseFake : IGetAllTransactionsUseCase
+    {
+        public GetAllTransactionsRequest? ReceivedRequest { get; private set; }
+        public CancellationToken ReceivedCancellationToken { get; private set; }
+        public PagedResponse<TransactionResponse> ResponseToReturn { get; set; } = new()
+        {
+            Data = null,
+            Message = string.Empty,
+            TotalCount = 0,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        public Task<PagedResponse<TransactionResponse>> ExecuteAsync(
+            GetAllTransactionsRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            ReceivedRequest = request;
+            ReceivedCancellationToken = cancellationToken;
+            return Task.FromResult(result: ResponseToReturn);
+        }
+    }
+
     private readonly CreateTransactionUseCaseFake _createUseCaseFake;
     private readonly DeleteTransactionUseCaseFake _deleteUseCaseFake;
+    private readonly GetAllTransactionsUseCaseFake _getAllUseCaseFake;
     private readonly GetTransactionByIdUseCaseFake _getByIdUseCaseFake;
     private readonly UpdateTransactionUseCaseFake _updateUseCaseFake;
     private readonly TransactionService _service;
@@ -102,11 +127,13 @@ public sealed class TransactionServiceTests
     {
         _createUseCaseFake = new CreateTransactionUseCaseFake();
         _deleteUseCaseFake = new DeleteTransactionUseCaseFake();
+        _getAllUseCaseFake = new GetAllTransactionsUseCaseFake();
         _getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
         _updateUseCaseFake = new UpdateTransactionUseCaseFake();
         _service = new TransactionService(
             createTransactionUseCase: _createUseCaseFake,
             deleteTransactionUseCase: _deleteUseCaseFake,
+            getAllTransactionsUseCase: _getAllUseCaseFake,
             getTransactionByIdUseCase: _getByIdUseCaseFake,
             updateTransactionUseCase: _updateUseCaseFake);
     }
@@ -376,18 +403,53 @@ public sealed class TransactionServiceTests
     }
 
     [Fact]
-    public async Task PendingMethods_ReturnPendingImplementationResponse()
+    public async Task GetAllAsync_DelegatesToUseCase_AndReturnsResponse()
     {
+        // Arrange
+        var request = new GetAllTransactionsRequest
+        {
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        var expectedResponse = new PagedResponse<TransactionResponse>
+        {
+            Data = [],
+            Message = "Transações encontradas com sucesso.",
+            TotalCount = 0,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        _getAllUseCaseFake.ResponseToReturn = expectedResponse;
+
         // Act
-        PagedResponse<TransactionResponse> getAllResponse = await _service.GetAllAsync(
-            request: new GetAllTransactionsRequest
-            {
-                PageNumber = 1,
-                PageSize = 10
-            },
+        PagedResponse<TransactionResponse> response = await _service.GetAllAsync(
+            request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(expected: "Implementação pendente.", actual: getAllResponse.Message);
+        Assert.Same(expected: expectedResponse, actual: response);
+        Assert.Same(expected: request, actual: _getAllUseCaseFake.ReceivedRequest);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_PropagatesCancellationToken()
+    {
+        // Arrange
+        var request = new GetAllTransactionsRequest
+        {
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        using var cts = new CancellationTokenSource();
+        CancellationToken token = cts.Token;
+
+        // Act
+        await _service.GetAllAsync(request: request, cancellationToken: token);
+
+        // Assert
+        Assert.Equal(expected: token, actual: _getAllUseCaseFake.ReceivedCancellationToken);
     }
 }

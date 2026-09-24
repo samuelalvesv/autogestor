@@ -2,6 +2,7 @@ using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
 using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
+using Autogestor.Application.UseCases.Categories.Queries.GetAllCategories;
 using Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
@@ -91,8 +92,32 @@ public sealed class CategoryServiceTests
         }
     }
 
+    private sealed class GetAllCategoriesUseCaseFake : IGetAllCategoriesUseCase
+    {
+        public GetAllCategoriesRequest? ReceivedRequest { get; private set; }
+        public CancellationToken ReceivedCancellationToken { get; private set; }
+        public PagedResponse<CategoryResponse> ResponseToReturn { get; set; } = new()
+        {
+            Data = null,
+            Message = string.Empty,
+            TotalCount = 0,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        public Task<PagedResponse<CategoryResponse>> ExecuteAsync(
+            GetAllCategoriesRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            ReceivedRequest = request;
+            ReceivedCancellationToken = cancellationToken;
+            return Task.FromResult(result: ResponseToReturn);
+        }
+    }
+
     private readonly CreateCategoryUseCaseFake _createUseCaseFake;
     private readonly DeleteCategoryUseCaseFake _deleteUseCaseFake;
+    private readonly GetAllCategoriesUseCaseFake _getAllUseCaseFake;
     private readonly GetCategoryByIdUseCaseFake _getByIdUseCaseFake;
     private readonly UpdateCategoryUseCaseFake _updateUseCaseFake;
     private readonly CategoryService _service;
@@ -101,11 +126,13 @@ public sealed class CategoryServiceTests
     {
         _createUseCaseFake = new CreateCategoryUseCaseFake();
         _deleteUseCaseFake = new DeleteCategoryUseCaseFake();
+        _getAllUseCaseFake = new GetAllCategoriesUseCaseFake();
         _getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
         _updateUseCaseFake = new UpdateCategoryUseCaseFake();
         _service = new CategoryService(
             createCategoryUseCase: _createUseCaseFake,
             deleteCategoryUseCase: _deleteUseCaseFake,
+            getAllCategoriesUseCase: _getAllUseCaseFake,
             getCategoryByIdUseCase: _getByIdUseCaseFake,
             updateCategoryUseCase: _updateUseCaseFake);
     }
@@ -361,18 +388,53 @@ public sealed class CategoryServiceTests
     }
 
     [Fact]
-    public async Task PendingMethods_ReturnPendingImplementationResponse()
+    public async Task GetAllAsync_DelegatesToUseCase_AndReturnsResponse()
     {
+        // Arrange
+        var request = new GetAllCategoriesRequest
+        {
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        var expectedResponse = new PagedResponse<CategoryResponse>
+        {
+            Data = [],
+            Message = "Categorias encontradas com sucesso.",
+            TotalCount = 0,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        _getAllUseCaseFake.ResponseToReturn = expectedResponse;
+
         // Act
-        PagedResponse<CategoryResponse> getAllResponse = await _service.GetAllAsync(
-            request: new GetAllCategoriesRequest
-            {
-                PageNumber = 1,
-                PageSize = 10
-            },
+        PagedResponse<CategoryResponse> response = await _service.GetAllAsync(
+            request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(expected: "Implementação pendente.", actual: getAllResponse.Message);
+        Assert.Same(expected: expectedResponse, actual: response);
+        Assert.Same(expected: request, actual: _getAllUseCaseFake.ReceivedRequest);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_PropagatesCancellationToken()
+    {
+        // Arrange
+        var request = new GetAllCategoriesRequest
+        {
+            PageNumber = 1,
+            PageSize = 10
+        };
+
+        using var cts = new CancellationTokenSource();
+        CancellationToken token = cts.Token;
+
+        // Act
+        await _service.GetAllAsync(request: request, cancellationToken: token);
+
+        // Assert
+        Assert.Equal(expected: token, actual: _getAllUseCaseFake.ReceivedCancellationToken);
     }
 }

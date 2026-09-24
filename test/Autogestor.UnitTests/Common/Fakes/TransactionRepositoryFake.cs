@@ -53,13 +53,19 @@ public sealed class TransactionRepositoryFake : ITransactionRepository
         return Task.FromResult(result: _transactions.FirstOrDefault(predicate: t => t.Id == id));
     }
 
-    public Task<IReadOnlyList<Transaction>> GetPagedAsync(
+    public Task<(IReadOnlyList<Transaction> transactions, int count)> GetPagedAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;
-        return Task.FromResult<IReadOnlyList<Transaction>>(
-            result: _transactions.Skip(count: (pageNumber - 1) * pageSize).Take(count: pageSize).ToList().AsReadOnly());
+        IReadOnlyList<Transaction> result = _transactions
+            .Skip(count: (pageNumber - 1) * pageSize)
+            .Take(count: pageSize)
+            .ToList()
+            .AsReadOnly();
+
+        return Task.FromResult(
+            result: (transactions: result, count: _transactions.Count));
     }
 }

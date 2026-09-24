@@ -1,6 +1,7 @@
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
+using Autogestor.Application.UseCases.Transactions.Queries.GetAllTransactions;
 using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
@@ -12,6 +13,7 @@ namespace Autogestor.Api.Services;
 public sealed class TransactionService(
     ICreateTransactionUseCase createTransactionUseCase,
     IDeleteTransactionUseCase deleteTransactionUseCase,
+    IGetAllTransactionsUseCase getAllTransactionsUseCase,
     IGetTransactionByIdUseCase getTransactionByIdUseCase,
     IUpdateTransactionUseCase updateTransactionUseCase) : ITransactionService
 {
@@ -32,14 +34,9 @@ public sealed class TransactionService(
     public Task<PagedResponse<TransactionResponse>> GetAllAsync(
         GetAllTransactionsRequest request,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(result: new PagedResponse<TransactionResponse>
-        {
-            Data = [],
-            Message = "Implementação pendente.",
-            TotalCount = 0,
-            PageNumber = 1,
-            PageSize = 10
-        });
+        getAllTransactionsUseCase.ExecuteAsync(
+            request: request,
+            cancellationToken: cancellationToken);
 
     public Task<Response<TransactionResponse>> GetByIdAsync(
         GetTransactionByIdRequest request,

@@ -62,9 +62,10 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta em novo contexto com o mesmo tenant
         await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var queryRepo = new CategoryRepository(context: queryContext);
-        IReadOnlyList<Category> all = await queryRepo.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
+        (IReadOnlyList<Category> all, int count) = await queryRepo.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
+        Assert.True(condition: count >= 2, userMessage: "A contagem total de categorias deve ser pelo menos 2.");
         Assert.Contains(collection: all, filter: c => c.Id == cat1.Id);
         Assert.Contains(collection: all, filter: c => c.Id == cat2.Id);
     }
@@ -87,11 +88,12 @@ public sealed class CategoryRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta com o contexto do Tenant 2
         await using AppDbContext contextTenant2 = fixture.CreateContext(tenantContext: tenantContext2);
         var repoTenant2 = new CategoryRepository(context: contextTenant2);
-        IReadOnlyList<Category> categoriesTenant2 = await repoTenant2.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
+        (IReadOnlyList<Category> categoriesTenant2, int countTenant2) = await repoTenant2.GetPagedAsync(pageNumber: 1, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
         Category? categoryById = await repoTenant2.GetByIdAsync(id: catTenant1.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - isolamento absoluto garantido por Global Query Filter
         Assert.Empty(collection: categoriesTenant2);
+        Assert.Equal(expected: 0, actual: countTenant2);
         Assert.Null(@object: categoryById);
     }
 

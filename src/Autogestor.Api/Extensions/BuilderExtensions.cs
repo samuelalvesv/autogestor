@@ -3,10 +3,12 @@ using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
 using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
+using Autogestor.Application.UseCases.Categories.Queries.GetAllCategories;
 using Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
+using Autogestor.Application.UseCases.Transactions.Queries.GetAllTransactions;
 using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 using Autogestor.Contract.Services;
 using Autogestor.Infrastructure;
@@ -61,11 +63,13 @@ public static class BuilderExtensions
     {
         builder.Services.AddScoped<ICreateCategoryUseCase, CreateCategoryUseCase>();
         builder.Services.AddScoped<IDeleteCategoryUseCase, DeleteCategoryUseCase>();
+        builder.Services.AddScoped<IGetAllCategoriesUseCase, GetAllCategoriesUseCase>();
         builder.Services.AddScoped<IGetCategoryByIdUseCase, GetCategoryByIdUseCase>();
         builder.Services.AddScoped<IUpdateCategoryUseCase, UpdateCategoryUseCase>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<ICreateTransactionUseCase, CreateTransactionUseCase>();
         builder.Services.AddScoped<IDeleteTransactionUseCase, DeleteTransactionUseCase>();
+        builder.Services.AddScoped<IGetAllTransactionsUseCase, GetAllTransactionsUseCase>();
         builder.Services.AddScoped<IGetTransactionByIdUseCase, GetTransactionByIdUseCase>();
         builder.Services.AddScoped<IUpdateTransactionUseCase, UpdateTransactionUseCase>();
         builder.Services.AddScoped<ITransactionService, TransactionService>();

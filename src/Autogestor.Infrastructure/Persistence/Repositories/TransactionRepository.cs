@@ -39,16 +39,20 @@ public sealed class TransactionRepository(AppDbContext context) : ITransactionRe
             cancellationToken: cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Transaction>> GetPagedAsync(
+    public async Task<(IReadOnlyList<Transaction> transactions, int count)> GetPagedAsync(
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return await context.Transactions
-            .AsNoTracking()
+        IQueryable<Transaction> query = context.Transactions.AsNoTracking();
+
+        int count = await query.CountAsync(cancellationToken: cancellationToken);
+        IReadOnlyList<Transaction> transactions = await query
             .OrderByDescending(keySelector: t => t.CreatedAt)
             .Skip(count: (pageNumber - 1) * pageSize)
             .Take(count: pageSize)
             .ToListAsync(cancellationToken: cancellationToken);
+
+        return (transactions, count);
     }
 }
