@@ -1,4 +1,3 @@
-using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
@@ -8,8 +7,7 @@ using Autogestor.Domain.Interfaces;
 namespace Autogestor.Application.UseCases.Categories.Reads.GetCategoryById;
 
 public sealed class GetCategoryByIdUseCase(
-    ICategoryRepository categoryRepository,
-    IUnitOfWork unitOfWork) : IGetCategoryByIdUseCase
+    ICategoryRepository categoryRepository) : IGetCategoryByIdUseCase
 {
     public async Task<Response<CategoryResponse>> ExecuteAsync(
         GetCategoryByIdRequest request,

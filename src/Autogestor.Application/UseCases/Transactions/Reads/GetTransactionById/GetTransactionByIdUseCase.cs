@@ -1,4 +1,3 @@
-using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
@@ -8,9 +7,7 @@ using Autogestor.Domain.Interfaces;
 namespace Autogestor.Application.UseCases.Transactions.Reads.GetTransactionById;
 
 public sealed class GetTransactionByIdUseCase(
-    ITransactionRepository transactionRepository,
-    ICategoryRepository categoryRepository,
-    IUnitOfWork unitOfWork) : IGetTransactionByIdUseCase
+    ITransactionRepository transactionRepository) : IGetTransactionByIdUseCase
 {
     public async Task<Response<TransactionResponse>> ExecuteAsync(
         GetTransactionByIdRequest request,

@@ -12,7 +12,7 @@ namespace Autogestor.Api.Services;
 public sealed class CategoryService(
     ICreateCategoryUseCase createCategoryUseCase,
     IDeleteCategoryUseCase deleteCategoryUseCase,
-    IGetCategoryByIdUseCase categoryGetByIdUseCase,
+    IGetCategoryByIdUseCase getCategoryByIdUseCase,
     IUpdateCategoryUseCase updateCategoryUseCase) : ICategoryService
 {
     public Task<Response<CategoryResponse>> CreateAsync(
@@ -44,7 +44,7 @@ public sealed class CategoryService(
     public Task<Response<CategoryResponse>> GetByIdAsync(
         GetCategoryByIdRequest request,
         CancellationToken cancellationToken = default) =>
-        categoryGetByIdUseCase.ExecuteAsync(
+        getCategoryByIdUseCase.ExecuteAsync(
             request: request,
             cancellationToken: cancellationToken);
 
