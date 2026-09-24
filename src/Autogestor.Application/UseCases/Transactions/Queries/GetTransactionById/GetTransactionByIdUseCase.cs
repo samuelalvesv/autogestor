@@ -4,7 +4,7 @@ using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Interfaces;
 
-namespace Autogestor.Application.UseCases.Transactions.Reads.GetTransactionById;
+namespace Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 
 public sealed class GetTransactionByIdUseCase(
     ITransactionRepository transactionRepository) : IGetTransactionByIdUseCase
@@ -15,6 +15,7 @@ public sealed class GetTransactionByIdUseCase(
     {
         Transaction? transaction = await transactionRepository.GetByIdAsync(
             id: request.Id,
+            asNoTracking: true,
             cancellationToken: cancellationToken);
 
         if (transaction is null)

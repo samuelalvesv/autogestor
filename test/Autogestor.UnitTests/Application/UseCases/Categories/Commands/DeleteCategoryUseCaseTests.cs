@@ -24,9 +24,7 @@ public sealed class DeleteCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Alimentação",
             description: "Despesas com mercados");
-        await categoryRepository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: existingCategory);
 
         var request = new DeleteCategoryRequest
         {
@@ -46,6 +44,7 @@ public sealed class DeleteCategoryUseCaseTests
 
         Assert.Empty(collection: categoryRepository.Categories);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 1, actual: transactionRepository.ExistsByCategoryIdCallCount);
     }
 
     [Fact]
@@ -75,6 +74,7 @@ public sealed class DeleteCategoryUseCaseTests
         Assert.Null(@object: response.Data);
         Assert.Equal(expected: "Categoria não encontrada.", actual: response.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 0, actual: transactionRepository.ExistsByCategoryIdCallCount);
         Assert.True(condition: transactionRepository.PassedCancellationToken == default, userMessage: "O repositório de transações não deve ser consultado quando a categoria não for encontrada.");
     }
 
@@ -93,18 +93,14 @@ public sealed class DeleteCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Transporte",
             description: "Combustível e manutenção");
-        await categoryRepository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: existingCategory);
 
         var linkedTransaction = Transaction.Create(
             title: "Gasolina",
             type: ETransactionType.Withdraw,
             amount: 250.00m,
             categoryId: existingCategory.Id);
-        await transactionRepository.AddAsync(
-            transaction: linkedTransaction,
-            cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: linkedTransaction);
 
         var request = new DeleteCategoryRequest
         {
@@ -122,6 +118,7 @@ public sealed class DeleteCategoryUseCaseTests
         Assert.Equal(expected: "Não é possível excluir uma categoria que possui transações vinculadas.", actual: response.Message);
         Assert.Single(collection: categoryRepository.Categories);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 1, actual: transactionRepository.ExistsByCategoryIdCallCount);
     }
 
     [Fact]
@@ -143,21 +140,15 @@ public sealed class DeleteCategoryUseCaseTests
             title: "Outra Categoria",
             description: "Com transações vinculadas");
 
-        await categoryRepository.AddAsync(
-            category: targetCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
-        await categoryRepository.AddAsync(
-            category: otherCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: targetCategory);
+        categoryRepository.Add(category: otherCategory);
 
         var otherTransaction = Transaction.Create(
             title: "Despesa da Outra Categoria",
             type: ETransactionType.Withdraw,
             amount: 75.00m,
             categoryId: otherCategory.Id);
-        await transactionRepository.AddAsync(
-            transaction: otherTransaction,
-            cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepository.Add(transaction: otherTransaction);
 
         var request = new DeleteCategoryRequest
         {
@@ -178,6 +169,7 @@ public sealed class DeleteCategoryUseCaseTests
         Assert.Single(collection: categoryRepository.Categories);
         Assert.Equal(expected: otherCategory.Id, actual: categoryRepository.Categories[0].Id);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
+        Assert.Equal(expected: 1, actual: transactionRepository.ExistsByCategoryIdCallCount);
     }
 
     [Fact]
@@ -195,9 +187,7 @@ public sealed class DeleteCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Assinaturas",
             description: "Serviços mensais");
-        await categoryRepository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: existingCategory);
 
         var request = new DeleteCategoryRequest
         {
@@ -221,6 +211,7 @@ public sealed class DeleteCategoryUseCaseTests
         Assert.Equal(expected: "Categoria não encontrada.", actual: secondResponse.Message);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
         Assert.Empty(collection: categoryRepository.Categories);
+        Assert.Equal(expected: 1, actual: transactionRepository.ExistsByCategoryIdCallCount);
     }
 
     [Fact]
@@ -238,9 +229,7 @@ public sealed class DeleteCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Lazer",
             description: "Cinema e viagens");
-        await categoryRepository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepository.Add(category: existingCategory);
 
         var request = new DeleteCategoryRequest
         {

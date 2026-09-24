@@ -22,9 +22,7 @@ public sealed class UpdateCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Alimentação",
             description: "Despesas com mercados");
-        await repository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(category: existingCategory);
 
         var request = new UpdateCategoryRequest
         {
@@ -99,9 +97,7 @@ public sealed class UpdateCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Transporte",
             description: "Descrição de transporte");
-        await repository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(category: existingCategory);
 
         var request = new UpdateCategoryRequest
         {
@@ -136,9 +132,7 @@ public sealed class UpdateCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Educação",
             description: "Descrição inicial");
-        await repository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(category: existingCategory);
 
         var request = new UpdateCategoryRequest
         {
@@ -170,9 +164,7 @@ public sealed class UpdateCategoryUseCaseTests
         var existingCategory = Category.Create(
             title: "Saúde",
             description: "Planos de saúde");
-        await repository.AddAsync(
-            category: existingCategory,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(category: existingCategory);
 
         var request = new UpdateCategoryRequest
         {

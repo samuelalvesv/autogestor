@@ -2,7 +2,7 @@ using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
 using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
-using Autogestor.Application.UseCases.Categories.Reads.GetCategoryById;
+using Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
@@ -91,20 +91,29 @@ public sealed class CategoryServiceTests
         }
     }
 
+    private readonly CreateCategoryUseCaseFake _createUseCaseFake;
+    private readonly DeleteCategoryUseCaseFake _deleteUseCaseFake;
+    private readonly GetCategoryByIdUseCaseFake _getByIdUseCaseFake;
+    private readonly UpdateCategoryUseCaseFake _updateUseCaseFake;
+    private readonly CategoryService _service;
+
+    public CategoryServiceTests()
+    {
+        _createUseCaseFake = new CreateCategoryUseCaseFake();
+        _deleteUseCaseFake = new DeleteCategoryUseCaseFake();
+        _getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
+        _updateUseCaseFake = new UpdateCategoryUseCaseFake();
+        _service = new CategoryService(
+            createCategoryUseCase: _createUseCaseFake,
+            deleteCategoryUseCase: _deleteUseCaseFake,
+            getCategoryByIdUseCase: _getByIdUseCaseFake,
+            updateCategoryUseCase: _updateUseCaseFake);
+    }
+
     [Fact]
     public async Task CreateAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new CreateCategoryRequest
         {
             Title = "Educação",
@@ -128,39 +137,29 @@ public sealed class CategoryServiceTests
             Message = "Categoria criada com sucesso."
         };
 
-        createUseCaseFake.ResponseToReturn = expectedResponse;
+        _createUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await service.CreateAsync(
+        Response<CategoryResponse> response = await _service.CreateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: createUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _createUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task CreateAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new CreateCategoryRequest
         {
             Title = "Saúde",
             Description = "Farmácia e consultas"
         };
 
-        createUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
+        _createUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -170,26 +169,16 @@ public sealed class CategoryServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.CreateAsync(request: request, cancellationToken: token);
+        await _service.CreateAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: createUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _createUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task GetByIdAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new GetCategoryByIdRequest
         {
             Id = Guid.NewGuid()
@@ -212,38 +201,28 @@ public sealed class CategoryServiceTests
             Message = "Categoria encontrada com sucesso."
         };
 
-        getByIdUseCaseFake.ResponseToReturn = expectedResponse;
+        _getByIdUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await service.GetByIdAsync(
+        Response<CategoryResponse> response = await _service.GetByIdAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: getByIdUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _getByIdUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task GetByIdAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new GetCategoryByIdRequest
         {
             Id = Guid.NewGuid()
         };
 
-        getByIdUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
+        _getByIdUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -253,26 +232,16 @@ public sealed class CategoryServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.GetByIdAsync(request: request, cancellationToken: token);
+        await _service.GetByIdAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: getByIdUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _getByIdUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task UpdateAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new UpdateCategoryRequest
         {
             Id = Guid.NewGuid(),
@@ -297,32 +266,22 @@ public sealed class CategoryServiceTests
             Message = "Categoria atualizada com sucesso."
         };
 
-        updateUseCaseFake.ResponseToReturn = expectedResponse;
+        _updateUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await service.UpdateAsync(
+        Response<CategoryResponse> response = await _service.UpdateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: updateUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _updateUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task UpdateAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new UpdateCategoryRequest
         {
             Id = Guid.NewGuid(),
@@ -330,7 +289,7 @@ public sealed class CategoryServiceTests
             Description = "Pós-graduação"
         };
 
-        updateUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
+        _updateUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -340,26 +299,16 @@ public sealed class CategoryServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.UpdateAsync(request: request, cancellationToken: token);
+        await _service.UpdateAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: updateUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _updateUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task DeleteAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new DeleteCategoryRequest
         {
             Id = Guid.NewGuid()
@@ -374,38 +323,28 @@ public sealed class CategoryServiceTests
             Message = "Categoria excluída com sucesso."
         };
 
-        deleteUseCaseFake.ResponseToReturn = expectedResponse;
+        _deleteUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<DeleteResponse> response = await service.DeleteAsync(
+        Response<DeleteResponse> response = await _service.DeleteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: deleteUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _deleteUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task DeleteAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         var request = new DeleteCategoryRequest
         {
             Id = Guid.NewGuid()
         };
 
-        deleteUseCaseFake.ResponseToReturn = new Response<DeleteResponse>
+        _deleteUseCaseFake.ResponseToReturn = new Response<DeleteResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -415,28 +354,17 @@ public sealed class CategoryServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.DeleteAsync(request: request, cancellationToken: token);
+        await _service.DeleteAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: deleteUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _deleteUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task PendingMethods_ReturnPendingImplementationResponse()
     {
-        // Arrange
-        var createUseCaseFake = new CreateCategoryUseCaseFake();
-        var deleteUseCaseFake = new DeleteCategoryUseCaseFake();
-        var getByIdUseCaseFake = new GetCategoryByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateCategoryUseCaseFake();
-        var service = new CategoryService(
-            createCategoryUseCase: createUseCaseFake,
-            deleteCategoryUseCase: deleteUseCaseFake,
-            getCategoryByIdUseCase: getByIdUseCaseFake,
-            updateCategoryUseCase: updateUseCaseFake);
-
         // Act
-        PagedResponse<CategoryResponse> getAllResponse = await service.GetAllAsync(
+        PagedResponse<CategoryResponse> getAllResponse = await _service.GetAllAsync(
             request: new GetAllCategoriesRequest
             {
                 PageNumber = 1,

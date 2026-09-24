@@ -27,12 +27,6 @@ public sealed class UpdateTransactionUseCase(
                 Message = "Transação não encontrada."
             };
 
-        transaction.Update(
-            title: request.Title,
-            type: (Domain.Enums.ETransactionType)request.Type,
-            amount: request.Amount,
-            categoryId: request.CategoryId);
-
         bool categoryExists = await categoryRepository.ExistsAsync(
             id: request.CategoryId,
             cancellationToken: cancellationToken);
@@ -43,6 +37,12 @@ public sealed class UpdateTransactionUseCase(
                 Data = null,
                 Message = "Categoria não encontrada para o tenant atual."
             };
+
+        transaction.Update(
+            title: request.Title,
+            type: (Domain.Enums.ETransactionType)request.Type,
+            amount: request.Amount,
+            categoryId: request.CategoryId);
 
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 

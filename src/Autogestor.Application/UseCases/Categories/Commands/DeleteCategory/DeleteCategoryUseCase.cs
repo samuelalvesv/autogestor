@@ -37,7 +37,7 @@ public sealed class DeleteCategoryUseCase(
                 Message = "Não é possível excluir uma categoria que possui transações vinculadas."
             };
 
-        await categoryRepository.RemoveAsync(category: category, cancellationToken: cancellationToken);
+        categoryRepository.Remove(category: category);
 
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 

@@ -11,7 +11,7 @@ namespace Autogestor.IntegrationTests.Persistence;
 public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
 {
     [Fact]
-    public async Task AddAsync_PersistsTransactionToPostgreSqlDatabase()
+    public async Task Add_PersistsTransactionToPostgreSqlDatabase()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -25,7 +25,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         var category = Category.Create(
             title: "Receitas Diversas",
             description: "Categoria para receitas variadas");
-        await categoryRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepo.Add(category: category);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         var transaction = Transaction.Create(
@@ -35,7 +35,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
             categoryId: category.Id);
 
         // Act
-        await transactionRepo.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepo.Add(transaction: transaction);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - consulta em novo contexto sem cache com o mesmo tenant
@@ -67,14 +67,14 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         var transactionRepo = new TransactionRepository(context: context);
 
         var category = Category.Create(title: "Operacional", description: "Custos operacionais");
-        await categoryRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepo.Add(category: category);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         var tx1 = Transaction.Create(title: "Tx 1", type: ETransactionType.Deposit, amount: 100.00m, categoryId: category.Id);
         var tx2 = Transaction.Create(title: "Tx 2", type: ETransactionType.Withdraw, amount: 50.00m, categoryId: category.Id);
 
-        await transactionRepo.AddAsync(transaction: tx1, cancellationToken: TestContext.Current.CancellationToken);
-        await transactionRepo.AddAsync(transaction: tx2, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepo.Add(transaction: tx1);
+        transactionRepo.Add(transaction: tx2);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta em novo contexto com o mesmo tenant
@@ -100,16 +100,16 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         var transactionRepo = new TransactionRepository(context: context);
 
         var category = Category.Create(title: "Operacional Paginação", description: "Custos operacionais");
-        await categoryRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepo.Add(category: category);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
-        var tx1 = Transaction.Create(title: "Tx Page 1", type: ETransactionType.Deposit, amount: 10.00m, categoryId: category.Id);
+        var tx1 = Transaction.Create(title: "Tx Page 1", type: ETransactionType.Deposit, amount: 100.00m, categoryId: category.Id);
         var tx2 = Transaction.Create(title: "Tx Page 2", type: ETransactionType.Withdraw, amount: 20.00m, categoryId: category.Id);
         var tx3 = Transaction.Create(title: "Tx Page 3", type: ETransactionType.Deposit, amount: 30.00m, categoryId: category.Id);
 
-        await transactionRepo.AddAsync(transaction: tx1, cancellationToken: TestContext.Current.CancellationToken);
-        await transactionRepo.AddAsync(transaction: tx2, cancellationToken: TestContext.Current.CancellationToken);
-        await transactionRepo.AddAsync(transaction: tx3, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepo.Add(transaction: tx1);
+        transactionRepo.Add(transaction: tx2);
+        transactionRepo.Add(transaction: tx3);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
@@ -137,11 +137,11 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         var txRepoTenant1 = new TransactionRepository(context: contextTenant1);
 
         var catTenant1 = Category.Create(title: "Cat Tenant 1", description: "Desc");
-        await catRepoTenant1.AddAsync(category: catTenant1, cancellationToken: TestContext.Current.CancellationToken);
+        catRepoTenant1.Add(category: catTenant1);
         await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         var txTenant1 = Transaction.Create(title: "Tx Tenant 1", type: ETransactionType.Deposit, amount: 1000.00m, categoryId: catTenant1.Id);
-        await txRepoTenant1.AddAsync(transaction: txTenant1, cancellationToken: TestContext.Current.CancellationToken);
+        txRepoTenant1.Add(transaction: txTenant1);
         await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consulta com o contexto do Tenant 2
@@ -233,7 +233,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         var transactionRepo = new TransactionRepository(context: context);
 
         var category = Category.Create(title: "Alimentação", description: "Gastos com alimentação");
-        await categoryRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepo.Add(category: category);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         var transaction = Transaction.Create(
@@ -241,7 +241,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
             type: ETransactionType.Withdraw,
             amount: 350.00m,
             categoryId: category.Id);
-        await transactionRepo.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepo.Add(transaction: transaction);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act & Assert - tentar remover a categoria em novo contexto (onde a transação não está em memória) deve falhar no banco via foreign key
@@ -271,8 +271,8 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         await using (AppDbContext setupContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
         {
             var catRepo = new CategoryRepository(context: setupContext);
-            await catRepo.AddAsync(category: category1, cancellationToken: TestContext.Current.CancellationToken);
-            await catRepo.AddAsync(category: category2, cancellationToken: TestContext.Current.CancellationToken);
+            catRepo.Add(category: category1);
+            catRepo.Add(category: category2);
             await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             var txRepo = new TransactionRepository(context: setupContext);
@@ -281,7 +281,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
                 type: ETransactionType.Deposit,
                 amount: 1000.00m,
                 categoryId: category1.Id);
-            await txRepo.AddAsync(transaction: initialTransaction, cancellationToken: TestContext.Current.CancellationToken);
+            txRepo.Add(transaction: initialTransaction);
             await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
             transactionId = initialTransaction.Id;
         }
@@ -335,7 +335,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         var transactionRepo = new TransactionRepository(context: context);
 
         var category = Category.Create(title: "Serviços", description: "Prestação de serviços");
-        await categoryRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        categoryRepo.Add(category: category);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         var transaction = Transaction.Create(
@@ -343,7 +343,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
             type: ETransactionType.Deposit,
             amount: 5000.00m,
             categoryId: category.Id);
-        await transactionRepo.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        transactionRepo.Add(transaction: transaction);
         await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
@@ -366,7 +366,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         var txRepoTenant1 = new TransactionRepository(context: contextTenant1);
 
         var category = Category.Create(title: "Investimentos", description: "Aplicações");
-        await catRepoTenant1.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+        catRepoTenant1.Add(category: category);
         await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         var transaction = Transaction.Create(
@@ -374,7 +374,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
             type: ETransactionType.Deposit,
             amount: 750.00m,
             categoryId: category.Id);
-        await txRepoTenant1.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+        txRepoTenant1.Add(transaction: transaction);
         await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         // Act - consultar sob Tenant 2
@@ -389,7 +389,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
     }
 
     [Fact]
-    public async Task RemoveAsync_RemovesTransactionFromPostgreSqlDatabase()
+    public async Task Remove_RemovesTransactionFromPostgreSqlDatabase()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -405,7 +405,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
             var txRepo = new TransactionRepository(context: setupContext);
 
             var category = Category.Create(title: "Transporte", description: "Gastos com locomoção");
-            await catRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+            catRepo.Add(category: category);
             await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             var transaction = Transaction.Create(
@@ -413,19 +413,19 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
                 type: ETransactionType.Withdraw,
                 amount: 180.00m,
                 categoryId: category.Id);
-            await txRepo.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+            txRepo.Add(transaction: transaction);
             await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
             transactionId = transaction.Id;
         }
 
-        // Act - carregar no repositório, chamar RemoveAsync e salvar alterações
+        // Act - carregar no repositório, chamar Remove e salvar alterações
         await using (AppDbContext removeContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext))
         {
             var removeRepo = new TransactionRepository(context: removeContext);
             Transaction? transactionToRemove = await removeRepo.GetByIdAsync(id: transactionId, cancellationToken: TestContext.Current.CancellationToken);
             Assert.NotNull(@object: transactionToRemove);
 
-            await removeRepo.RemoveAsync(transaction: transactionToRemove, cancellationToken: TestContext.Current.CancellationToken);
+            removeRepo.Remove(transaction: transactionToRemove);
             await removeContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
         }
 
@@ -456,7 +456,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
             var txRepo = new TransactionRepository(context: setupContext);
 
             var category = Category.Create(title: "Alimentação", description: "Gastos com mercado");
-            await catRepo.AddAsync(category: category, cancellationToken: TestContext.Current.CancellationToken);
+            catRepo.Add(category: category);
             await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             var transaction = Transaction.Create(
@@ -464,7 +464,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
                 type: ETransactionType.Withdraw,
                 amount: 120.00m,
                 categoryId: category.Id);
-            await txRepo.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+            txRepo.Add(transaction: transaction);
             await setupContext.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
             categoryId = category.Id;
         }
@@ -495,8 +495,8 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
 
             var catWithTx = Category.Create(title: "Com Transação", description: "Desc");
             var catWithoutTx = Category.Create(title: "Sem Transação", description: "Desc");
-            await catRepoTenant1.AddAsync(category: catWithTx, cancellationToken: TestContext.Current.CancellationToken);
-            await catRepoTenant1.AddAsync(category: catWithoutTx, cancellationToken: TestContext.Current.CancellationToken);
+            catRepoTenant1.Add(category: catWithTx);
+            catRepoTenant1.Add(category: catWithoutTx);
             await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             var transaction = Transaction.Create(
@@ -504,7 +504,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
                 type: ETransactionType.Withdraw,
                 amount: 90.00m,
                 categoryId: catWithTx.Id);
-            await txRepoTenant1.AddAsync(transaction: transaction, cancellationToken: TestContext.Current.CancellationToken);
+            txRepoTenant1.Add(transaction: transaction);
             await contextTenant1.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             categoryIdWithTx = catWithTx.Id;
@@ -527,5 +527,45 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
 
         Assert.False(condition: existsForOtherTenant, userMessage: "Não deve encontrar transações vinculadas sob outro tenant.");
         Assert.False(condition: existsForRandomId, userMessage: "Um id aleatório de categoria deve retornar false.");
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WithAsNoTracking_ReturnsUntrackedEntity()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var tenantId = Guid.NewGuid();
+        var userContext = new UserContextFake(userId: userId);
+        var tenantContext = new TenantContextFake(tenantId: tenantId);
+        await using AppDbContext context = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var categoryRepo = new CategoryRepository(context: context);
+        var transactionRepo = new TransactionRepository(context: context);
+
+        var category = Category.Create(title: "Investimentos", description: "Ações e fundos");
+        categoryRepo.Add(category: category);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        var transaction = Transaction.Create(
+            title: "Compra de Ações",
+            type: ETransactionType.Withdraw,
+            amount: 500.00m,
+            categoryId: category.Id);
+        transactionRepo.Add(transaction: transaction);
+        await context.SaveChangesAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        // Act
+        await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var queryRepo = new TransactionRepository(context: queryContext);
+        Transaction? tracked = await queryRepo.GetByIdAsync(id: transaction.Id, asNoTracking: false, cancellationToken: TestContext.Current.CancellationToken);
+
+        await using AppDbContext noTrackingContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
+        var noTrackingRepo = new TransactionRepository(context: noTrackingContext);
+        Transaction? untracked = await noTrackingRepo.GetByIdAsync(id: transaction.Id, asNoTracking: true, cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.NotNull(@object: tracked);
+        Assert.NotNull(@object: untracked);
+        Assert.Equal(expected: EntityState.Unchanged, actual: queryContext.Entry(entity: tracked).State);
+        Assert.Equal(expected: EntityState.Detached, actual: noTrackingContext.Entry(entity: untracked).State);
     }
 }

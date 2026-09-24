@@ -6,17 +6,11 @@ namespace Autogestor.Infrastructure.Persistence.Repositories;
 
 public sealed class TransactionRepository(AppDbContext context) : ITransactionRepository
 {
-    public Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default)
-    {
-        context.Transactions.Add(entity: transaction);
-        return Task.CompletedTask;
-    }
+    public void Add(Transaction transaction)
+        => context.Transactions.Add(entity: transaction);
 
-    public Task RemoveAsync(Transaction transaction, CancellationToken cancellationToken = default)
-    {
-        context.Transactions.Remove(entity: transaction);
-        return Task.CompletedTask;
-    }
+    public void Remove(Transaction transaction)
+        => context.Transactions.Remove(entity: transaction);
 
     public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.Transactions
@@ -30,11 +24,20 @@ public sealed class TransactionRepository(AppDbContext context) : ITransactionRe
                 predicate: t => t.CategoryId == categoryId,
                 cancellationToken: cancellationToken);
 
-    public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
-        context.Transactions
-            .FirstOrDefaultAsync(
-                predicate: t => t.Id == id,
-                cancellationToken: cancellationToken);
+    public Task<Transaction?> GetByIdAsync(
+        Guid id,
+        bool asNoTracking = false,
+        CancellationToken cancellationToken = default)
+    {
+        IQueryable<Transaction> query = context.Transactions;
+
+        if (asNoTracking)
+            query = query.AsNoTracking();
+
+        return query.FirstOrDefaultAsync(
+            predicate: t => t.Id == id,
+            cancellationToken: cancellationToken);
+    }
 
     public async Task<IReadOnlyList<Transaction>> GetPagedAsync(
         int pageNumber,

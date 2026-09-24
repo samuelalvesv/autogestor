@@ -2,7 +2,7 @@ using Autogestor.Api.Services;
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
-using Autogestor.Application.UseCases.Transactions.Reads.GetTransactionById;
+using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
@@ -92,20 +92,29 @@ public sealed class TransactionServiceTests
         }
     }
 
+    private readonly CreateTransactionUseCaseFake _createUseCaseFake;
+    private readonly DeleteTransactionUseCaseFake _deleteUseCaseFake;
+    private readonly GetTransactionByIdUseCaseFake _getByIdUseCaseFake;
+    private readonly UpdateTransactionUseCaseFake _updateUseCaseFake;
+    private readonly TransactionService _service;
+
+    public TransactionServiceTests()
+    {
+        _createUseCaseFake = new CreateTransactionUseCaseFake();
+        _deleteUseCaseFake = new DeleteTransactionUseCaseFake();
+        _getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
+        _updateUseCaseFake = new UpdateTransactionUseCaseFake();
+        _service = new TransactionService(
+            createTransactionUseCase: _createUseCaseFake,
+            deleteTransactionUseCase: _deleteUseCaseFake,
+            getTransactionByIdUseCase: _getByIdUseCaseFake,
+            updateTransactionUseCase: _updateUseCaseFake);
+    }
+
     [Fact]
     public async Task CreateAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new CreateTransactionRequest
         {
             Title = "Venda de Produto",
@@ -133,32 +142,22 @@ public sealed class TransactionServiceTests
             Message = "Transação criada com sucesso."
         };
 
-        createUseCaseFake.ResponseToReturn = expectedResponse;
+        _createUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<TransactionResponse> response = await service.CreateAsync(
+        Response<TransactionResponse> response = await _service.CreateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: createUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _createUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task CreateAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new CreateTransactionRequest
         {
             Title = "Venda de Serviço",
@@ -167,7 +166,7 @@ public sealed class TransactionServiceTests
             CategoryId = Guid.NewGuid()
         };
 
-        createUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
+        _createUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -177,26 +176,16 @@ public sealed class TransactionServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.CreateAsync(request: request, cancellationToken: token);
+        await _service.CreateAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: createUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _createUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task GetByIdAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new GetTransactionByIdRequest
         {
             Id = Guid.NewGuid()
@@ -221,38 +210,28 @@ public sealed class TransactionServiceTests
             Message = "Transação encontrada com sucesso."
         };
 
-        getByIdUseCaseFake.ResponseToReturn = expectedResponse;
+        _getByIdUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<TransactionResponse> response = await service.GetByIdAsync(
+        Response<TransactionResponse> response = await _service.GetByIdAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: getByIdUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _getByIdUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task GetByIdAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new GetTransactionByIdRequest
         {
             Id = Guid.NewGuid()
         };
 
-        getByIdUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
+        _getByIdUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -262,26 +241,16 @@ public sealed class TransactionServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.GetByIdAsync(request: request, cancellationToken: token);
+        await _service.GetByIdAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: getByIdUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _getByIdUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task UpdateAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new UpdateTransactionRequest
         {
             Id = Guid.NewGuid(),
@@ -310,32 +279,22 @@ public sealed class TransactionServiceTests
             Message = "Transação atualizada com sucesso."
         };
 
-        updateUseCaseFake.ResponseToReturn = expectedResponse;
+        _updateUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<TransactionResponse> response = await service.UpdateAsync(
+        Response<TransactionResponse> response = await _service.UpdateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: updateUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _updateUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task UpdateAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new UpdateTransactionRequest
         {
             Id = Guid.NewGuid(),
@@ -345,7 +304,7 @@ public sealed class TransactionServiceTests
             CategoryId = Guid.NewGuid()
         };
 
-        updateUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
+        _updateUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -355,26 +314,16 @@ public sealed class TransactionServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.UpdateAsync(request: request, cancellationToken: token);
+        await _service.UpdateAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: updateUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _updateUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task DeleteAsync_DelegatesToUseCase_AndReturnsResponse()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new DeleteTransactionRequest
         {
             Id = Guid.NewGuid()
@@ -389,38 +338,28 @@ public sealed class TransactionServiceTests
             Message = "Transação excluída com sucesso."
         };
 
-        deleteUseCaseFake.ResponseToReturn = expectedResponse;
+        _deleteUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<DeleteResponse> response = await service.DeleteAsync(
+        Response<DeleteResponse> response = await _service.DeleteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Same(expected: expectedResponse, actual: response);
-        Assert.Same(expected: request, actual: deleteUseCaseFake.ReceivedRequest);
+        Assert.Same(expected: request, actual: _deleteUseCaseFake.ReceivedRequest);
     }
 
     [Fact]
     public async Task DeleteAsync_PropagatesCancellationToken()
     {
         // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         var request = new DeleteTransactionRequest
         {
             Id = Guid.NewGuid()
         };
 
-        deleteUseCaseFake.ResponseToReturn = new Response<DeleteResponse>
+        _deleteUseCaseFake.ResponseToReturn = new Response<DeleteResponse>
         {
             Data = null,
             Message = "Sucesso"
@@ -430,28 +369,17 @@ public sealed class TransactionServiceTests
         CancellationToken token = cts.Token;
 
         // Act
-        await service.DeleteAsync(request: request, cancellationToken: token);
+        await _service.DeleteAsync(request: request, cancellationToken: token);
 
         // Assert
-        Assert.Equal(expected: token, actual: deleteUseCaseFake.ReceivedCancellationToken);
+        Assert.Equal(expected: token, actual: _deleteUseCaseFake.ReceivedCancellationToken);
     }
 
     [Fact]
     public async Task PendingMethods_ReturnPendingImplementationResponse()
     {
-        // Arrange
-        var createUseCaseFake = new CreateTransactionUseCaseFake();
-        var deleteUseCaseFake = new DeleteTransactionUseCaseFake();
-        var getByIdUseCaseFake = new GetTransactionByIdUseCaseFake();
-        var updateUseCaseFake = new UpdateTransactionUseCaseFake();
-        var service = new TransactionService(
-            createTransactionUseCase: createUseCaseFake,
-            deleteTransactionUseCase: deleteUseCaseFake,
-            getTransactionByIdUseCase: getByIdUseCaseFake,
-            updateTransactionUseCase: updateUseCaseFake);
-
         // Act
-        PagedResponse<TransactionResponse> getAllResponse = await service.GetAllAsync(
+        PagedResponse<TransactionResponse> getAllResponse = await _service.GetAllAsync(
             request: new GetAllTransactionsRequest
             {
                 PageNumber = 1,

@@ -4,7 +4,7 @@ using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Interfaces;
 
-namespace Autogestor.Application.UseCases.Categories.Reads.GetCategoryById;
+namespace Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
 
 public sealed class GetCategoryByIdUseCase(
     ICategoryRepository categoryRepository) : IGetCategoryByIdUseCase
@@ -15,6 +15,7 @@ public sealed class GetCategoryByIdUseCase(
     {
         Category? category = await categoryRepository.GetByIdAsync(
             id: request.Id,
+            asNoTracking: true,
             cancellationToken: cancellationToken);
 
         if (category is null)

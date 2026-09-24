@@ -25,7 +25,7 @@ public sealed class DeleteTransactionUseCase(
                 Message = "Transação não encontrada."
             };
 
-        await transactionRepository.RemoveAsync(transaction: transaction, cancellationToken: cancellationToken);
+        transactionRepository.Remove(transaction: transaction);
 
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 

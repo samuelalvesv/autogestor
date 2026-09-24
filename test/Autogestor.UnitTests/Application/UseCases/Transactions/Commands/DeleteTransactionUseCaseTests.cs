@@ -24,9 +24,7 @@ public sealed class DeleteTransactionUseCaseTests
             type: ETransactionType.Withdraw,
             amount: 350.75m,
             categoryId: Guid.NewGuid());
-        await repository.AddAsync(
-            transaction: existingTransaction,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(transaction: existingTransaction);
 
         var request = new DeleteTransactionRequest
         {
@@ -96,12 +94,8 @@ public sealed class DeleteTransactionUseCaseTests
             amount: 200.00m,
             categoryId: Guid.NewGuid());
 
-        await repository.AddAsync(
-            transaction: targetTransaction,
-            cancellationToken: TestContext.Current.CancellationToken);
-        await repository.AddAsync(
-            transaction: remainingTransaction,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(transaction: targetTransaction);
+        repository.Add(transaction: remainingTransaction);
 
         var request = new DeleteTransactionRequest
         {
@@ -139,9 +133,7 @@ public sealed class DeleteTransactionUseCaseTests
             type: ETransactionType.Withdraw,
             amount: 49.90m,
             categoryId: Guid.NewGuid());
-        await repository.AddAsync(
-            transaction: existingTransaction,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(transaction: existingTransaction);
 
         var request = new DeleteTransactionRequest
         {
@@ -182,9 +174,7 @@ public sealed class DeleteTransactionUseCaseTests
             type: ETransactionType.Deposit,
             amount: 5000.00m,
             categoryId: Guid.NewGuid());
-        await repository.AddAsync(
-            transaction: existingTransaction,
-            cancellationToken: TestContext.Current.CancellationToken);
+        repository.Add(transaction: existingTransaction);
 
         var request = new DeleteTransactionRequest
         {

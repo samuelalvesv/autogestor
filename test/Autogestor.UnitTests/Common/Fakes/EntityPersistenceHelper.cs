@@ -13,4 +13,12 @@ public static class EntityPersistenceHelper
         typeof(TenantEntity).GetProperty(name: nameof(TenantEntity.TenantId))!
             .SetValue(obj: entity, value: tenantId);
     }
+
+    public static void SetAuditUpdateFields(AuditableEntity entity, Guid updatedBy, DateTime updatedAt)
+    {
+        typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.UpdatedBy))!
+            .SetValue(obj: entity, value: updatedBy);
+        typeof(AuditableEntity).GetProperty(name: nameof(AuditableEntity.UpdatedAt))!
+            .SetValue(obj: entity, value: updatedAt);
+    }
 }

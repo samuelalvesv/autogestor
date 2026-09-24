@@ -1,7 +1,7 @@
 using Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
-using Autogestor.Application.UseCases.Transactions.Reads.GetTransactionById;
+using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;

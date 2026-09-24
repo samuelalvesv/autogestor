@@ -1,7 +1,7 @@
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
 using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
-using Autogestor.Application.UseCases.Categories.Reads.GetCategoryById;
+using Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;

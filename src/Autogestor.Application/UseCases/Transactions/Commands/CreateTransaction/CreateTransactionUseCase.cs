@@ -16,12 +16,6 @@ public sealed class CreateTransactionUseCase(
         CreateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var transaction = Transaction.Create(
-            title: request.Title,
-            type: (Domain.Enums.ETransactionType)request.Type,
-            amount: request.Amount,
-            categoryId: request.CategoryId);
-
         bool categoryExists = await categoryRepository.ExistsAsync(
             id: request.CategoryId,
             cancellationToken: cancellationToken);
@@ -33,9 +27,13 @@ public sealed class CreateTransactionUseCase(
                 Message = "Categoria não encontrada para o tenant atual."
             };
 
-        await transactionRepository.AddAsync(
-            transaction: transaction,
-            cancellationToken: cancellationToken);
+        var transaction = Transaction.Create(
+            title: request.Title,
+            type: (Domain.Enums.ETransactionType)request.Type,
+            amount: request.Amount,
+            categoryId: request.CategoryId);
+
+        transactionRepository.Add(transaction: transaction);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
         var response = new TransactionResponse
