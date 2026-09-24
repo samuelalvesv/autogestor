@@ -1,3 +1,4 @@
+using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
@@ -35,7 +36,7 @@ public sealed class GetTransactionByIdUseCase(
             UpdatedAt = transaction.UpdatedAt,
             TenantId = transaction.TenantId,
             Title = transaction.Title,
-            Type = (Contract.Enums.ETransactionType)transaction.Type,
+            Type = (ETransactionType)transaction.Type,
             Amount = transaction.Amount,
             CategoryId = transaction.CategoryId
         };

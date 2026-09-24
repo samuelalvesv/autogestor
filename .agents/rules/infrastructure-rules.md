@@ -19,6 +19,7 @@ applyTo: "src/Autogestor.Infrastructure/**/*.cs"
 - **Consultas Eficientes**:
   - Usar `.AsNoTracking()` em todas as consultas que sejam estritamente para leitura.
   - Repositórios **nunca** devem retornar `IQueryable`. Toda consulta deve ser materializada na camada de infraestrutura (retornando `IReadOnlyList<T>`, `IEnumerable<T>` ou `T?`) para evitar vazamento de complexidade de banco (como N+1 queries) para a camada de Application.
+  - **Curto-Circuito em Consultas Paginadas (Early Exit)**: Em métodos de paginação que executam contagem total antes de buscar os registros da página, aplicar curto-circuito imediato quando a contagem for zero ou quando o deslocamento solicitado for maior ou igual ao total de registros disponíveis, retornando uma coleção vazia sem disparar a consulta subsequente de materialização no banco de dados.
 - **Convenção de Nomenclatura (snake_case)**:
   - A tradução para snake_case é automática (`UseSnakeCaseNamingConvention()`). Não utilizar `ToTable` ou `HasColumnName` nas classes de mapeamento para este propósito.
 - **Tipos de Coluna (PostgreSQL)**:

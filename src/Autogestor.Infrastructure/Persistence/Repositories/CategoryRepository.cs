@@ -34,16 +34,19 @@ public sealed class CategoryRepository(AppDbContext context) : ICategoryReposito
     }
 
     public async Task<(IReadOnlyList<Category> categories, int count)> GetPagedAsync(
-        int pageNumber,
+        int skip,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Category> query = context.Categories.AsNoTracking();
 
         int count = await query.CountAsync(cancellationToken: cancellationToken);
+        if (count == 0 || skip >= count)
+            return ([], count);
+
         IReadOnlyList<Category> categories = await query
             .OrderByDescending(keySelector: c => c.CreatedAt)
-            .Skip(count: (pageNumber - 1) * pageSize)
+            .Skip(count: skip)
             .Take(count: pageSize)
             .ToListAsync(cancellationToken: cancellationToken);
 

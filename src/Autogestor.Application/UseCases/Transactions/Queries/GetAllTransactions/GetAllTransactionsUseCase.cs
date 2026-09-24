@@ -1,3 +1,4 @@
+using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
@@ -14,7 +15,7 @@ public sealed class GetAllTransactionsUseCase(
         CancellationToken cancellationToken = default)
     {
         (IReadOnlyList<Transaction> transactions, int count) = await transactionRepository.GetPagedAsync(
-            pageNumber: request.PageNumber,
+            skip: request.Skip,
             pageSize: request.PageSize,
             cancellationToken: cancellationToken);
 
@@ -29,7 +30,7 @@ public sealed class GetAllTransactionsUseCase(
             };
 
         IReadOnlyList<TransactionResponse> response = [.. transactions
-            .Select(transaction => new TransactionResponse
+            .Select(selector: transaction => new TransactionResponse
             {
                 Id = transaction.Id,
                 Active = transaction.Active,
@@ -39,7 +40,7 @@ public sealed class GetAllTransactionsUseCase(
                 UpdatedAt = transaction.UpdatedAt,
                 TenantId = transaction.TenantId,
                 Title = transaction.Title,
-                Type = (Contract.Enums.ETransactionType)transaction.Type,
+                Type = (ETransactionType)transaction.Type,
                 Amount = transaction.Amount,
                 CategoryId = transaction.CategoryId
             })];

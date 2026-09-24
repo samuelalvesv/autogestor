@@ -11,6 +11,8 @@ public sealed class CategoryRepositoryFake : ICategoryRepository
     public CancellationToken PassedCancellationToken { get; private set; }
     public bool? LastGetByIdAsNoTracking { get; private set; }
     public int ExistsCallCount { get; private set; }
+    public int? LastPagedSkip { get; private set; }
+    public int? LastPagedPageSize { get; private set; }
 
     public void Add(Category category)
     {
@@ -48,13 +50,22 @@ public sealed class CategoryRepositoryFake : ICategoryRepository
     }
 
     public Task<(IReadOnlyList<Category> categories, int count)> GetPagedAsync(
-        int pageNumber,
+        int skip,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;
+        LastPagedSkip = skip;
+        LastPagedPageSize = pageSize;
+
+        if (_categories.Count == 0 || skip >= _categories.Count)
+        {
+            return Task.FromResult<(IReadOnlyList<Category> categories, int count)>(
+                result: (categories: [], count: _categories.Count));
+        }
+
         IReadOnlyList<Category> result = _categories
-            .Skip(count: (pageNumber - 1) * pageSize)
+            .Skip(count: skip)
             .Take(count: pageSize)
             .ToList()
             .AsReadOnly();

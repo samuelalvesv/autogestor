@@ -51,4 +51,31 @@ public sealed class PagedRequestTests
         // Assert
         Assert.NotEmpty(collection: errors);
     }
+
+    [Theory]
+    [InlineData(1, 25, 0)]
+    [InlineData(2, 25, 25)]
+    [InlineData(3, 10, 20)]
+    [InlineData(10, 50, 450)]
+    [InlineData(0, 25, 0)]
+    [InlineData(-1, 25, 0)]
+    [InlineData(-10, 50, 0)]
+    [InlineData(1, 0, 0)]
+    [InlineData(2, 0, 0)]
+    [InlineData(2, -10, 0)]
+    [InlineData(0, -10, 0)]
+    [InlineData(int.MaxValue, 25, int.MaxValue)]
+    [InlineData(100_000_000, 50, int.MaxValue)]
+    public void Skip_ShouldCalculateCorrectly(int pageNumber, int pageSize, int expectedSkip)
+    {
+        // Arrange & Act
+        var request = new TestPagedRequest
+        {
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        // Assert
+        Assert.Equal(expected: expectedSkip, actual: request.Skip);
+    }
 }

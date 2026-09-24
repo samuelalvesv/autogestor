@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
+using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
@@ -40,7 +41,7 @@ public sealed class GetTransactionByIdUseCaseTests
         Assert.Equal(expected: "Transação encontrada com sucesso.", actual: response.Message);
         Assert.Equal(expected: transaction.Id, actual: response.Data.Id);
         Assert.Equal(expected: transaction.Title, actual: response.Data.Title);
-        Assert.Equal(expected: Autogestor.Contract.Enums.ETransactionType.Deposit, actual: response.Data.Type);
+        Assert.Equal(expected: ETransactionType.Deposit, actual: response.Data.Type);
         Assert.Equal(expected: transaction.Amount, actual: response.Data.Amount);
         Assert.Equal(expected: transaction.CategoryId, actual: response.Data.CategoryId);
         Assert.Equal(expected: transaction.Active, actual: response.Data.Active);

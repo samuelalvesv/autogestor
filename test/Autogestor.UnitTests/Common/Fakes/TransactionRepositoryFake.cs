@@ -11,6 +11,8 @@ public sealed class TransactionRepositoryFake : ITransactionRepository
     public CancellationToken PassedCancellationToken { get; private set; }
     public bool? LastGetByIdAsNoTracking { get; private set; }
     public int ExistsByCategoryIdCallCount { get; private set; }
+    public int? LastPagedSkip { get; private set; }
+    public int? LastPagedPageSize { get; private set; }
 
     public void Add(Transaction transaction)
     {
@@ -54,13 +56,22 @@ public sealed class TransactionRepositoryFake : ITransactionRepository
     }
 
     public Task<(IReadOnlyList<Transaction> transactions, int count)> GetPagedAsync(
-        int pageNumber,
+        int skip,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;
+        LastPagedSkip = skip;
+        LastPagedPageSize = pageSize;
+
+        if (_transactions.Count == 0 || skip >= _transactions.Count)
+        {
+            return Task.FromResult<(IReadOnlyList<Transaction> transactions, int count)>(
+                result: (transactions: [], count: _transactions.Count));
+        }
+
         IReadOnlyList<Transaction> result = _transactions
-            .Skip(count: (pageNumber - 1) * pageSize)
+            .Skip(count: skip)
             .Take(count: pageSize)
             .ToList()
             .AsReadOnly();

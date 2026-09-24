@@ -14,7 +14,7 @@ public sealed class GetAllCategoriesUseCase(
         CancellationToken cancellationToken = default)
     {
         (IReadOnlyList<Category> categories, int count) = await categoryRepository.GetPagedAsync(
-            pageNumber: request.PageNumber,
+            skip: request.Skip,
             pageSize: request.PageSize,
             cancellationToken: cancellationToken);
 
@@ -29,7 +29,7 @@ public sealed class GetAllCategoriesUseCase(
             };
 
         IReadOnlyList<CategoryResponse> response = [.. categories
-            .Select(category => new CategoryResponse
+            .Select(selector: category => new CategoryResponse
             {
                 Id = category.Id,
                 Active = category.Active,

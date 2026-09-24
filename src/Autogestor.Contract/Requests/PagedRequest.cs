@@ -13,4 +13,8 @@ public abstract record PagedRequest
     [DataMember(Order = 2)]
     [Range(minimum: ContractDefaults.MinPageSize, maximum: ContractDefaults.MaxPageSize)]
     public required int PageSize { get; init; }
+
+    public int Skip => PageNumber > 0 && PageSize > 0
+        ? (int)Math.Min((long)(PageNumber - 1) * PageSize, int.MaxValue)
+        : 0;
 }
