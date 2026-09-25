@@ -1,6 +1,5 @@
 using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Requests.Categories;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Interfaces;
@@ -11,7 +10,7 @@ public sealed class CreateCategoryUseCase(
     ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork) : ICreateCategoryUseCase
 {
-    public async Task<Response<CategoryResponse>> ExecuteAsync(
+    public async Task<CategoryResponse> ExecuteAsync(
         CreateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -22,7 +21,7 @@ public sealed class CreateCategoryUseCase(
         categoryRepository.Add(category: category);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-        var response = new CategoryResponse
+        return new CategoryResponse
         {
             Id = category.Id,
             Active = category.Active,
@@ -33,12 +32,6 @@ public sealed class CreateCategoryUseCase(
             TenantId = category.TenantId,
             Title = category.Title,
             Description = category.Description
-        };
-
-        return new Response<CategoryResponse>
-        {
-            Data = response,
-            Message = "Categoria criada com sucesso."
         };
     }
 }

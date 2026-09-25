@@ -12,7 +12,7 @@ namespace Autogestor.UnitTests.Application.UseCases.Transactions.Queries;
 public sealed class GetAllTransactionsUseCaseTests
 {
     [Fact]
-    public async Task ExecuteAsync_WhenTransactionsExist_ReturnsSuccessPagedResponseWithMappedData()
+    public async Task ExecuteAsync_WhenTransactionsExist_ReturnsPagedResponseWithMappedData()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -48,7 +48,6 @@ public sealed class GetAllTransactionsUseCaseTests
         Assert.NotNull(@object: response);
         Assert.NotNull(@object: response.Data);
         Assert.Equal(expected: 2, actual: response.Data.Count);
-        Assert.Equal(expected: "Transações encontradas com sucesso.", actual: response.Message);
         Assert.Equal(expected: 2, actual: response.TotalCount);
         Assert.Equal(expected: 1, actual: response.PageNumber);
         Assert.Equal(expected: 10, actual: response.PageSize);
@@ -81,7 +80,7 @@ public sealed class GetAllTransactionsUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTransactionHasBeenUpdated_ReturnsSuccessPagedResponseWithUpdatedAuditFields()
+    public async Task ExecuteAsync_WhenTransactionHasBeenUpdated_ReturnsPagedResponseWithUpdatedAuditFields()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -116,7 +115,6 @@ public sealed class GetAllTransactionsUseCaseTests
         Assert.NotNull(@object: response);
         Assert.NotNull(@object: response.Data);
         Assert.Single(collection: response.Data);
-        Assert.Equal(expected: "Transações encontradas com sucesso.", actual: response.Message);
 
         TransactionResponse item = response.Data[index: 0];
         Assert.Equal(expected: transaction.Id, actual: item.Id);
@@ -125,7 +123,7 @@ public sealed class GetAllTransactionsUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenNoTransactionsExist_ReturnsEmptyPagedResponseWithDataNull()
+    public async Task ExecuteAsync_WhenNoTransactionsExist_ReturnsEmptyPagedResponseWithEmptyData()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -144,15 +142,14 @@ public sealed class GetAllTransactionsUseCaseTests
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Transações não encontradas.", actual: response.Message);
+        Assert.Empty(collection: response.Data);
         Assert.Equal(expected: 0, actual: response.TotalCount);
         Assert.Equal(expected: 1, actual: response.PageNumber);
         Assert.Equal(expected: 10, actual: response.PageSize);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPageExceedsCount_ReturnsEmptyPagedResponseWithDataNull()
+    public async Task ExecuteAsync_WhenPageExceedsCount_ReturnsEmptyPagedResponseWithEmptyData()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -178,15 +175,14 @@ public sealed class GetAllTransactionsUseCaseTests
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Transações não encontradas.", actual: response.Message);
+        Assert.Empty(collection: response.Data);
         Assert.Equal(expected: 1, actual: response.TotalCount);
         Assert.Equal(expected: 2, actual: response.PageNumber);
         Assert.Equal(expected: 10, actual: response.PageSize);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenSubsequentPageHasData_ReturnsSuccessPagedResponseWithPagedSubset()
+    public async Task ExecuteAsync_WhenSubsequentPageHasData_ReturnsPagedResponseWithPagedSubset()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -228,7 +224,6 @@ public sealed class GetAllTransactionsUseCaseTests
         Assert.NotNull(@object: response);
         Assert.NotNull(@object: response.Data);
         Assert.Single(collection: response.Data);
-        Assert.Equal(expected: "Transações encontradas com sucesso.", actual: response.Message);
         Assert.Equal(expected: 3, actual: response.TotalCount);
         Assert.Equal(expected: 2, actual: response.PageNumber);
         Assert.Equal(expected: 2, actual: response.PageSize);
@@ -236,7 +231,7 @@ public sealed class GetAllTransactionsUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPageOffsetExactlyEqualsCount_ReturnsEmptyPagedResponseWithDataNull()
+    public async Task ExecuteAsync_WhenPageOffsetExactlyEqualsCount_ReturnsEmptyPagedResponseWithEmptyData()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -270,8 +265,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Transações não encontradas.", actual: response.Message);
+        Assert.Empty(collection: response.Data);
         Assert.Equal(expected: 2, actual: response.TotalCount);
         Assert.Equal(expected: 2, actual: response.PageNumber);
         Assert.Equal(expected: 2, actual: response.PageSize);
@@ -326,7 +320,7 @@ public sealed class GetAllTransactionsUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPageNumberIsMaxInt_ReturnsEmptyPagedResponseWithDataNull()
+    public async Task ExecuteAsync_WhenPageNumberIsMaxInt_ReturnsEmptyPagedResponseWithEmptyData()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -352,8 +346,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Transações não encontradas.", actual: response.Message);
+        Assert.Empty(collection: response.Data);
         Assert.Equal(expected: 1, actual: response.TotalCount);
         Assert.Equal(expected: int.MaxValue, actual: response.PageNumber);
         Assert.Equal(expected: 25, actual: response.PageSize);

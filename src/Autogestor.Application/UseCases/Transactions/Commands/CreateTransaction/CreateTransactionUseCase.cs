@@ -1,9 +1,9 @@
 using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.Domain.Interfaces;
 
 namespace Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
@@ -13,7 +13,7 @@ public sealed class CreateTransactionUseCase(
     ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork) : ICreateTransactionUseCase
 {
-    public async Task<Response<TransactionResponse>> ExecuteAsync(
+    public async Task<TransactionResponse> ExecuteAsync(
         CreateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -22,11 +22,7 @@ public sealed class CreateTransactionUseCase(
             cancellationToken: cancellationToken);
 
         if (!categoryExists)
-            return new Response<TransactionResponse>
-            {
-                Data = null,
-                Message = "Categoria não encontrada para o tenant atual."
-            };
+            throw new NotFoundException(message: "Categoria não encontrada para o tenant atual.");
 
         var transaction = Transaction.Create(
             title: request.Title,
@@ -37,7 +33,7 @@ public sealed class CreateTransactionUseCase(
         transactionRepository.Add(transaction: transaction);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-        var response = new TransactionResponse
+        return new TransactionResponse
         {
             Id = transaction.Id,
             Active = transaction.Active,
@@ -50,12 +46,6 @@ public sealed class CreateTransactionUseCase(
             Type = (ETransactionType)transaction.Type,
             Amount = transaction.Amount,
             CategoryId = transaction.CategoryId
-        };
-
-        return new Response<TransactionResponse>
-        {
-            Data = response,
-            Message = "Transação criada com sucesso."
         };
     }
 }

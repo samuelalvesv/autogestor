@@ -5,7 +5,7 @@ namespace Autogestor.Application.UseCases.Transactions.Commands.DeleteTransactio
 
 public interface IDeleteTransactionUseCase
 {
-    Task<Response<DeleteResponse>> ExecuteAsync(
+    Task<DeleteResponse> ExecuteAsync(
         DeleteTransactionRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -1,8 +1,8 @@
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.Domain.Interfaces;
 
 namespace Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
@@ -10,23 +10,17 @@ namespace Autogestor.Application.UseCases.Transactions.Queries.GetTransactionByI
 public sealed class GetTransactionByIdUseCase(
     ITransactionRepository transactionRepository) : IGetTransactionByIdUseCase
 {
-    public async Task<Response<TransactionResponse>> ExecuteAsync(
+    public async Task<TransactionResponse> ExecuteAsync(
         GetTransactionByIdRequest request,
         CancellationToken cancellationToken = default)
     {
         Transaction? transaction = await transactionRepository.GetByIdAsync(
             id: request.Id,
             asNoTracking: true,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken)
+            ?? throw new NotFoundException(message: "Transação não encontrada.");
 
-        if (transaction is null)
-            return new Response<TransactionResponse>
-            {
-                Data = null,
-                Message = "Transação não encontrada."
-            };
-
-        var response = new TransactionResponse
+        return new TransactionResponse
         {
             Id = transaction.Id,
             Active = transaction.Active,
@@ -39,12 +33,6 @@ public sealed class GetTransactionByIdUseCase(
             Type = (ETransactionType)transaction.Type,
             Amount = transaction.Amount,
             CategoryId = transaction.CategoryId
-        };
-
-        return new Response<TransactionResponse>
-        {
-            Data = response,
-            Message = "Transação encontrada com sucesso."
         };
     }
 }

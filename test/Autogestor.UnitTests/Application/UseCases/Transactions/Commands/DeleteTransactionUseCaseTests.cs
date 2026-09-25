@@ -3,6 +3,7 @@ using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Enums;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 
 namespace Autogestor.UnitTests.Application.UseCases.Transactions.Commands;
@@ -32,22 +33,20 @@ public sealed class DeleteTransactionUseCaseTests
         };
 
         // Act
-        Response<DeleteResponse> response = await useCase.ExecuteAsync(
+        DeleteResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Transação excluída com sucesso.", actual: response.Message);
-        Assert.Equal(expected: existingTransaction.Id, actual: response.Data.Id);
+        Assert.Equal(expected: existingTransaction.Id, actual: response.Id);
 
         Assert.Empty(collection: repository.Transactions);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTransactionNotFound_ReturnsFailureResponse()
+    public async Task ExecuteAsync_WhenTransactionNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -61,15 +60,13 @@ public sealed class DeleteTransactionUseCaseTests
             Id = Guid.NewGuid()
         };
 
-        // Act
-        Response<DeleteResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Transação não encontrada.", actual: response.Message);
+        Assert.Equal(expected: "Transação não encontrada.", actual: exception.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
@@ -103,15 +100,13 @@ public sealed class DeleteTransactionUseCaseTests
         };
 
         // Act
-        Response<DeleteResponse> response = await useCase.ExecuteAsync(
+        DeleteResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Transação excluída com sucesso.", actual: response.Message);
-        Assert.Equal(expected: targetTransaction.Id, actual: response.Data.Id);
+        Assert.Equal(expected: targetTransaction.Id, actual: response.Id);
 
         Assert.Single(collection: repository.Transactions);
         Assert.Equal(expected: remainingTransaction.Id, actual: repository.Transactions[0].Id);
@@ -119,7 +114,7 @@ public sealed class DeleteTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenExecutedTwice_ReturnsNotFoundOnSecondCall()
+    public async Task ExecuteAsync_WhenExecutedTwice_ThrowsNotFoundOnSecondCall()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -141,20 +136,20 @@ public sealed class DeleteTransactionUseCaseTests
         };
 
         // Act 1
-        Response<DeleteResponse> firstResponse = await useCase.ExecuteAsync(
+        DeleteResponse firstResponse = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
-        // Act 2
-        Response<DeleteResponse> secondResponse = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act 2 & Assert
+        NotFoundException secondException = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
         // Assert
-        Assert.NotNull(@object: firstResponse.Data);
-        Assert.Equal(expected: "Transação excluída com sucesso.", actual: firstResponse.Message);
-        Assert.Null(@object: secondResponse.Data);
-        Assert.Equal(expected: "Transação não encontrada.", actual: secondResponse.Message);
+        Assert.NotNull(@object: firstResponse);
+        Assert.Equal(expected: existingTransaction.Id, actual: firstResponse.Id);
+        Assert.Equal(expected: "Transação não encontrada.", actual: secondException.Message);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
         Assert.Empty(collection: repository.Transactions);
     }

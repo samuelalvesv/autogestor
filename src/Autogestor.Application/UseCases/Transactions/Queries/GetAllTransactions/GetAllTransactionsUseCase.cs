@@ -19,18 +19,8 @@ public sealed class GetAllTransactionsUseCase(
             pageSize: request.PageSize,
             cancellationToken: cancellationToken);
 
-        if (transactions.Count == 0)
-            return new PagedResponse<TransactionResponse>
-            {
-                Data = null,
-                Message = "Transações não encontradas.",
-                TotalCount = count,
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize
-            };
-
         IReadOnlyList<TransactionResponse> response = [.. transactions
-            .Select(selector: transaction => new TransactionResponse
+            .Select(selector: static transaction => new TransactionResponse
             {
                 Id = transaction.Id,
                 Active = transaction.Active,
@@ -48,7 +38,6 @@ public sealed class GetAllTransactionsUseCase(
         return new PagedResponse<TransactionResponse>
         {
             Data = response,
-            Message = "Transações encontradas com sucesso.",
             TotalCount = count,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize

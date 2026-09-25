@@ -17,14 +17,14 @@ public sealed class CategoryService(
     IGetCategoryByIdUseCase getCategoryByIdUseCase,
     IUpdateCategoryUseCase updateCategoryUseCase) : ICategoryService
 {
-    public Task<Response<CategoryResponse>> CreateAsync(
+    public Task<CategoryResponse> CreateAsync(
         CreateCategoryRequest request,
         CancellationToken cancellationToken = default) =>
         createCategoryUseCase.ExecuteAsync(
             request: request,
             cancellationToken: cancellationToken);
 
-    public Task<Response<DeleteResponse>> DeleteAsync(
+    public Task<DeleteResponse> DeleteAsync(
         DeleteCategoryRequest request,
         CancellationToken cancellationToken = default) =>
         deleteCategoryUseCase.ExecuteAsync(
@@ -38,14 +38,14 @@ public sealed class CategoryService(
             request: request,
             cancellationToken: cancellationToken);
 
-    public Task<Response<CategoryResponse>> GetByIdAsync(
+    public Task<CategoryResponse> GetByIdAsync(
         GetCategoryByIdRequest request,
         CancellationToken cancellationToken = default) =>
         getCategoryByIdUseCase.ExecuteAsync(
             request: request,
             cancellationToken: cancellationToken);
 
-    public Task<Response<CategoryResponse>> UpdateAsync(
+    public Task<CategoryResponse> UpdateAsync(
         UpdateCategoryRequest request,
         CancellationToken cancellationToken = default) =>
         updateCategoryUseCase.ExecuteAsync(

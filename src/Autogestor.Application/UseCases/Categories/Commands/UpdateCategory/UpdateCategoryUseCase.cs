@@ -1,8 +1,8 @@
 using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Requests.Categories;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.Domain.Interfaces;
 
 namespace Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
@@ -11,20 +11,14 @@ public sealed class UpdateCategoryUseCase(
     ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork) : IUpdateCategoryUseCase
 {
-    public async Task<Response<CategoryResponse>> ExecuteAsync(
+    public async Task<CategoryResponse> ExecuteAsync(
         UpdateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
         Category? category = await categoryRepository.GetByIdAsync(
             id: request.Id,
-            cancellationToken: cancellationToken);
-
-        if (category is null)
-            return new Response<CategoryResponse>
-            {
-                Data = null,
-                Message = "Categoria não encontrada."
-            };
+            cancellationToken: cancellationToken)
+            ?? throw new NotFoundException(message: "Categoria não encontrada.");
 
         category.Update(
             title: request.Title,
@@ -32,7 +26,7 @@ public sealed class UpdateCategoryUseCase(
 
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-        var response = new CategoryResponse
+        return new CategoryResponse
         {
             Id = category.Id,
             Active = category.Active,
@@ -43,12 +37,6 @@ public sealed class UpdateCategoryUseCase(
             TenantId = category.TenantId,
             Title = category.Title,
             Description = category.Description
-        };
-
-        return new Response<CategoryResponse>
-        {
-            Data = response,
-            Message = "Categoria atualizada com sucesso."
         };
     }
 }

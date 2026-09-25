@@ -1,6 +1,5 @@
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
 using Autogestor.Contract.Requests.Categories;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.UnitTests.Common.Fakes;
 
@@ -8,7 +7,6 @@ namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
 
 public sealed class CreateCategoryUseCaseTests
 {
-
     [Fact]
     public async Task ExecuteAsync_WithValidRequest_ReturnsSuccessResponseAndPersistsCategory()
     {
@@ -26,22 +24,20 @@ public sealed class CreateCategoryUseCaseTests
         };
 
         // Act
-        Response<CategoryResponse> response = await useCase.ExecuteAsync(
+        CategoryResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Categoria criada com sucesso.", actual: response.Message);
-        Assert.Equal(expected: request.Title, actual: response.Data.Title);
-        Assert.Equal(expected: request.Description, actual: response.Data.Description);
-        Assert.NotEqual(expected: Guid.Empty, actual: response.Data.Id);
-        Assert.True(condition: response.Data.Active, userMessage: "A categoria deve ser criada como ativa por padrão.");
-        Assert.NotEqual(expected: Guid.Empty, actual: response.Data.TenantId);
-        Assert.Equal(expected: repository.Categories[0].TenantId, actual: response.Data.TenantId);
-        Assert.Null(@object: response.Data.UpdatedBy);
-        Assert.Null(@object: response.Data.UpdatedAt);
+        Assert.Equal(expected: request.Title, actual: response.Title);
+        Assert.Equal(expected: request.Description, actual: response.Description);
+        Assert.NotEqual(expected: Guid.Empty, actual: response.Id);
+        Assert.True(condition: response.Active, userMessage: "A categoria deve ser criada como ativa por padrão.");
+        Assert.NotEqual(expected: Guid.Empty, actual: response.TenantId);
+        Assert.Equal(expected: repository.Categories[0].TenantId, actual: response.TenantId);
+        Assert.Null(@object: response.UpdatedBy);
+        Assert.Null(@object: response.UpdatedAt);
 
         Assert.Single(collection: repository.Categories);
         Assert.Equal(expected: request.Title, actual: repository.Categories[0].Title);

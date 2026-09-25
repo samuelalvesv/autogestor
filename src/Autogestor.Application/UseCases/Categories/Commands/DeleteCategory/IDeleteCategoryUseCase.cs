@@ -5,7 +5,7 @@ namespace Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 
 public interface IDeleteCategoryUseCase
 {
-    Task<Response<DeleteResponse>> ExecuteAsync(
+    Task<DeleteResponse> ExecuteAsync(
         DeleteCategoryRequest request,
         CancellationToken cancellationToken = default);
 }

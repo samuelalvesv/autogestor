@@ -6,18 +6,15 @@ namespace Autogestor.Contract.Responses;
 public sealed record PagedResponse<T>
 {
     [DataMember(Order = 1)]
-    public required IReadOnlyList<T>? Data { get; init; }
+    public required IReadOnlyList<T> Data { get; init; }
 
     [DataMember(Order = 2)]
-    public required string Message { get; init; }
-
-    [DataMember(Order = 3)]
     public required int TotalCount { get; init; }
 
-    [DataMember(Order = 4)]
+    [DataMember(Order = 3)]
     public required int PageNumber { get; init; }
 
-    [DataMember(Order = 5)]
+    [DataMember(Order = 4)]
     public required int PageSize { get; init; }
 
     public int TotalPage => PageSize > 0 ? (TotalCount + PageSize - 1) / PageSize : 0;

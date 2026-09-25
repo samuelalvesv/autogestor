@@ -17,14 +17,14 @@ public sealed class TransactionService(
     IGetTransactionByIdUseCase getTransactionByIdUseCase,
     IUpdateTransactionUseCase updateTransactionUseCase) : ITransactionService
 {
-    public Task<Response<TransactionResponse>> CreateAsync(
+    public Task<TransactionResponse> CreateAsync(
         CreateTransactionRequest request,
         CancellationToken cancellationToken = default) =>
         createTransactionUseCase.ExecuteAsync(
             request: request,
             cancellationToken: cancellationToken);
 
-    public Task<Response<DeleteResponse>> DeleteAsync(
+    public Task<DeleteResponse> DeleteAsync(
         DeleteTransactionRequest request,
         CancellationToken cancellationToken = default) =>
         deleteTransactionUseCase.ExecuteAsync(
@@ -38,14 +38,14 @@ public sealed class TransactionService(
             request: request,
             cancellationToken: cancellationToken);
 
-    public Task<Response<TransactionResponse>> GetByIdAsync(
+    public Task<TransactionResponse> GetByIdAsync(
         GetTransactionByIdRequest request,
         CancellationToken cancellationToken = default) =>
         getTransactionByIdUseCase.ExecuteAsync(
             request: request,
             cancellationToken: cancellationToken);
 
-    public Task<Response<TransactionResponse>> UpdateAsync(
+    public Task<TransactionResponse> UpdateAsync(
         UpdateTransactionRequest request,
         CancellationToken cancellationToken = default) =>
         updateTransactionUseCase.ExecuteAsync(

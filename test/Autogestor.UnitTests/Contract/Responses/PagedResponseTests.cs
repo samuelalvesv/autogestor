@@ -17,7 +17,6 @@ public sealed class PagedResponseTests
         var pagedResponse = new PagedResponse<string>
         {
             Data = ["item1", "item2"],
-            Message = "Sucesso",
             TotalCount = totalCount,
             PageNumber = 1,
             PageSize = pageSize
@@ -33,21 +32,19 @@ public sealed class PagedResponseTests
     }
 
     [Fact]
-    public void PagedResponse_ExplicitInitialization_ShouldHaveCorrectValues()
+    public void PagedResponse_WithEmptyData_ShouldHaveCorrectValues()
     {
         // Act
-        var pagedResponse = new PagedResponse<object?>
+        var pagedResponse = new PagedResponse<string>
         {
-            Data = null,
-            Message = "Sem dados",
+            Data = [],
             TotalCount = 0,
             PageNumber = 1,
             PageSize = 25
         };
 
         // Assert
-        Assert.Null(@object: pagedResponse.Data);
-        Assert.Equal(expected: "Sem dados", actual: pagedResponse.Message);
+        Assert.Empty(collection: pagedResponse.Data);
         Assert.Equal(expected: 0, actual: pagedResponse.TotalCount);
         Assert.Equal(expected: 1, actual: pagedResponse.PageNumber);
         Assert.Equal(expected: 25, actual: pagedResponse.PageSize);
@@ -55,21 +52,22 @@ public sealed class PagedResponseTests
     }
 
     [Fact]
-    public void PagedResponse_WithMessage_ShouldSetMessageCorrectly()
+    public void PagedResponse_WithData_ShouldHaveCorrectValues()
     {
         // Act
         var pagedResponse = new PagedResponse<string>
         {
             Data = ["item"],
-            Message = "List loaded",
             TotalCount = 1,
             PageNumber = 1,
             PageSize = 25
         };
 
         // Assert
-        Assert.Equal(expected: "List loaded", actual: pagedResponse.Message);
-        Assert.NotNull(@object: pagedResponse.Data);
         Assert.Single(collection: pagedResponse.Data);
+        Assert.Equal(expected: 1, actual: pagedResponse.TotalCount);
+        Assert.Equal(expected: 1, actual: pagedResponse.PageNumber);
+        Assert.Equal(expected: 25, actual: pagedResponse.PageSize);
+        Assert.Equal(expected: 1, actual: pagedResponse.TotalPage);
     }
 }

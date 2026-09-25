@@ -17,13 +17,22 @@ public sealed class TransactionServiceTests
     {
         public CreateTransactionRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<TransactionResponse> ResponseToReturn { get; set; } = new()
+        public TransactionResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = string.Empty,
+            Type = ETransactionType.Deposit,
+            Amount = 0m,
+            CategoryId = Guid.NewGuid(),
+            TenantId = Guid.NewGuid()
         };
 
-        public Task<Response<TransactionResponse>> ExecuteAsync(
+        public Task<TransactionResponse> ExecuteAsync(
             CreateTransactionRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -37,13 +46,22 @@ public sealed class TransactionServiceTests
     {
         public UpdateTransactionRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<TransactionResponse> ResponseToReturn { get; set; } = new()
+        public TransactionResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = string.Empty,
+            Type = ETransactionType.Deposit,
+            Amount = 0m,
+            CategoryId = Guid.NewGuid(),
+            TenantId = Guid.NewGuid()
         };
 
-        public Task<Response<TransactionResponse>> ExecuteAsync(
+        public Task<TransactionResponse> ExecuteAsync(
             UpdateTransactionRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -57,13 +75,12 @@ public sealed class TransactionServiceTests
     {
         public DeleteTransactionRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<DeleteResponse> ResponseToReturn { get; set; } = new()
+        public DeleteResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid()
         };
 
-        public Task<Response<DeleteResponse>> ExecuteAsync(
+        public Task<DeleteResponse> ExecuteAsync(
             DeleteTransactionRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -77,13 +94,22 @@ public sealed class TransactionServiceTests
     {
         public GetTransactionByIdRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<TransactionResponse> ResponseToReturn { get; set; } = new()
+        public TransactionResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = string.Empty,
+            Type = ETransactionType.Deposit,
+            Amount = 0m,
+            CategoryId = Guid.NewGuid(),
+            TenantId = Guid.NewGuid()
         };
 
-        public Task<Response<TransactionResponse>> ExecuteAsync(
+        public Task<TransactionResponse> ExecuteAsync(
             GetTransactionByIdRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -99,8 +125,7 @@ public sealed class TransactionServiceTests
         public CancellationToken ReceivedCancellationToken { get; private set; }
         public PagedResponse<TransactionResponse> ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty,
+            Data = [],
             TotalCount = 0,
             PageNumber = 1,
             PageSize = 10
@@ -150,29 +175,25 @@ public sealed class TransactionServiceTests
             CategoryId = Guid.NewGuid()
         };
 
-        var expectedResponse = new Response<TransactionResponse>
+        var expectedResponse = new TransactionResponse
         {
-            Data = new TransactionResponse
-            {
-                Id = Guid.NewGuid(),
-                Active = true,
-                CreatedBy = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedBy = null,
-                UpdatedAt = null,
-                Title = request.Title,
-                Type = request.Type,
-                Amount = request.Amount,
-                CategoryId = request.CategoryId,
-                TenantId = Guid.NewGuid()
-            },
-            Message = "Transação criada com sucesso."
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = request.Title,
+            Type = request.Type,
+            Amount = request.Amount,
+            CategoryId = request.CategoryId,
+            TenantId = Guid.NewGuid()
         };
 
         _createUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<TransactionResponse> response = await _service.CreateAsync(
+        TransactionResponse response = await _service.CreateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -191,12 +212,6 @@ public sealed class TransactionServiceTests
             Type = ETransactionType.Deposit,
             Amount = 250.00m,
             CategoryId = Guid.NewGuid()
-        };
-
-        _createUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
         };
 
         using var cts = new CancellationTokenSource();
@@ -218,29 +233,25 @@ public sealed class TransactionServiceTests
             Id = Guid.NewGuid()
         };
 
-        var expectedResponse = new Response<TransactionResponse>
+        var expectedResponse = new TransactionResponse
         {
-            Data = new TransactionResponse
-            {
-                Id = request.Id,
-                Active = true,
-                CreatedBy = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedBy = null,
-                UpdatedAt = null,
-                Title = "Pagamento",
-                Type = ETransactionType.Withdraw,
-                Amount = 100.00m,
-                CategoryId = Guid.NewGuid(),
-                TenantId = Guid.NewGuid()
-            },
-            Message = "Transação encontrada com sucesso."
+            Id = request.Id,
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = "Pagamento",
+            Type = ETransactionType.Withdraw,
+            Amount = 100.00m,
+            CategoryId = Guid.NewGuid(),
+            TenantId = Guid.NewGuid()
         };
 
         _getByIdUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<TransactionResponse> response = await _service.GetByIdAsync(
+        TransactionResponse response = await _service.GetByIdAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -256,12 +267,6 @@ public sealed class TransactionServiceTests
         var request = new GetTransactionByIdRequest
         {
             Id = Guid.NewGuid()
-        };
-
-        _getByIdUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
         };
 
         using var cts = new CancellationTokenSource();
@@ -287,29 +292,25 @@ public sealed class TransactionServiceTests
             CategoryId = Guid.NewGuid()
         };
 
-        var expectedResponse = new Response<TransactionResponse>
+        var expectedResponse = new TransactionResponse
         {
-            Data = new TransactionResponse
-            {
-                Id = request.Id,
-                Active = true,
-                CreatedBy = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedBy = Guid.NewGuid(),
-                UpdatedAt = DateTime.UtcNow,
-                Title = request.Title,
-                Type = ETransactionType.Deposit,
-                Amount = request.Amount,
-                CategoryId = request.CategoryId,
-                TenantId = Guid.NewGuid()
-            },
-            Message = "Transação atualizada com sucesso."
+            Id = request.Id,
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = Guid.NewGuid(),
+            UpdatedAt = DateTime.UtcNow,
+            Title = request.Title,
+            Type = ETransactionType.Deposit,
+            Amount = request.Amount,
+            CategoryId = request.CategoryId,
+            TenantId = Guid.NewGuid()
         };
 
         _updateUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<TransactionResponse> response = await _service.UpdateAsync(
+        TransactionResponse response = await _service.UpdateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -331,12 +332,6 @@ public sealed class TransactionServiceTests
             CategoryId = Guid.NewGuid()
         };
 
-        _updateUseCaseFake.ResponseToReturn = new Response<TransactionResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
-        };
-
         using var cts = new CancellationTokenSource();
         CancellationToken token = cts.Token;
 
@@ -356,19 +351,15 @@ public sealed class TransactionServiceTests
             Id = Guid.NewGuid()
         };
 
-        var expectedResponse = new Response<DeleteResponse>
+        var expectedResponse = new DeleteResponse
         {
-            Data = new DeleteResponse
-            {
-                Id = request.Id
-            },
-            Message = "Transação excluída com sucesso."
+            Id = request.Id
         };
 
         _deleteUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<DeleteResponse> response = await _service.DeleteAsync(
+        DeleteResponse response = await _service.DeleteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -384,12 +375,6 @@ public sealed class TransactionServiceTests
         var request = new DeleteTransactionRequest
         {
             Id = Guid.NewGuid()
-        };
-
-        _deleteUseCaseFake.ResponseToReturn = new Response<DeleteResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
         };
 
         using var cts = new CancellationTokenSource();
@@ -415,7 +400,6 @@ public sealed class TransactionServiceTests
         var expectedResponse = new PagedResponse<TransactionResponse>
         {
             Data = [],
-            Message = "Transações encontradas com sucesso.",
             TotalCount = 0,
             PageNumber = 1,
             PageSize = 10

@@ -1,8 +1,8 @@
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
 using Autogestor.Contract.Requests.Categories;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 
 namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
@@ -32,19 +32,17 @@ public sealed class UpdateCategoryUseCaseTests
         };
 
         // Act
-        Response<CategoryResponse> response = await useCase.ExecuteAsync(
+        CategoryResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Categoria atualizada com sucesso.", actual: response.Message);
-        Assert.Equal(expected: request.Id, actual: response.Data.Id);
-        Assert.Equal(expected: request.Title, actual: response.Data.Title);
-        Assert.Equal(expected: request.Description, actual: response.Data.Description);
-        Assert.True(condition: response.Data.Active, userMessage: "A categoria deve permanecer ativa após atualização.");
-        Assert.Equal(expected: existingCategory.TenantId, actual: response.Data.TenantId);
+        Assert.Equal(expected: request.Id, actual: response.Id);
+        Assert.Equal(expected: request.Title, actual: response.Title);
+        Assert.Equal(expected: request.Description, actual: response.Description);
+        Assert.True(condition: response.Active, userMessage: "A categoria deve permanecer ativa após atualização.");
+        Assert.Equal(expected: existingCategory.TenantId, actual: response.TenantId);
 
         Assert.Single(collection: repository.Categories);
         Assert.Equal(expected: request.Title, actual: repository.Categories[0].Title);
@@ -53,7 +51,7 @@ public sealed class UpdateCategoryUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCategoryNotFound_ReturnsFailureResponse()
+    public async Task ExecuteAsync_WhenCategoryNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
@@ -69,15 +67,13 @@ public sealed class UpdateCategoryUseCaseTests
             Description = "Descrição válida"
         };
 
-        // Act
-        Response<CategoryResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Categoria não encontrada.", actual: response.Message);
+        Assert.Equal(expected: "Categoria não encontrada.", actual: exception.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 

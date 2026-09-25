@@ -3,6 +3,7 @@ using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Enums;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 
 namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
@@ -32,15 +33,13 @@ public sealed class DeleteCategoryUseCaseTests
         };
 
         // Act
-        Response<DeleteResponse> response = await useCase.ExecuteAsync(
+        DeleteResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Categoria excluída com sucesso.", actual: response.Message);
-        Assert.Equal(expected: existingCategory.Id, actual: response.Data.Id);
+        Assert.Equal(expected: existingCategory.Id, actual: response.Id);
 
         Assert.Empty(collection: categoryRepository.Categories);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
@@ -48,7 +47,7 @@ public sealed class DeleteCategoryUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCategoryNotFound_ReturnsFailureResponse()
+    public async Task ExecuteAsync_WhenCategoryNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var categoryRepository = new CategoryRepositoryFake();
@@ -64,22 +63,20 @@ public sealed class DeleteCategoryUseCaseTests
             Id = Guid.NewGuid()
         };
 
-        // Act
-        Response<DeleteResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Categoria não encontrada.", actual: response.Message);
+        Assert.Equal(expected: "Categoria não encontrada.", actual: exception.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
         Assert.Equal(expected: 0, actual: transactionRepository.ExistsByCategoryIdCallCount);
         Assert.True(condition: transactionRepository.PassedCancellationToken == default, userMessage: "O repositório de transações não deve ser consultado quando a categoria não for encontrada.");
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCategoryHasLinkedTransactions_ReturnsFailureResponse()
+    public async Task ExecuteAsync_WhenCategoryHasLinkedTransactions_ThrowsBusinessRuleException()
     {
         // Arrange
         var categoryRepository = new CategoryRepositoryFake();
@@ -107,15 +104,13 @@ public sealed class DeleteCategoryUseCaseTests
             Id = existingCategory.Id
         };
 
-        // Act
-        Response<DeleteResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        BusinessRuleException exception = await Assert.ThrowsAsync<BusinessRuleException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Não é possível excluir uma categoria que possui transações vinculadas.", actual: response.Message);
+        Assert.Equal(expected: "Não é possível excluir uma categoria que possui transações vinculadas.", actual: exception.Message);
         Assert.Single(collection: categoryRepository.Categories);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
         Assert.Equal(expected: 1, actual: transactionRepository.ExistsByCategoryIdCallCount);
@@ -156,15 +151,13 @@ public sealed class DeleteCategoryUseCaseTests
         };
 
         // Act
-        Response<DeleteResponse> response = await useCase.ExecuteAsync(
+        DeleteResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Categoria excluída com sucesso.", actual: response.Message);
-        Assert.Equal(expected: targetCategory.Id, actual: response.Data.Id);
+        Assert.Equal(expected: targetCategory.Id, actual: response.Id);
 
         Assert.Single(collection: categoryRepository.Categories);
         Assert.Equal(expected: otherCategory.Id, actual: categoryRepository.Categories[0].Id);
@@ -173,7 +166,7 @@ public sealed class DeleteCategoryUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenExecutedTwice_ReturnsNotFoundOnSecondCall()
+    public async Task ExecuteAsync_WhenExecutedTwice_ThrowsNotFoundOnSecondCall()
     {
         // Arrange
         var categoryRepository = new CategoryRepositoryFake();
@@ -195,20 +188,20 @@ public sealed class DeleteCategoryUseCaseTests
         };
 
         // Act 1
-        Response<DeleteResponse> firstResponse = await useCase.ExecuteAsync(
+        DeleteResponse firstResponse = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
-        // Act 2
-        Response<DeleteResponse> secondResponse = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act 2 & Assert
+        NotFoundException secondException = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
         // Assert
-        Assert.NotNull(@object: firstResponse.Data);
-        Assert.Equal(expected: "Categoria excluída com sucesso.", actual: firstResponse.Message);
-        Assert.Null(@object: secondResponse.Data);
-        Assert.Equal(expected: "Categoria não encontrada.", actual: secondResponse.Message);
+        Assert.NotNull(@object: firstResponse);
+        Assert.Equal(expected: existingCategory.Id, actual: firstResponse.Id);
+        Assert.Equal(expected: "Categoria não encontrada.", actual: secondException.Message);
         Assert.Equal(expected: 1, actual: unitOfWork.CommitCount);
         Assert.Empty(collection: categoryRepository.Categories);
         Assert.Equal(expected: 1, actual: transactionRepository.ExistsByCategoryIdCallCount);

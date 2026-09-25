@@ -1,9 +1,9 @@
 using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 
 namespace Autogestor.UnitTests.Application.UseCases.Transactions.Queries;
@@ -11,7 +11,7 @@ namespace Autogestor.UnitTests.Application.UseCases.Transactions.Queries;
 public sealed class GetTransactionByIdUseCaseTests
 {
     [Fact]
-    public async Task ExecuteAsync_WhenTransactionExists_ReturnsSuccessResponseWithData()
+    public async Task ExecuteAsync_WhenTransactionExists_ReturnsTransactionResponse()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -31,30 +31,28 @@ public sealed class GetTransactionByIdUseCaseTests
         };
 
         // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
+        TransactionResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Transação encontrada com sucesso.", actual: response.Message);
-        Assert.Equal(expected: transaction.Id, actual: response.Data.Id);
-        Assert.Equal(expected: transaction.Title, actual: response.Data.Title);
-        Assert.Equal(expected: ETransactionType.Deposit, actual: response.Data.Type);
-        Assert.Equal(expected: transaction.Amount, actual: response.Data.Amount);
-        Assert.Equal(expected: transaction.CategoryId, actual: response.Data.CategoryId);
-        Assert.Equal(expected: transaction.Active, actual: response.Data.Active);
-        Assert.Equal(expected: transaction.TenantId, actual: response.Data.TenantId);
-        Assert.Equal(expected: transaction.CreatedBy, actual: response.Data.CreatedBy);
-        Assert.Equal(expected: transaction.CreatedAt, actual: response.Data.CreatedAt);
-        Assert.Equal(expected: transaction.UpdatedBy, actual: response.Data.UpdatedBy);
-        Assert.Equal(expected: transaction.UpdatedAt, actual: response.Data.UpdatedAt);
+        Assert.Equal(expected: transaction.Id, actual: response.Id);
+        Assert.Equal(expected: transaction.Title, actual: response.Title);
+        Assert.Equal(expected: ETransactionType.Deposit, actual: response.Type);
+        Assert.Equal(expected: transaction.Amount, actual: response.Amount);
+        Assert.Equal(expected: transaction.CategoryId, actual: response.CategoryId);
+        Assert.Equal(expected: transaction.Active, actual: response.Active);
+        Assert.Equal(expected: transaction.TenantId, actual: response.TenantId);
+        Assert.Equal(expected: transaction.CreatedBy, actual: response.CreatedBy);
+        Assert.Equal(expected: transaction.CreatedAt, actual: response.CreatedAt);
+        Assert.Equal(expected: transaction.UpdatedBy, actual: response.UpdatedBy);
+        Assert.Equal(expected: transaction.UpdatedAt, actual: response.UpdatedAt);
         Assert.True(condition: repository.LastGetByIdAsNoTracking.GetValueOrDefault(), userMessage: "A consulta deve ser executada com asNoTracking habilitado.");
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTransactionNotFound_ReturnsNotFoundResponse()
+    public async Task ExecuteAsync_WhenTransactionNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -65,20 +63,18 @@ public sealed class GetTransactionByIdUseCaseTests
             Id = Guid.NewGuid()
         };
 
-        // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Transação não encontrada.", actual: response.Message);
+        Assert.Equal(expected: "Transação não encontrada.", actual: exception.Message);
         Assert.True(condition: repository.LastGetByIdAsNoTracking.GetValueOrDefault(), userMessage: "A consulta deve ser executada com asNoTracking habilitado mesmo quando a entidade não for encontrada.");
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTransactionHasBeenUpdated_ReturnsSuccessResponseWithUpdatedAuditFields()
+    public async Task ExecuteAsync_WhenTransactionHasBeenUpdated_ReturnsTransactionResponseWithUpdatedAuditFields()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
@@ -104,17 +100,15 @@ public sealed class GetTransactionByIdUseCaseTests
         };
 
         // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
+        TransactionResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Transação encontrada com sucesso.", actual: response.Message);
-        Assert.Equal(expected: transaction.Id, actual: response.Data.Id);
-        Assert.Equal(expected: updatedBy, actual: response.Data.UpdatedBy);
-        Assert.Equal(expected: updatedAt, actual: response.Data.UpdatedAt);
+        Assert.Equal(expected: transaction.Id, actual: response.Id);
+        Assert.Equal(expected: updatedBy, actual: response.UpdatedBy);
+        Assert.Equal(expected: updatedAt, actual: response.UpdatedAt);
         Assert.True(condition: repository.LastGetByIdAsNoTracking.GetValueOrDefault(), userMessage: "A consulta deve ser executada com asNoTracking habilitado.");
     }
 
@@ -133,10 +127,10 @@ public sealed class GetTransactionByIdUseCaseTests
         using var cts = new CancellationTokenSource();
         CancellationToken token = cts.Token;
 
-        // Act
-        await useCase.ExecuteAsync(request: request, cancellationToken: token);
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(request: request, cancellationToken: token));
 
-        // Assert
         Assert.Equal(expected: token, actual: repository.PassedCancellationToken);
     }
 }

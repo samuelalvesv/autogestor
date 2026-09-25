@@ -16,13 +16,20 @@ public sealed class CategoryServiceTests
     {
         public CreateCategoryRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<CategoryResponse> ResponseToReturn { get; set; } = new()
+        public CategoryResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = string.Empty,
+            Description = string.Empty,
+            TenantId = Guid.NewGuid()
         };
 
-        public Task<Response<CategoryResponse>> ExecuteAsync(
+        public Task<CategoryResponse> ExecuteAsync(
             CreateCategoryRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -36,13 +43,20 @@ public sealed class CategoryServiceTests
     {
         public UpdateCategoryRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<CategoryResponse> ResponseToReturn { get; set; } = new()
+        public CategoryResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = string.Empty,
+            Description = string.Empty,
+            TenantId = Guid.NewGuid()
         };
 
-        public Task<Response<CategoryResponse>> ExecuteAsync(
+        public Task<CategoryResponse> ExecuteAsync(
             UpdateCategoryRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -56,13 +70,12 @@ public sealed class CategoryServiceTests
     {
         public DeleteCategoryRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<DeleteResponse> ResponseToReturn { get; set; } = new()
+        public DeleteResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid()
         };
 
-        public Task<Response<DeleteResponse>> ExecuteAsync(
+        public Task<DeleteResponse> ExecuteAsync(
             DeleteCategoryRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -76,13 +89,20 @@ public sealed class CategoryServiceTests
     {
         public GetCategoryByIdRequest? ReceivedRequest { get; private set; }
         public CancellationToken ReceivedCancellationToken { get; private set; }
-        public Response<CategoryResponse> ResponseToReturn { get; set; } = new()
+        public CategoryResponse ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = string.Empty,
+            Description = string.Empty,
+            TenantId = Guid.NewGuid()
         };
 
-        public Task<Response<CategoryResponse>> ExecuteAsync(
+        public Task<CategoryResponse> ExecuteAsync(
             GetCategoryByIdRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -98,8 +118,7 @@ public sealed class CategoryServiceTests
         public CancellationToken ReceivedCancellationToken { get; private set; }
         public PagedResponse<CategoryResponse> ResponseToReturn { get; set; } = new()
         {
-            Data = null,
-            Message = string.Empty,
+            Data = [],
             TotalCount = 0,
             PageNumber = 1,
             PageSize = 10
@@ -147,27 +166,23 @@ public sealed class CategoryServiceTests
             Description = "Cursos e livros"
         };
 
-        var expectedResponse = new Response<CategoryResponse>
+        var expectedResponse = new CategoryResponse
         {
-            Data = new CategoryResponse
-            {
-                Id = Guid.NewGuid(),
-                Active = true,
-                CreatedBy = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedBy = null,
-                UpdatedAt = null,
-                Title = request.Title,
-                Description = request.Description,
-                TenantId = Guid.NewGuid()
-            },
-            Message = "Categoria criada com sucesso."
+            Id = Guid.NewGuid(),
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = request.Title,
+            Description = request.Description,
+            TenantId = Guid.NewGuid()
         };
 
         _createUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await _service.CreateAsync(
+        CategoryResponse response = await _service.CreateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -184,12 +199,6 @@ public sealed class CategoryServiceTests
         {
             Title = "Saúde",
             Description = "Farmácia e consultas"
-        };
-
-        _createUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
         };
 
         using var cts = new CancellationTokenSource();
@@ -211,27 +220,23 @@ public sealed class CategoryServiceTests
             Id = Guid.NewGuid()
         };
 
-        var expectedResponse = new Response<CategoryResponse>
+        var expectedResponse = new CategoryResponse
         {
-            Data = new CategoryResponse
-            {
-                Id = request.Id,
-                Active = true,
-                CreatedBy = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedBy = null,
-                UpdatedAt = null,
-                Title = "Alimentação",
-                Description = "Restaurantes e compras",
-                TenantId = Guid.NewGuid()
-            },
-            Message = "Categoria encontrada com sucesso."
+            Id = request.Id,
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = null,
+            UpdatedAt = null,
+            Title = "Alimentação",
+            Description = "Restaurantes e compras",
+            TenantId = Guid.NewGuid()
         };
 
         _getByIdUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await _service.GetByIdAsync(
+        CategoryResponse response = await _service.GetByIdAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -247,12 +252,6 @@ public sealed class CategoryServiceTests
         var request = new GetCategoryByIdRequest
         {
             Id = Guid.NewGuid()
-        };
-
-        _getByIdUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
         };
 
         using var cts = new CancellationTokenSource();
@@ -276,27 +275,23 @@ public sealed class CategoryServiceTests
             Description = "Pós-graduação"
         };
 
-        var expectedResponse = new Response<CategoryResponse>
+        var expectedResponse = new CategoryResponse
         {
-            Data = new CategoryResponse
-            {
-                Id = request.Id,
-                Active = true,
-                CreatedBy = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedBy = Guid.NewGuid(),
-                UpdatedAt = DateTime.UtcNow,
-                Title = request.Title,
-                Description = request.Description,
-                TenantId = Guid.NewGuid()
-            },
-            Message = "Categoria atualizada com sucesso."
+            Id = request.Id,
+            Active = true,
+            CreatedBy = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedBy = Guid.NewGuid(),
+            UpdatedAt = DateTime.UtcNow,
+            Title = request.Title,
+            Description = request.Description,
+            TenantId = Guid.NewGuid()
         };
 
         _updateUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<CategoryResponse> response = await _service.UpdateAsync(
+        CategoryResponse response = await _service.UpdateAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -314,12 +309,6 @@ public sealed class CategoryServiceTests
             Id = Guid.NewGuid(),
             Title = "Educação Superior",
             Description = "Pós-graduação"
-        };
-
-        _updateUseCaseFake.ResponseToReturn = new Response<CategoryResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
         };
 
         using var cts = new CancellationTokenSource();
@@ -341,19 +330,15 @@ public sealed class CategoryServiceTests
             Id = Guid.NewGuid()
         };
 
-        var expectedResponse = new Response<DeleteResponse>
+        var expectedResponse = new DeleteResponse
         {
-            Data = new DeleteResponse
-            {
-                Id = request.Id
-            },
-            Message = "Categoria excluída com sucesso."
+            Id = request.Id
         };
 
         _deleteUseCaseFake.ResponseToReturn = expectedResponse;
 
         // Act
-        Response<DeleteResponse> response = await _service.DeleteAsync(
+        DeleteResponse response = await _service.DeleteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
@@ -369,12 +354,6 @@ public sealed class CategoryServiceTests
         var request = new DeleteCategoryRequest
         {
             Id = Guid.NewGuid()
-        };
-
-        _deleteUseCaseFake.ResponseToReturn = new Response<DeleteResponse>
-        {
-            Data = null,
-            Message = "Sucesso"
         };
 
         using var cts = new CancellationTokenSource();
@@ -400,7 +379,6 @@ public sealed class CategoryServiceTests
         var expectedResponse = new PagedResponse<CategoryResponse>
         {
             Data = [],
-            Message = "Categorias encontradas com sucesso.",
             TotalCount = 0,
             PageNumber = 1,
             PageSize = 10

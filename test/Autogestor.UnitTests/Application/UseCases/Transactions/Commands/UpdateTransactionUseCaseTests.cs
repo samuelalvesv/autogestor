@@ -1,9 +1,9 @@
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 using DomainTransactionType = Autogestor.Domain.Enums.ETransactionType;
 
@@ -48,21 +48,19 @@ public sealed class UpdateTransactionUseCaseTests
         };
 
         // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
+        TransactionResponse response = await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Equal(expected: "Transação atualizada com sucesso.", actual: response.Message);
-        Assert.Equal(expected: request.Id, actual: response.Data.Id);
-        Assert.Equal(expected: request.Title, actual: response.Data.Title);
-        Assert.Equal(expected: request.Type, actual: response.Data.Type);
-        Assert.Equal(expected: request.Amount, actual: response.Data.Amount);
-        Assert.Equal(expected: request.CategoryId, actual: response.Data.CategoryId);
-        Assert.True(condition: response.Data.Active, userMessage: "A transação deve permanecer ativa após atualização.");
-        Assert.Equal(expected: transaction.TenantId, actual: response.Data.TenantId);
+        Assert.Equal(expected: request.Id, actual: response.Id);
+        Assert.Equal(expected: request.Title, actual: response.Title);
+        Assert.Equal(expected: request.Type, actual: response.Type);
+        Assert.Equal(expected: request.Amount, actual: response.Amount);
+        Assert.Equal(expected: request.CategoryId, actual: response.CategoryId);
+        Assert.True(condition: response.Active, userMessage: "A transação deve permanecer ativa após atualização.");
+        Assert.Equal(expected: transaction.TenantId, actual: response.TenantId);
 
         Assert.Single(collection: transactionRepository.Transactions);
         Assert.Equal(expected: request.Title, actual: transactionRepository.Transactions[0].Title);
@@ -74,7 +72,7 @@ public sealed class UpdateTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTransactionNotFound_ReturnsFailureResponse()
+    public async Task ExecuteAsync_WhenTransactionNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -94,21 +92,19 @@ public sealed class UpdateTransactionUseCaseTests
             CategoryId = Guid.NewGuid()
         };
 
-        // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Transação não encontrada.", actual: response.Message);
+        Assert.Equal(expected: "Transação não encontrada.", actual: exception.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
         Assert.Equal(expected: 0, actual: categoryRepository.ExistsCallCount);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCategoryNotFound_ReturnsFailureResponse()
+    public async Task ExecuteAsync_WhenCategoryNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -138,15 +134,13 @@ public sealed class UpdateTransactionUseCaseTests
             CategoryId = Guid.NewGuid()
         };
 
-        // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: response.Message);
+        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: exception.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
         Assert.Equal(expected: 1, actual: categoryRepository.ExistsCallCount);
         Assert.Equal(expected: "Material de Escritório", actual: transaction.Title);
@@ -156,7 +150,7 @@ public sealed class UpdateTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCategoryDoesNotExistAndDomainFieldsInvalid_ReturnsFailureResponseWithoutThrowingDomainException()
+    public async Task ExecuteAsync_WhenCategoryDoesNotExistAndDomainFieldsInvalid_ThrowsNotFoundException()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -186,15 +180,13 @@ public sealed class UpdateTransactionUseCaseTests
             CategoryId = Guid.NewGuid()
         };
 
-        // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: response.Message);
+        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: exception.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
         Assert.Equal(expected: 1, actual: categoryRepository.ExistsCallCount);
         Assert.Equal(expected: "Material de Escritório", actual: transaction.Title);
@@ -379,7 +371,7 @@ public sealed class UpdateTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithEmptyCategoryId_ReturnsFailureResponse()
+    public async Task ExecuteAsync_WithEmptyCategoryId_ThrowsNotFoundException()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -409,15 +401,13 @@ public sealed class UpdateTransactionUseCaseTests
             CategoryId = Guid.Empty
         };
 
-        // Act
-        Response<TransactionResponse> response = await useCase.ExecuteAsync(
-            request: request,
-            cancellationToken: TestContext.Current.CancellationToken);
+        // Act & Assert
+        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        // Assert
-        Assert.NotNull(@object: response);
-        Assert.Null(@object: response.Data);
-        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: response.Message);
+        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: exception.Message);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 }

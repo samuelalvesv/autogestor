@@ -18,18 +18,8 @@ public sealed class GetAllCategoriesUseCase(
             pageSize: request.PageSize,
             cancellationToken: cancellationToken);
 
-        if (categories.Count == 0)
-            return new PagedResponse<CategoryResponse>
-            {
-                Data = null,
-                Message = "Categorias não encontradas.",
-                TotalCount = count,
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize
-            };
-
         IReadOnlyList<CategoryResponse> response = [.. categories
-            .Select(selector: category => new CategoryResponse
+            .Select(selector: static category => new CategoryResponse
             {
                 Id = category.Id,
                 Active = category.Active,
@@ -45,7 +35,6 @@ public sealed class GetAllCategoriesUseCase(
         return new PagedResponse<CategoryResponse>
         {
             Data = response,
-            Message = "Categorias encontradas com sucesso.",
             TotalCount = count,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize

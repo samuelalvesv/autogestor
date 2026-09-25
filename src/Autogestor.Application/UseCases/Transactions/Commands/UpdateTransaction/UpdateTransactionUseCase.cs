@@ -1,9 +1,9 @@
 using Autogestor.Application.Interfaces;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
-using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.Domain.Interfaces;
 
 namespace Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
@@ -13,31 +13,21 @@ public sealed class UpdateTransactionUseCase(
     ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork) : IUpdateTransactionUseCase
 {
-    public async Task<Response<TransactionResponse>> ExecuteAsync(
+    public async Task<TransactionResponse> ExecuteAsync(
         UpdateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
         Transaction? transaction = await transactionRepository.GetByIdAsync(
             id: request.Id,
-            cancellationToken: cancellationToken);
-
-        if (transaction is null)
-            return new Response<TransactionResponse>
-            {
-                Data = null,
-                Message = "Transação não encontrada."
-            };
+            cancellationToken: cancellationToken)
+            ?? throw new NotFoundException(message: "Transação não encontrada.");
 
         bool categoryExists = await categoryRepository.ExistsAsync(
             id: request.CategoryId,
             cancellationToken: cancellationToken);
 
         if (!categoryExists)
-            return new Response<TransactionResponse>
-            {
-                Data = null,
-                Message = "Categoria não encontrada para o tenant atual."
-            };
+            throw new NotFoundException(message: "Categoria não encontrada para o tenant atual.");
 
         transaction.Update(
             title: request.Title,
@@ -47,7 +37,7 @@ public sealed class UpdateTransactionUseCase(
 
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-        var response = new TransactionResponse
+        return new TransactionResponse
         {
             Id = transaction.Id,
             Active = transaction.Active,
@@ -60,12 +50,6 @@ public sealed class UpdateTransactionUseCase(
             Type = (ETransactionType)transaction.Type,
             Amount = transaction.Amount,
             CategoryId = transaction.CategoryId
-        };
-
-        return new Response<TransactionResponse>
-        {
-            Data = response,
-            Message = "Transação atualizada com sucesso."
         };
     }
 }
