@@ -20,6 +20,8 @@ applyTo: "src/Autogestor.Api/**/*.cs"
 - **Configuração gRPC-Web**:
   - Habilitar suporte a gRPC-Web no `Program.cs` com `app.UseGrpcWeb()`.
   - Mapear serviços com `app.MapGrpcService<T>().EnableGrpcWeb()`.
+- **Compatibilidade com Native AOT**: É proibido o registro de serviços ou middlewares baseados em reflexão dinâmica em tempo de execução (como serviços de reflection do gRPC), preservando a integridade de compilação antecipada (AOT).
+- **Tratamento de Exceções de Domínio**: Interceptadores de erro devem mapear exceções de domínio para códigos de status gRPC exclusivamente através de correspondência de padrões (*pattern matching*) por tipo de exceção, sem depender de enumerações intermediárias.
 - **Injeção de Dependências**: O `Program.cs` deste projeto é o único que conhece todas as camadas concretas da aplicação para poder compor o contêiner de DI.
 
 ## Ferramentas

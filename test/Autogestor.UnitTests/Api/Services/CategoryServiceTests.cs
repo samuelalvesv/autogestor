@@ -119,9 +119,8 @@ public sealed class CategoryServiceTests
         public PagedResponse<CategoryResponse> ResponseToReturn { get; set; } = new()
         {
             Data = [],
-            TotalCount = 0,
-            PageNumber = 1,
-            PageSize = 10
+            HasNextPage = false,
+            NextCursor = null
         };
 
         public Task<PagedResponse<CategoryResponse>> ExecuteAsync(
@@ -372,16 +371,15 @@ public sealed class CategoryServiceTests
         // Arrange
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 1,
+            Cursor = null,
             PageSize = 10
         };
 
         var expectedResponse = new PagedResponse<CategoryResponse>
         {
             Data = [],
-            TotalCount = 0,
-            PageNumber = 1,
-            PageSize = 10
+            HasNextPage = false,
+            NextCursor = null
         };
 
         _getAllUseCaseFake.ResponseToReturn = expectedResponse;
@@ -402,7 +400,7 @@ public sealed class CategoryServiceTests
         // Arrange
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 1,
+            Cursor = null,
             PageSize = 10
         };
 

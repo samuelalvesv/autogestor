@@ -17,6 +17,7 @@ applyTo: "src/Autogestor.Domain/**/*.cs"
 - **Isolamento de Infraestrutura**: Zero pacotes NuGet externos e zero referências a outros projetos da Solution.
 - **Herança de Classes Base**: As entidades de domínio devem herdar de `AuditableEntity` (para dados globais auditados) ou `TenantEntity` (para dados isolados por tenant auditados). Casos especiais que não requerem auditoria de usuário (como a própria entidade de usuário, logs de sistema ou dados estáticos globais) devem herdar diretamente de `Entity`.
 - **Encapsulamento**: Em classes seladas, os construtores devem ser estritamente privados (`private`); em classes base abstratas destinadas a herança, devem ser protegidos (`protected`). A instanciação pública é realizada exclusivamente por métodos de fábrica expressivos (`Create`, `From`) para garantir que instâncias inválidas nunca sejam criadas.
+- **Categorização Polimórfica de Exceções**: A taxonomia de erros e violações de regras de negócio reside exclusivamente na hierarquia de tipos derivados de `DomainException`. É proibido o uso de enumerações ou propriedades auxiliares de classificação de erro, assegurando que o tratamento de falhas ocorra via polimorfismo puro.
 - **Identity & Multi-Tenancy**: Seguir integralmente [.agents/rules/identity-multitenancy.md](identity-multitenancy.md).
 
 ## Ferramentas

@@ -80,7 +80,6 @@ public static class BuilderExtensions
     public static WebApplicationBuilder AddGrpcConfiguration(this WebApplicationBuilder builder)
     {
         builder.Services.AddCodeFirstGrpc(configureOptions: options => options.Interceptors.Add<GrpcExceptionInterceptor>());
-        builder.Services.AddCodeFirstGrpcReflection();
 
         return builder;
     }

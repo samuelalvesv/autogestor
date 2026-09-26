@@ -31,12 +31,12 @@ public sealed partial class GrpcExceptionInterceptor(ILogger<GrpcExceptionInterc
         }
         catch (DomainException ex)
         {
-            StatusCode statusCode = ex.ErrorType switch
+            StatusCode statusCode = ex switch
             {
-                DomainErrorType.NotFound => StatusCode.NotFound,
-                DomainErrorType.Validation => StatusCode.InvalidArgument,
-                DomainErrorType.BusinessRule => StatusCode.FailedPrecondition,
-                DomainErrorType.Conflict => StatusCode.AlreadyExists,
+                NotFoundException => StatusCode.NotFound,
+                DomainValidationException => StatusCode.InvalidArgument,
+                BusinessRuleException => StatusCode.FailedPrecondition,
+                ConflictException => StatusCode.AlreadyExists,
                 _ => StatusCode.Internal
             };
 

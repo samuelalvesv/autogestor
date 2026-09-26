@@ -14,8 +14,8 @@ public sealed class GetAllTransactionsUseCase(
         GetAllTransactionsRequest request,
         CancellationToken cancellationToken = default)
     {
-        (IReadOnlyList<Transaction> transactions, int count) = await transactionRepository.GetPagedAsync(
-            skip: request.Skip,
+        (IReadOnlyList<Transaction>? transactions, bool hasNextPage) = await transactionRepository.GetPagedAsync(
+            cursor: request.Cursor,
             pageSize: request.PageSize,
             cancellationToken: cancellationToken);
 
@@ -38,9 +38,8 @@ public sealed class GetAllTransactionsUseCase(
         return new PagedResponse<TransactionResponse>
         {
             Data = response,
-            TotalCount = count,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize
+            HasNextPage = hasNextPage,
+            NextCursor = hasNextPage ? transactions[^1].Id : null
         };
     }
 }

@@ -4,70 +4,55 @@ namespace Autogestor.UnitTests.Contract.Responses;
 
 public sealed class PagedResponseTests
 {
-    [Theory]
-    [InlineData(100, 25, 4)]
-    [InlineData(101, 25, 5)]
-    [InlineData(0, 25, 0)]
-    [InlineData(1, 10, 1)]
-    [InlineData(50, 0, 0)] // Guard against division by zero
-    [InlineData(50, -5, 0)]
-    public void TotalPage_ShouldCalculateCorrectly(int totalCount, int pageSize, int expectedTotalPages)
+    [Fact]
+    public void PagedResponse_WithHasNextPage_ShouldHaveNextCursor()
     {
-        // Act
+        // Arrange & Act
+        var nextCursor = Guid.NewGuid();
         var pagedResponse = new PagedResponse<string>
         {
             Data = ["item1", "item2"],
-            TotalCount = totalCount,
-            PageNumber = 1,
-            PageSize = pageSize
+            HasNextPage = true,
+            NextCursor = nextCursor
         };
 
         // Assert
-        Assert.Equal(expected: expectedTotalPages, actual: pagedResponse.TotalPage);
-        Assert.Equal(expected: totalCount, actual: pagedResponse.TotalCount);
-        Assert.Equal(expected: 1, actual: pagedResponse.PageNumber);
-        Assert.Equal(expected: pageSize, actual: pagedResponse.PageSize);
-        Assert.NotNull(@object: pagedResponse.Data);
+        Assert.True(condition: pagedResponse.HasNextPage, userMessage: "Deve indicar que há próxima página.");
+        Assert.Equal(expected: nextCursor, actual: pagedResponse.NextCursor);
         Assert.Equal(expected: 2, actual: pagedResponse.Data.Count);
+    }
+
+    [Fact]
+    public void PagedResponse_WithNoNextPage_ShouldHaveNullCursor()
+    {
+        // Arrange & Act
+        var pagedResponse = new PagedResponse<string>
+        {
+            Data = ["item1"],
+            HasNextPage = false,
+            NextCursor = null
+        };
+
+        // Assert
+        Assert.False(condition: pagedResponse.HasNextPage, userMessage: "Não deve indicar próxima página.");
+        Assert.Null(@object: pagedResponse.NextCursor);
+        Assert.Single(collection: pagedResponse.Data);
     }
 
     [Fact]
     public void PagedResponse_WithEmptyData_ShouldHaveCorrectValues()
     {
-        // Act
+        // Arrange & Act
         var pagedResponse = new PagedResponse<string>
         {
             Data = [],
-            TotalCount = 0,
-            PageNumber = 1,
-            PageSize = 25
+            HasNextPage = false,
+            NextCursor = null
         };
 
         // Assert
         Assert.Empty(collection: pagedResponse.Data);
-        Assert.Equal(expected: 0, actual: pagedResponse.TotalCount);
-        Assert.Equal(expected: 1, actual: pagedResponse.PageNumber);
-        Assert.Equal(expected: 25, actual: pagedResponse.PageSize);
-        Assert.Equal(expected: 0, actual: pagedResponse.TotalPage);
-    }
-
-    [Fact]
-    public void PagedResponse_WithData_ShouldHaveCorrectValues()
-    {
-        // Act
-        var pagedResponse = new PagedResponse<string>
-        {
-            Data = ["item"],
-            TotalCount = 1,
-            PageNumber = 1,
-            PageSize = 25
-        };
-
-        // Assert
-        Assert.Single(collection: pagedResponse.Data);
-        Assert.Equal(expected: 1, actual: pagedResponse.TotalCount);
-        Assert.Equal(expected: 1, actual: pagedResponse.PageNumber);
-        Assert.Equal(expected: 25, actual: pagedResponse.PageSize);
-        Assert.Equal(expected: 1, actual: pagedResponse.TotalPage);
+        Assert.False(condition: pagedResponse.HasNextPage, userMessage: "Lista vazia não deve ter próxima página.");
+        Assert.Null(@object: pagedResponse.NextCursor);
     }
 }

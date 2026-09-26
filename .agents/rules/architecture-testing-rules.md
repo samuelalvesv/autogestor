@@ -15,6 +15,8 @@ applyTo: "test/Autogestor.ArchitectureTests/**/*.cs"
 - **Padrões de Nomenclatura e Design**:
   - Garantir que todas as interfaces comecem com `I` (ex: `IXxxRepository`).
   - Garantir que classes dentro de Domain e Application sejam marcadas como `sealed` por padrão, a menos que herança seja explicitamente intencional.
+- **Validação de Exaustividade de Mapeamento**:
+  - Testes de arquitetura devem inspecionar programaticamente os componentes de tratamento e interceptação de erros da API para assegurar que todas as subclasses concretas de `DomainException` possuam correspondência explícita implementada, prevenindo captura genérica silenciosa de falhas de domínio.
 - **Tecnologia**: Usar a biblioteca **`NetArchTest.eNhancedEdition`** para definir as asserções de arquitetura de forma fluida.
 
 ## Ferramentas

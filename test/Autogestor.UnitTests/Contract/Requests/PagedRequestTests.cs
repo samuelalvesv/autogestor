@@ -22,7 +22,6 @@ public sealed class PagedRequestTests
         // Arrange & Act
         var request = new TestPagedRequest
         {
-            PageNumber = ContractDefaults.DefaultPageNumber,
             PageSize = ContractDefaults.DefaultPageSize
         };
 
@@ -32,17 +31,49 @@ public sealed class PagedRequestTests
         Assert.Empty(collection: errors);
     }
 
-    [Theory]
-    [InlineData(0, 25)]
-    [InlineData(-1, 25)]
-    [InlineData(1, 5)]
-    [InlineData(1, 51)]
-    public void PagedRequest_WithInvalidValues_FailsValidation(int pageNumber, int pageSize)
+    [Fact]
+    public void PagedRequest_WithCursor_PassesValidation()
     {
         // Arrange & Act
         var request = new TestPagedRequest
         {
-            PageNumber = pageNumber,
+            Cursor = Guid.NewGuid(),
+            PageSize = ContractDefaults.DefaultPageSize
+        };
+
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
+        // Assert
+        Assert.Empty(collection: errors);
+    }
+
+    [Fact]
+    public void PagedRequest_WithNullCursor_PassesValidation()
+    {
+        // Arrange & Act
+        var request = new TestPagedRequest
+        {
+            Cursor = null,
+            PageSize = ContractDefaults.DefaultPageSize
+        };
+
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
+        // Assert
+        Assert.Empty(collection: errors);
+        Assert.Null(@object: request.Cursor);
+    }
+
+    [Theory]
+    [InlineData(5)]
+    [InlineData(51)]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void PagedRequest_WithInvalidPageSize_FailsValidation(int pageSize)
+    {
+        // Arrange & Act
+        var request = new TestPagedRequest
+        {
             PageSize = pageSize
         };
 
@@ -50,32 +81,5 @@ public sealed class PagedRequestTests
 
         // Assert
         Assert.NotEmpty(collection: errors);
-    }
-
-    [Theory]
-    [InlineData(1, 25, 0)]
-    [InlineData(2, 25, 25)]
-    [InlineData(3, 10, 20)]
-    [InlineData(10, 50, 450)]
-    [InlineData(0, 25, 0)]
-    [InlineData(-1, 25, 0)]
-    [InlineData(-10, 50, 0)]
-    [InlineData(1, 0, 0)]
-    [InlineData(2, 0, 0)]
-    [InlineData(2, -10, 0)]
-    [InlineData(0, -10, 0)]
-    [InlineData(int.MaxValue, 25, int.MaxValue)]
-    [InlineData(100_000_000, 50, int.MaxValue)]
-    public void Skip_ShouldCalculateCorrectly(int pageNumber, int pageSize, int expectedSkip)
-    {
-        // Arrange & Act
-        var request = new TestPagedRequest
-        {
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        // Assert
-        Assert.Equal(expected: expectedSkip, actual: request.Skip);
     }
 }

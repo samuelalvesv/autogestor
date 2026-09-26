@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Autogestor.Contract;
 using Autogestor.Contract.Requests.Transactions;
 
 namespace Autogestor.UnitTests.Contract.Requests.Transactions;
@@ -19,8 +20,25 @@ public sealed class GetAllTransactionsRequestTests
         // Arrange
         var request = new GetAllTransactionsRequest
         {
-            PageNumber = 1,
-            PageSize = 25
+            Cursor = Guid.NewGuid(),
+            PageSize = ContractDefaults.DefaultPageSize
+        };
+
+        // Act
+        IList<ValidationResult> errors = ValidateModel(model: request);
+
+        // Assert
+        Assert.Empty(collection: errors);
+    }
+
+    [Fact]
+    public void GetAllTransactionsRequest_WithNullCursor_PassesValidation()
+    {
+        // Arrange
+        var request = new GetAllTransactionsRequest
+        {
+            Cursor = null,
+            PageSize = ContractDefaults.DefaultPageSize
         };
 
         // Act
@@ -31,17 +49,15 @@ public sealed class GetAllTransactionsRequestTests
     }
 
     [Theory]
-    [InlineData(0, 25)]
-    [InlineData(-1, 25)]
-    [InlineData(1, 0)]
-    [InlineData(1, -5)]
-    [InlineData(1, 1001)]
-    public void GetAllTransactionsRequest_WithInvalidPagination_FailsValidation(int pageNumber, int pageSize)
+    [InlineData(5)]
+    [InlineData(51)]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void GetAllTransactionsRequest_WithInvalidPagination_FailsValidation(int pageSize)
     {
         // Arrange
         var request = new GetAllTransactionsRequest
         {
-            PageNumber = pageNumber,
             PageSize = pageSize
         };
 

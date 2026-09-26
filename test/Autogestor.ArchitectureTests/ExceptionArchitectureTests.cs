@@ -75,4 +75,35 @@ public sealed class ExceptionArchitectureTests
             condition: result.IsSuccessful,
             userMessage: "Todas as exceções especializadas de domínio devem ser marcadas como sealed.");
     }
+
+    [Fact]
+    public void GrpcExceptionInterceptor_ShouldMapAllDomainExceptionSubclasses()
+    {
+        // Arrange
+        IEnumerable<Type> domainExceptionTypes = DomainAssembly
+            .GetTypes()
+            .Where(predicate: t => t.IsSubclassOf(c: typeof(DomainException))
+                                 && !t.IsAbstract);
+
+        string? interceptorSourcePath = Directory.GetFiles(
+                path: Path.GetFullPath(path: Path.Combine(path1: AppContext.BaseDirectory, path2: "../../../../../src/Autogestor.Api")),
+                searchPattern: "GrpcExceptionInterceptor.cs",
+                searchOption: SearchOption.AllDirectories)
+            .FirstOrDefault();
+
+        Assert.NotNull(@object: interceptorSourcePath);
+
+        string interceptorSource = File.ReadAllText(path: interceptorSourcePath);
+
+        // Act
+        var unmappedTypes = domainExceptionTypes
+            .Where(predicate: t => !interceptorSource.Contains(value: t.Name, comparisonType: StringComparison.Ordinal))
+            .Select(selector: t => t.Name)
+            .ToList();
+
+        // Assert
+        Assert.True(
+            condition: unmappedTypes.Count == 0,
+            userMessage: $"As seguintes exceções de domínio não estão mapeadas no GrpcExceptionInterceptor: {string.Join(separator: ", ", values: unmappedTypes)}. Adicione o mapeamento no pattern matching do interceptor.");
+    }
 }

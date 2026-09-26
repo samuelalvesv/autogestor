@@ -80,16 +80,16 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta em novo contexto com o mesmo tenant
         await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var queryRepo = new TransactionRepository(context: queryContext);
-        (IReadOnlyList<Transaction> all, int count) = await queryRepo.GetPagedAsync(skip: 0, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
+        (IReadOnlyList<Transaction>? all, bool _) = await queryRepo.GetPagedAsync(cursor: null, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.True(condition: count >= 2, userMessage: "A contagem total de transações deve ser pelo menos 2.");
+        Assert.True(condition: all.Count >= 2, userMessage: "A contagem de transações deve ser pelo menos 2.");
         Assert.Contains(collection: all, filter: t => t.Id == tx1.Id);
         Assert.Contains(collection: all, filter: t => t.Id == tx2.Id);
     }
 
     [Fact]
-    public async Task GetPagedAsync_WithMultiplePages_RespectsPageSizeAndSkip()
+    public async Task GetPagedAsync_WithMultiplePages_RespectsPageSizeAndCursor()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -116,18 +116,19 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         // Act
         await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var queryRepo = new TransactionRepository(context: queryContext);
-        (IReadOnlyList<Transaction> page1, int count1) = await queryRepo.GetPagedAsync(skip: 0, pageSize: 2, cancellationToken: TestContext.Current.CancellationToken);
-        (IReadOnlyList<Transaction> page2, int count2) = await queryRepo.GetPagedAsync(skip: 2, pageSize: 2, cancellationToken: TestContext.Current.CancellationToken);
+        (IReadOnlyList<Transaction>? page1, bool hasNextPage1) = await queryRepo.GetPagedAsync(cursor: null, pageSize: 2, cancellationToken: TestContext.Current.CancellationToken);
+        Guid lastId = page1[^1].Id;
+        (IReadOnlyList<Transaction>? page2, bool hasNextPage2) = await queryRepo.GetPagedAsync(cursor: lastId, pageSize: 2, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(expected: 3, actual: count1);
-        Assert.Equal(expected: 3, actual: count2);
+        Assert.True(condition: hasNextPage1, userMessage: "A primeira página deve indicar que há próxima página.");
         Assert.Equal(expected: 2, actual: page1.Count);
         Assert.True(condition: page2.Count >= 1, userMessage: "A segunda página deve conter ao menos o registro restante.");
+        Assert.DoesNotContain(collection: page2, filter: t => page1.Any(p1 => p1.Id == t.Id));
     }
 
     [Fact]
-    public async Task GetPagedAsync_WhenSkipExceedsOrEqualsTotalCount_ReturnsEmptyListAndTotalCount()
+    public async Task GetPagedAsync_WhenCursorExceedsRange_ReturnsEmptyList()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -151,14 +152,11 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         // Act
         await using AppDbContext queryContext = fixture.CreateContext(userContext: userContext, tenantContext: tenantContext);
         var queryRepo = new TransactionRepository(context: queryContext);
-        (IReadOnlyList<Transaction> emptyPage, int countExceeded) = await queryRepo.GetPagedAsync(skip: 100, pageSize: 10, cancellationToken: TestContext.Current.CancellationToken);
-        (IReadOnlyList<Transaction> maxIntPage, int countMaxInt) = await queryRepo.GetPagedAsync(skip: int.MaxValue, pageSize: 10, cancellationToken: TestContext.Current.CancellationToken);
+        (IReadOnlyList<Transaction>? emptyPage, bool hasNextPage) = await queryRepo.GetPagedAsync(cursor: Guid.Empty, pageSize: 10, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Empty(collection: emptyPage);
-        Assert.True(condition: countExceeded >= 2, userMessage: "A contagem total de transações deve permanecer preservada no curto-circuito.");
-        Assert.Empty(collection: maxIntPage);
-        Assert.True(condition: countMaxInt >= 2, userMessage: "A contagem total de transações deve permanecer preservada para skip com int.MaxValue.");
+        Assert.False(condition: hasNextPage, userMessage: "Página vazia não deve indicar próxima página.");
     }
 
     [Fact]
@@ -185,12 +183,12 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         // Act - consulta com o contexto do Tenant 2
         await using AppDbContext contextTenant2 = fixture.CreateContext(tenantContext: tenantContext2);
         var txRepoTenant2 = new TransactionRepository(context: contextTenant2);
-        (IReadOnlyList<Transaction> transactionsTenant2, int countTenant2) = await txRepoTenant2.GetPagedAsync(skip: 0, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
+        (IReadOnlyList<Transaction>? transactionsTenant2, bool hasNextPageTenant2) = await txRepoTenant2.GetPagedAsync(cursor: null, pageSize: 25, cancellationToken: TestContext.Current.CancellationToken);
         Transaction? transactionById = await txRepoTenant2.GetByIdAsync(id: txTenant1.Id, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - isolamento absoluto garantido por Global Query Filter
         Assert.Empty(collection: transactionsTenant2);
-        Assert.Equal(expected: 0, actual: countTenant2);
+        Assert.False(condition: hasNextPageTenant2, userMessage: "Consulta isolada não deve indicar próxima página.");
         Assert.Null(@object: transactionById);
     }
 
@@ -217,7 +215,7 @@ public sealed class TransactionRepositoryTests(PostgreSqlFixture fixture)
         cts.Cancel();
 
         await Assert.ThrowsAsync<OperationCanceledException>(
-            testCode: () => repository.GetPagedAsync(skip: 0, pageSize: 25, cancellationToken: cts.Token));
+            testCode: () => repository.GetPagedAsync(cursor: null, pageSize: 25, cancellationToken: cts.Token));
     }
 
     [Fact]

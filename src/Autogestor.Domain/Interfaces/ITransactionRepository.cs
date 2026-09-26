@@ -9,5 +9,5 @@ public interface ITransactionRepository
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> ExistsByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken = default);
     Task<Transaction?> GetByIdAsync(Guid id, bool asNoTracking = false, CancellationToken cancellationToken = default);
-    Task<(IReadOnlyList<Transaction> transactions, int count)> GetPagedAsync(int skip, int pageSize, CancellationToken cancellationToken = default);
+    Task<(IReadOnlyList<Transaction> Items, bool HasNextPage)> GetPagedAsync(Guid? cursor, int pageSize, CancellationToken cancellationToken = default);
 }

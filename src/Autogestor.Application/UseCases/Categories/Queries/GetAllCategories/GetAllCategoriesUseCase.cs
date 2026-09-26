@@ -13,8 +13,8 @@ public sealed class GetAllCategoriesUseCase(
         GetAllCategoriesRequest request,
         CancellationToken cancellationToken = default)
     {
-        (IReadOnlyList<Category> categories, int count) = await categoryRepository.GetPagedAsync(
-            skip: request.Skip,
+        (IReadOnlyList<Category>? categories, bool hasNextPage) = await categoryRepository.GetPagedAsync(
+            cursor: request.Cursor,
             pageSize: request.PageSize,
             cancellationToken: cancellationToken);
 
@@ -35,9 +35,8 @@ public sealed class GetAllCategoriesUseCase(
         return new PagedResponse<CategoryResponse>
         {
             Data = response,
-            TotalCount = count,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize
+            HasNextPage = hasNextPage,
+            NextCursor = hasNextPage ? categories[^1].Id : null
         };
     }
 }

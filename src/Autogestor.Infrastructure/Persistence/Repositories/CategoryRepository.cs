@@ -33,23 +33,26 @@ public sealed class CategoryRepository(AppDbContext context) : ICategoryReposito
             cancellationToken: cancellationToken);
     }
 
-    public async Task<(IReadOnlyList<Category> categories, int count)> GetPagedAsync(
-        int skip,
+    public async Task<(IReadOnlyList<Category> Items, bool HasNextPage)> GetPagedAsync(
+        Guid? cursor,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Category> query = context.Categories.AsNoTracking();
 
-        int count = await query.CountAsync(cancellationToken: cancellationToken);
-        if (count == 0 || skip >= count)
-            return ([], count);
+        if (cursor is not null)
+            query = query.Where(predicate: c => c.Id.CompareTo(cursor.Value) < 0);
 
-        IReadOnlyList<Category> categories = await query
-            .OrderByDescending(keySelector: c => c.CreatedAt)
-            .Skip(count: skip)
-            .Take(count: pageSize)
+        List<Category> items = await query
+            .OrderByDescending(keySelector: c => c.Id)
+            .Take(count: pageSize + 1)
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return (categories, count);
+        bool hasNextPage = items.Count > pageSize;
+
+        if (hasNextPage)
+            items.RemoveAt(index: items.Count - 1);
+
+        return (items, hasNextPage);
     }
 }

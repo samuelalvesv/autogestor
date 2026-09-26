@@ -126,9 +126,8 @@ public sealed class TransactionServiceTests
         public PagedResponse<TransactionResponse> ResponseToReturn { get; set; } = new()
         {
             Data = [],
-            TotalCount = 0,
-            PageNumber = 1,
-            PageSize = 10
+            HasNextPage = false,
+            NextCursor = null
         };
 
         public Task<PagedResponse<TransactionResponse>> ExecuteAsync(
@@ -393,16 +392,15 @@ public sealed class TransactionServiceTests
         // Arrange
         var request = new GetAllTransactionsRequest
         {
-            PageNumber = 1,
+            Cursor = null,
             PageSize = 10
         };
 
         var expectedResponse = new PagedResponse<TransactionResponse>
         {
             Data = [],
-            TotalCount = 0,
-            PageNumber = 1,
-            PageSize = 10
+            HasNextPage = false,
+            NextCursor = null
         };
 
         _getAllUseCaseFake.ResponseToReturn = expectedResponse;
@@ -423,7 +421,7 @@ public sealed class TransactionServiceTests
         // Arrange
         var request = new GetAllTransactionsRequest
         {
-            PageNumber = 1,
+            Cursor = null,
             PageSize = 10
         };
 

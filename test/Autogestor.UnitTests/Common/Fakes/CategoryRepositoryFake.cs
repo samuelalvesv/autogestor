@@ -11,7 +11,7 @@ public sealed class CategoryRepositoryFake : ICategoryRepository
     public CancellationToken PassedCancellationToken { get; private set; }
     public bool? LastGetByIdAsNoTracking { get; private set; }
     public int ExistsCallCount { get; private set; }
-    public int? LastPagedSkip { get; private set; }
+    public Guid? LastPagedCursor { get; private set; }
     public int? LastPagedPageSize { get; private set; }
 
     public void Add(Category category)
@@ -49,28 +49,29 @@ public sealed class CategoryRepositoryFake : ICategoryRepository
         return Task.FromResult(result: _categories.FirstOrDefault(predicate: c => c.Id == id));
     }
 
-    public Task<(IReadOnlyList<Category> categories, int count)> GetPagedAsync(
-        int skip,
+    public Task<(IReadOnlyList<Category> Items, bool HasNextPage)> GetPagedAsync(
+        Guid? cursor,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;
-        LastPagedSkip = skip;
+        LastPagedCursor = cursor;
         LastPagedPageSize = pageSize;
 
-        if (_categories.Count == 0 || skip >= _categories.Count)
+        IEnumerable<Category> query = _categories
+            .OrderByDescending(keySelector: c => c.Id);
+
+        if (cursor is not null)
+            query = query.Where(predicate: c => c.Id.CompareTo(cursor.Value) < 0);
+
+        List<Category> items = [.. query.Take(count: pageSize + 1)];
+
+        bool hasNextPage = items.Count > pageSize;
+        if (hasNextPage)
         {
-            return Task.FromResult<(IReadOnlyList<Category> categories, int count)>(
-                result: (categories: [], count: _categories.Count));
+            items.RemoveAt(index: items.Count - 1);
         }
 
-        IReadOnlyList<Category> result = _categories
-            .Skip(count: skip)
-            .Take(count: pageSize)
-            .ToList()
-            .AsReadOnly();
-
-        return Task.FromResult(
-            result: (categories: result, count: _categories.Count));
+        return Task.FromResult(result: ((IReadOnlyList<Category>)items, hasNextPage));
     }
 }

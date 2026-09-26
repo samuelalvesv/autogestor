@@ -9,13 +9,8 @@ public sealed record PagedResponse<T>
     public required IReadOnlyList<T> Data { get; init; }
 
     [DataMember(Order = 2)]
-    public required int TotalCount { get; init; }
+    public required bool HasNextPage { get; init; }
 
     [DataMember(Order = 3)]
-    public required int PageNumber { get; init; }
-
-    [DataMember(Order = 4)]
-    public required int PageSize { get; init; }
-
-    public int TotalPage => PageSize > 0 ? (TotalCount + PageSize - 1) / PageSize : 0;
+    public Guid? NextCursor { get; init; }
 }

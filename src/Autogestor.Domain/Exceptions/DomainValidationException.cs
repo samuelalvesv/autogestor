@@ -3,17 +3,17 @@ namespace Autogestor.Domain.Exceptions;
 public sealed class DomainValidationException : DomainException
 {
     public DomainValidationException()
-        : base(message: "Dados inválidos.", errorType: DomainErrorType.Validation)
+        : base(message: "Dados inválidos.")
     {
     }
 
     public DomainValidationException(string message)
-        : base(message: message, errorType: DomainErrorType.Validation)
+        : base(message: message)
     {
     }
 
     public DomainValidationException(string message, Exception innerException)
-        : base(message: message, innerException: innerException, errorType: DomainErrorType.Validation)
+        : base(message: message, innerException: innerException)
     {
     }
 }

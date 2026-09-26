@@ -11,7 +11,7 @@ public sealed class TransactionRepositoryFake : ITransactionRepository
     public CancellationToken PassedCancellationToken { get; private set; }
     public bool? LastGetByIdAsNoTracking { get; private set; }
     public int ExistsByCategoryIdCallCount { get; private set; }
-    public int? LastPagedSkip { get; private set; }
+    public Guid? LastPagedCursor { get; private set; }
     public int? LastPagedPageSize { get; private set; }
 
     public void Add(Transaction transaction)
@@ -55,28 +55,29 @@ public sealed class TransactionRepositoryFake : ITransactionRepository
         return Task.FromResult(result: _transactions.FirstOrDefault(predicate: t => t.Id == id));
     }
 
-    public Task<(IReadOnlyList<Transaction> transactions, int count)> GetPagedAsync(
-        int skip,
+    public Task<(IReadOnlyList<Transaction> Items, bool HasNextPage)> GetPagedAsync(
+        Guid? cursor,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         PassedCancellationToken = cancellationToken;
-        LastPagedSkip = skip;
+        LastPagedCursor = cursor;
         LastPagedPageSize = pageSize;
 
-        if (_transactions.Count == 0 || skip >= _transactions.Count)
+        IEnumerable<Transaction> query = _transactions
+            .OrderByDescending(keySelector: t => t.Id);
+
+        if (cursor is not null)
+            query = query.Where(predicate: t => t.Id.CompareTo(cursor.Value) < 0);
+
+        List<Transaction> items = [.. query.Take(count: pageSize + 1)];
+
+        bool hasNextPage = items.Count > pageSize;
+        if (hasNextPage)
         {
-            return Task.FromResult<(IReadOnlyList<Transaction> transactions, int count)>(
-                result: (transactions: [], count: _transactions.Count));
+            items.RemoveAt(index: items.Count - 1);
         }
 
-        IReadOnlyList<Transaction> result = _transactions
-            .Skip(count: skip)
-            .Take(count: pageSize)
-            .ToList()
-            .AsReadOnly();
-
-        return Task.FromResult(
-            result: (transactions: result, count: _transactions.Count));
+        return Task.FromResult(result: ((IReadOnlyList<Transaction>)items, hasNextPage));
     }
 }

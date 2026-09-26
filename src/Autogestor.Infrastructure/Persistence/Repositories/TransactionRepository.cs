@@ -39,23 +39,26 @@ public sealed class TransactionRepository(AppDbContext context) : ITransactionRe
             cancellationToken: cancellationToken);
     }
 
-    public async Task<(IReadOnlyList<Transaction> transactions, int count)> GetPagedAsync(
-        int skip,
+    public async Task<(IReadOnlyList<Transaction> Items, bool HasNextPage)> GetPagedAsync(
+        Guid? cursor,
         int pageSize,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Transaction> query = context.Transactions.AsNoTracking();
 
-        int count = await query.CountAsync(cancellationToken: cancellationToken);
-        if (count == 0 || skip >= count)
-            return ([], count);
+        if (cursor is not null)
+            query = query.Where(predicate: t => t.Id.CompareTo(cursor.Value) < 0);
 
-        IReadOnlyList<Transaction> transactions = await query
-            .OrderByDescending(keySelector: t => t.CreatedAt)
-            .Skip(count: skip)
-            .Take(count: pageSize)
+        List<Transaction> items = await query
+            .OrderByDescending(keySelector: t => t.Id)
+            .Take(count: pageSize + 1)
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return (transactions, count);
+        bool hasNextPage = items.Count > pageSize;
+
+        if (hasNextPage)
+            items.RemoveAt(index: items.Count - 1);
+
+        return (items, hasNextPage);
     }
 }

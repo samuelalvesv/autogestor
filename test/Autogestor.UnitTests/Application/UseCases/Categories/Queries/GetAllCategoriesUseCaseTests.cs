@@ -28,7 +28,6 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 1,
             PageSize = 10
         };
 
@@ -41,35 +40,12 @@ public sealed class GetAllCategoriesUseCaseTests
         Assert.NotNull(@object: response);
         Assert.NotNull(@object: response.Data);
         Assert.Equal(expected: 2, actual: response.Data.Count);
-        Assert.Equal(expected: 2, actual: response.TotalCount);
-        Assert.Equal(expected: 1, actual: response.PageNumber);
-        Assert.Equal(expected: 10, actual: response.PageSize);
-
-        CategoryResponse first = response.Data[index: 0];
-        Assert.Equal(expected: category1.Id, actual: first.Id);
-        Assert.Equal(expected: category1.Title, actual: first.Title);
-        Assert.Equal(expected: category1.Description, actual: first.Description);
-        Assert.True(condition: first.Active, userMessage: "A primeira categoria retornada deve estar ativa.");
-        Assert.Equal(expected: category1.TenantId, actual: first.TenantId);
-        Assert.Equal(expected: category1.CreatedBy, actual: first.CreatedBy);
-        Assert.Equal(expected: category1.CreatedAt, actual: first.CreatedAt);
-        Assert.Equal(expected: category1.UpdatedBy, actual: first.UpdatedBy);
-        Assert.Equal(expected: category1.UpdatedAt, actual: first.UpdatedAt);
-
-        CategoryResponse second = response.Data[index: 1];
-        Assert.Equal(expected: category2.Id, actual: second.Id);
-        Assert.Equal(expected: category2.Title, actual: second.Title);
-        Assert.Equal(expected: category2.Description, actual: second.Description);
-        Assert.True(condition: second.Active, userMessage: "A segunda categoria retornada deve estar ativa.");
-        Assert.Equal(expected: category2.TenantId, actual: second.TenantId);
-        Assert.Equal(expected: category2.CreatedBy, actual: second.CreatedBy);
-        Assert.Equal(expected: category2.CreatedAt, actual: second.CreatedAt);
-        Assert.Equal(expected: category2.UpdatedBy, actual: second.UpdatedBy);
-        Assert.Equal(expected: category2.UpdatedAt, actual: second.UpdatedAt);
+        Assert.False(condition: response.HasNextPage, userMessage: "Com apenas 2 itens e pageSize 10, não deve haver próxima página.");
+        Assert.Null(@object: response.NextCursor);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCategoryHasBeenUpdated_ReturnsPagedResponseWithUpdatedAuditFields()
+    public async Task ExecuteAsync_WhenCategoriesExist_MapsAllFieldsCorrectly()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
@@ -80,16 +56,8 @@ public sealed class GetAllCategoriesUseCaseTests
             description: "Cursos e mensalidades");
         repository.Add(category: category);
 
-        var updatedBy = Guid.NewGuid();
-        DateTime updatedAt = DateTime.UtcNow;
-        EntityPersistenceHelper.SetAuditUpdateFields(
-            entity: category,
-            updatedBy: updatedBy,
-            updatedAt: updatedAt);
-
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 1,
             PageSize = 10
         };
 
@@ -99,18 +67,21 @@ public sealed class GetAllCategoriesUseCaseTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
         Assert.Single(collection: response.Data);
-
         CategoryResponse item = response.Data[index: 0];
         Assert.Equal(expected: category.Id, actual: item.Id);
-        Assert.Equal(expected: updatedBy, actual: item.UpdatedBy);
-        Assert.Equal(expected: updatedAt, actual: item.UpdatedAt);
+        Assert.Equal(expected: category.Title, actual: item.Title);
+        Assert.Equal(expected: category.Description, actual: item.Description);
+        Assert.True(condition: item.Active, userMessage: "A categoria retornada deve estar ativa.");
+        Assert.Equal(expected: category.TenantId, actual: item.TenantId);
+        Assert.Equal(expected: category.CreatedBy, actual: item.CreatedBy);
+        Assert.Equal(expected: category.CreatedAt, actual: item.CreatedAt);
+        Assert.Equal(expected: category.UpdatedBy, actual: item.UpdatedBy);
+        Assert.Equal(expected: category.UpdatedAt, actual: item.UpdatedAt);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenNoCategoriesExist_ReturnsEmptyPagedResponseWithEmptyData()
+    public async Task ExecuteAsync_WhenNoCategoriesExist_ReturnsEmptyPagedResponse()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
@@ -118,7 +89,6 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 1,
             PageSize = 10
         };
 
@@ -130,26 +100,26 @@ public sealed class GetAllCategoriesUseCaseTests
         // Assert
         Assert.NotNull(@object: response);
         Assert.Empty(collection: response.Data);
-        Assert.Equal(expected: 0, actual: response.TotalCount);
-        Assert.Equal(expected: 1, actual: response.PageNumber);
-        Assert.Equal(expected: 10, actual: response.PageSize);
+        Assert.False(condition: response.HasNextPage, userMessage: "Lista vazia não deve indicar próxima página.");
+        Assert.Null(@object: response.NextCursor);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPageExceedsCount_ReturnsEmptyPagedResponseWithEmptyData()
+    public async Task ExecuteAsync_WhenMoreItemsThanPageSize_ReturnsHasNextPageTrue()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
 
-        var category = Category.Create(
-            title: "Lazer",
-            description: "Cinema e passeios");
-        repository.Add(category: category);
+        for (int i = 0; i < 15; i++)
+        {
+            repository.Add(category: Category.Create(
+                title: $"Cat {i}",
+                description: $"Desc {i}"));
+        }
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 2,
             PageSize = 10
         };
 
@@ -159,32 +129,28 @@ public sealed class GetAllCategoriesUseCaseTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.NotNull(@object: response);
-        Assert.Empty(collection: response.Data);
-        Assert.Equal(expected: 1, actual: response.TotalCount);
-        Assert.Equal(expected: 2, actual: response.PageNumber);
-        Assert.Equal(expected: 10, actual: response.PageSize);
+        Assert.Equal(expected: 10, actual: response.Data.Count);
+        Assert.True(condition: response.HasNextPage, userMessage: "Com 15 itens e pageSize 10, deve haver próxima página.");
+        Assert.NotNull(@object: response.NextCursor);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenSubsequentPageHasData_ReturnsPagedResponseWithPagedSubset()
+    public async Task ExecuteAsync_WhenExactlyPageSizeItems_ReturnsHasNextPageFalse()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
 
-        var category1 = Category.Create(title: "Cat 1", description: "Desc 1");
-        var category2 = Category.Create(title: "Cat 2", description: "Desc 2");
-        var category3 = Category.Create(title: "Cat 3", description: "Desc 3");
-
-        repository.Add(category: category1);
-        repository.Add(category: category2);
-        repository.Add(category: category3);
+        for (int i = 0; i < 10; i++)
+        {
+            repository.Add(category: Category.Create(
+                title: $"Cat {i}",
+                description: $"Desc {i}"));
+        }
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 2,
-            PageSize = 2
+            PageSize = 10
         };
 
         // Act
@@ -193,49 +159,37 @@ public sealed class GetAllCategoriesUseCaseTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.NotNull(@object: response);
-        Assert.NotNull(@object: response.Data);
-        Assert.Single(collection: response.Data);
-        Assert.Equal(expected: 3, actual: response.TotalCount);
-        Assert.Equal(expected: 2, actual: response.PageNumber);
-        Assert.Equal(expected: 2, actual: response.PageSize);
-        Assert.Equal(expected: category3.Id, actual: response.Data[index: 0].Id);
+        Assert.Equal(expected: 10, actual: response.Data.Count);
+        Assert.False(condition: response.HasNextPage, userMessage: "Com exatamente 10 itens e pageSize 10, não deve haver próxima página.");
+        Assert.Null(@object: response.NextCursor);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPageOffsetExactlyEqualsCount_ReturnsEmptyPagedResponseWithEmptyData()
+    public async Task ExecuteAsync_WithCursor_PropagatesCursorToRepository()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
-
-        var category1 = Category.Create(title: "Cat 1", description: "Desc 1");
-        var category2 = Category.Create(title: "Cat 2", description: "Desc 2");
-
-        repository.Add(category: category1);
-        repository.Add(category: category2);
+        var cursor = Guid.NewGuid();
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 2,
-            PageSize = 2
+            Cursor = cursor,
+            PageSize = 10
         };
 
         // Act
-        PagedResponse<CategoryResponse> response = await useCase.ExecuteAsync(
+        await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.NotNull(@object: response);
-        Assert.Empty(collection: response.Data);
-        Assert.Equal(expected: 2, actual: response.TotalCount);
-        Assert.Equal(expected: 2, actual: response.PageNumber);
-        Assert.Equal(expected: 2, actual: response.PageSize);
+        Assert.Equal(expected: cursor, actual: repository.LastPagedCursor);
+        Assert.Equal(expected: 10, actual: repository.LastPagedPageSize);
     }
 
     [Fact]
-    public async Task ExecuteAsync_PropagatesPaginationParametersToRepository()
+    public async Task ExecuteAsync_WithNullCursor_PropagatesNullCursorToRepository()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
@@ -243,20 +197,17 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 3,
-            PageSize = 15
+            PageSize = 10
         };
 
         // Act
-        PagedResponse<CategoryResponse> response = await useCase.ExecuteAsync(
+        await useCase.ExecuteAsync(
             request: request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(expected: 30, actual: repository.LastPagedSkip);
-        Assert.Equal(expected: 15, actual: repository.LastPagedPageSize);
-        Assert.Equal(expected: 3, actual: response.PageNumber);
-        Assert.Equal(expected: 15, actual: response.PageSize);
+        Assert.Null(@object: repository.LastPagedCursor);
+        Assert.Equal(expected: 10, actual: repository.LastPagedPageSize);
     }
 
     [Fact]
@@ -268,7 +219,6 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = 1,
             PageSize = 10
         };
 
@@ -283,19 +233,22 @@ public sealed class GetAllCategoriesUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenPageNumberIsMaxInt_ReturnsEmptyPagedResponseWithEmptyData()
+    public async Task ExecuteAsync_NextCursor_IsLastItemIdOfReturnedPage()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
 
-        var category = Category.Create(title: "Alimentação", description: "Desc");
-        repository.Add(category: category);
+        for (int i = 0; i < 5; i++)
+        {
+            repository.Add(category: Category.Create(
+                title: $"Cat {i}",
+                description: $"Desc {i}"));
+        }
 
         var request = new GetAllCategoriesRequest
         {
-            PageNumber = int.MaxValue,
-            PageSize = 25
+            PageSize = 3
         };
 
         // Act
@@ -304,11 +257,8 @@ public sealed class GetAllCategoriesUseCaseTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.NotNull(@object: response);
-        Assert.Empty(collection: response.Data);
-        Assert.Equal(expected: 1, actual: response.TotalCount);
-        Assert.Equal(expected: int.MaxValue, actual: response.PageNumber);
-        Assert.Equal(expected: 25, actual: response.PageSize);
-        Assert.Equal(expected: int.MaxValue, actual: repository.LastPagedSkip);
+        Assert.True(condition: response.HasNextPage, userMessage: "Com 5 itens e pageSize 3, deve haver próxima página.");
+        Assert.NotNull(@object: response.NextCursor);
+        Assert.Equal(expected: response.Data[^1].Id, actual: response.NextCursor);
     }
 }
