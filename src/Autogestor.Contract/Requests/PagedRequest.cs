@@ -6,7 +6,7 @@ namespace Autogestor.Contract.Requests;
 public abstract record PagedRequest
 {
     [DataMember(Order = 1)]
-    public Guid? Cursor { get; init; }
+    public required Guid? Cursor { get; init; }
 
     [DataMember(Order = 2)]
     public required int PageSize { get; init; }

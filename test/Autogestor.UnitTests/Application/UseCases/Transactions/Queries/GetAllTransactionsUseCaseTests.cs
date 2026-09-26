@@ -41,6 +41,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -68,6 +69,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 0
         };
 
@@ -99,6 +101,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -134,6 +137,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -170,6 +174,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -205,6 +210,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -256,6 +262,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -280,6 +287,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -314,6 +322,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 

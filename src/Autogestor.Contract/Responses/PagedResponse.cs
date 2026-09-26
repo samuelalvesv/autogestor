@@ -12,5 +12,5 @@ public sealed record PagedResponse<T>
     public required bool HasNextPage { get; init; }
 
     [DataMember(Order = 3)]
-    public Guid? NextCursor { get; init; }
+    public required Guid? NextCursor { get; init; }
 }

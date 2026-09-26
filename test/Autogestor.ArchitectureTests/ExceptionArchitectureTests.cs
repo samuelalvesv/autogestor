@@ -8,18 +8,18 @@ namespace Autogestor.ArchitectureTests;
 public sealed class ExceptionArchitectureTests
 {
     private static readonly Assembly DomainAssembly = typeof(Domain.Entities.Entity).Assembly;
-    private static readonly Assembly ApplicationAssembly = Assembly.Load("Autogestor.Application");
+    private static readonly Assembly ApplicationAssembly = typeof(Application.Mappers.CategoryMapper).Assembly;
 
     [Fact]
     public void CustomExceptions_ShouldInheritFromDomainException()
     {
-        TestResult result = Types.InAssemblies([DomainAssembly, ApplicationAssembly])
+        TestResult result = Types.InAssemblies(assemblies: [DomainAssembly, ApplicationAssembly])
             .That()
-            .HaveNameEndingWith("Exception")
+            .HaveNameEndingWith(end: "Exception")
             .And()
-            .DoNotHaveName("DomainException")
+            .DoNotHaveName(name: "DomainException")
             .Should()
-            .Inherit(typeof(DomainException))
+            .Inherit(type: typeof(DomainException))
             .GetResult();
 
         Assert.True(
@@ -30,13 +30,13 @@ public sealed class ExceptionArchitectureTests
     [Fact]
     public void AllExceptionsInDomainAndApplication_ShouldInheritFromDomainException()
     {
-        TestResult result = Types.InAssemblies([DomainAssembly, ApplicationAssembly])
+        TestResult result = Types.InAssemblies(assemblies: [DomainAssembly, ApplicationAssembly])
             .That()
-            .Inherit(typeof(Exception))
+            .Inherit(type: typeof(Exception))
             .And()
-            .DoNotHaveName("DomainException")
+            .DoNotHaveName(name: "DomainException")
             .Should()
-            .Inherit(typeof(DomainException))
+            .Inherit(type: typeof(DomainException))
             .GetResult();
 
         Assert.True(
@@ -47,11 +47,11 @@ public sealed class ExceptionArchitectureTests
     [Fact]
     public void DomainExceptions_ShouldHaveNameEndingWithException()
     {
-        TestResult result = Types.InAssemblies([DomainAssembly, ApplicationAssembly])
+        TestResult result = Types.InAssemblies(assemblies: [DomainAssembly, ApplicationAssembly])
             .That()
-            .Inherit(typeof(DomainException))
+            .Inherit(type: typeof(DomainException))
             .Should()
-            .HaveNameEndingWith("Exception")
+            .HaveNameEndingWith(end: "Exception")
             .GetResult();
 
         Assert.True(
@@ -62,11 +62,11 @@ public sealed class ExceptionArchitectureTests
     [Fact]
     public void SpecializedDomainExceptions_ShouldBeSealed()
     {
-        TestResult result = Types.InAssembly(DomainAssembly)
+        TestResult result = Types.InAssembly(assembly: DomainAssembly)
             .That()
-            .Inherit(typeof(DomainException))
+            .Inherit(type: typeof(DomainException))
             .And()
-            .DoNotHaveName("DomainException")
+            .DoNotHaveName(name: "DomainException")
             .Should()
             .BeSealed()
             .GetResult();
@@ -82,7 +82,7 @@ public sealed class ExceptionArchitectureTests
         // Arrange
         IEnumerable<Type> domainExceptionTypes = DomainAssembly
             .GetTypes()
-            .Where(predicate: t => t.IsSubclassOf(c: typeof(DomainException))
+            .Where(predicate: static t => t.IsSubclassOf(c: typeof(DomainException))
                                  && !t.IsAbstract);
 
         string? interceptorSourcePath = Directory.GetFiles(
@@ -98,7 +98,7 @@ public sealed class ExceptionArchitectureTests
         // Act
         var unmappedTypes = domainExceptionTypes
             .Where(predicate: t => !interceptorSource.Contains(value: t.Name, comparisonType: StringComparison.Ordinal))
-            .Select(selector: t => t.Name)
+            .Select(selector: static t => t.Name)
             .ToList();
 
         // Assert

@@ -34,6 +34,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -61,6 +62,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 0
         };
 
@@ -89,6 +91,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -122,6 +125,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -155,6 +159,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -187,6 +192,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -238,6 +244,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -262,6 +269,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 
@@ -293,6 +301,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
+            Cursor = null,
             PageSize = 10
         };
 

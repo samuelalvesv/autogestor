@@ -16,14 +16,14 @@ public sealed class LayersTests
     private static readonly Assembly DomainAssembly = typeof(Domain.Entities.Entity).Assembly;
     private static readonly Assembly ContractAssembly = typeof(Contract.ContractDefaults).Assembly;
     private static readonly Assembly InfrastructureAssembly = typeof(Infrastructure.Persistence.AppDbContext).Assembly;
-    private static readonly Assembly ApplicationAssembly = Assembly.Load("Autogestor.Application");
+    private static readonly Assembly ApplicationAssembly = typeof(Application.Mappers.CategoryMapper).Assembly;
 
     [Fact]
     public void Domain_ShouldNotHaveDependencyOnOtherLayers()
     {
-        TestResult result = Types.InAssembly(DomainAssembly)
+        TestResult result = Types.InAssembly(assembly: DomainAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny(ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace, ContractNamespace)
+            .HaveDependencyOnAny(dependencies: [ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace, ContractNamespace])
             .GetResult();
 
         Assert.True(condition: result.IsSuccessful, userMessage: "A camada Domain não deve depender de outras camadas.");
@@ -32,9 +32,9 @@ public sealed class LayersTests
     [Fact]
     public void Contract_ShouldNotHaveDependencyOnOtherLayers()
     {
-        TestResult result = Types.InAssembly(ContractAssembly)
+        TestResult result = Types.InAssembly(assembly: ContractAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny(DomainNamespace, ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace)
+            .HaveDependencyOnAny(dependencies: [DomainNamespace, ApplicationNamespace, InfrastructureNamespace, ApiNamespace, WebNamespace])
             .GetResult();
 
         Assert.True(condition: result.IsSuccessful, userMessage: "A camada Contract não deve depender de outras camadas.");
@@ -43,9 +43,9 @@ public sealed class LayersTests
     [Fact]
     public void Contract_ShouldNotDependOnSystemComponentModelDataAnnotations()
     {
-        TestResult result = Types.InAssembly(ContractAssembly)
+        TestResult result = Types.InAssembly(assembly: ContractAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny("System.ComponentModel.DataAnnotations")
+            .HaveDependencyOnAny(dependencies: "System.ComponentModel.DataAnnotations")
             .GetResult();
 
         Assert.True(condition: result.IsSuccessful, userMessage: "A camada Contract não deve depender de DataAnnotations.");
@@ -54,9 +54,9 @@ public sealed class LayersTests
     [Fact]
     public void Application_ShouldNotHaveDependencyOnOuterLayers()
     {
-        TestResult result = Types.InAssembly(ApplicationAssembly)
+        TestResult result = Types.InAssembly(assembly: ApplicationAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny(InfrastructureNamespace, ApiNamespace, WebNamespace)
+            .HaveDependencyOnAny(dependencies: [InfrastructureNamespace, ApiNamespace, WebNamespace])
             .GetResult();
 
         Assert.True(condition: result.IsSuccessful, userMessage: "A camada Application não deve depender de Infrastructure, Api ou Web.");
@@ -65,9 +65,9 @@ public sealed class LayersTests
     [Fact]
     public void Application_ShouldNotDependOnReflectionBasedScanning()
     {
-        TestResult result = Types.InAssembly(ApplicationAssembly)
+        TestResult result = Types.InAssembly(assembly: ApplicationAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny("FluentValidation.DependencyInjectionExtensions")
+            .HaveDependencyOnAny(dependencies: "FluentValidation.DependencyInjectionExtensions")
             .GetResult();
 
         Assert.True(condition: result.IsSuccessful, userMessage: "A camada Application não deve depender de pacotes de scanning reflexivo.");
@@ -76,9 +76,9 @@ public sealed class LayersTests
     [Fact]
     public void Infrastructure_ShouldNotHaveDependencyOnApiOrWeb()
     {
-        TestResult result = Types.InAssembly(InfrastructureAssembly)
+        TestResult result = Types.InAssembly(assembly: InfrastructureAssembly)
             .ShouldNot()
-            .HaveDependencyOnAny(ApiNamespace, WebNamespace)
+            .HaveDependencyOnAny(dependencies: [ApiNamespace, WebNamespace])
             .GetResult();
 
         Assert.True(condition: result.IsSuccessful, userMessage: "A camada Infrastructure não deve depender de Api ou Web.");
@@ -87,18 +87,18 @@ public sealed class LayersTests
     [Fact]
     public void Interfaces_ShouldStartWithI()
     {
-        TestResult domainResult = Types.InAssembly(DomainAssembly)
+        TestResult domainResult = Types.InAssembly(assembly: DomainAssembly)
             .That()
             .AreInterfaces()
             .Should()
-            .HaveNameStartingWith("I")
+            .HaveNameStartingWith(start: "I")
             .GetResult();
 
-        TestResult contractResult = Types.InAssembly(ContractAssembly)
+        TestResult contractResult = Types.InAssembly(assembly: ContractAssembly)
             .That()
             .AreInterfaces()
             .Should()
-            .HaveNameStartingWith("I")
+            .HaveNameStartingWith(start: "I")
             .GetResult();
 
         Assert.True(condition: domainResult.IsSuccessful, userMessage: "As interfaces da camada Domain devem iniciar com 'I'.");
@@ -108,16 +108,16 @@ public sealed class LayersTests
     [Fact]
     public void Validators_ShouldBeSealedAndImplementIValidator()
     {
-        TestResult netArchResult = Types.InAssembly(ApplicationAssembly)
+        TestResult netArchResult = Types.InAssembly(assembly: ApplicationAssembly)
             .That()
-            .HaveNameEndingWith("Validator")
+            .HaveNameEndingWith(end: "Validator")
             .Should()
             .BeSealed()
             .GetResult();
 
         Assert.True(condition: netArchResult.IsSuccessful, userMessage: "Todos os validadores de request devem ser sealed.");
 
-        Type[] validatorTypes = [.. ApplicationAssembly.GetTypes().Where(static t => t.Name.EndsWith("Validator", StringComparison.Ordinal) && !t.IsNested)];
+        Type[] validatorTypes = [.. ApplicationAssembly.GetTypes().Where(static t => t.Name.EndsWith(value: "Validator", comparisonType: StringComparison.Ordinal) && !t.IsNested)];
 
         Assert.NotEmpty(collection: validatorTypes);
 
