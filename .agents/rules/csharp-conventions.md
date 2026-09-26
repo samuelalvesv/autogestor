@@ -31,8 +31,9 @@ applyTo: "**/*.{cs,razor}"
 ## Diretrizes de Otimização e Performance
 
 - **Source Generators (Geração de Código no Build)**: É proibido o uso de reflexão em tempo de execução (`System.Reflection`).
-  - Para serialização/desserialização JSON, utilizar obrigatoriamente **System.Text.Json Source Generation** configurando uma classe parcial que estende `JsonSerializerContext` com os atributos `[JsonSourceGenerationOptions]` e `[JsonSerializable]`.
-  - Usar o atributo `[JsonConstructor]` para instruir explicitamente o compilador sobre qual construtor de record/classe imutável utilizar durante a desserialização.
+  - **Transporte e Serialização**: O canal canônico e exclusivo de transporte cliente-servidor é 100% gRPC Code-First via Protobuf. Caso ocorra manipulação de JSON para integrações isoladas, utilizar obrigatoriamente **System.Text.Json Source Generation** configurando uma classe parcial que estende `JsonSerializerContext` com os atributos `[JsonSourceGenerationOptions]` e `[JsonSerializable]`.
+  - **Mapeamento de Objetos**: A biblioteca oficial de mapeamento entre contratos e entidades de domínio é o **Riok.Mapperly**, operando estritamente via Source Generator em tempo de compilação, assegurando zero overhead de memória, zero reflexão em runtime e total conformidade com Native AOT. É expressamente proibido o uso de bibliotecas baseadas em reflexão dinâmica em tempo de execução.
+  - **Logging**: Emissão de logs estruturados deve utilizar o Source Generator nativo `[LoggerMessage]` em métodos parciais estáticos com `Microsoft.Extensions.Logging`, garantindo zero alocações na Heap e conformidade estrita com Native AOT.
   - Para expressões regulares estáticas, utilizar obrigatoriamente o atributo `[GeneratedRegex]` em métodos parciais.
 - **Estruturas de Dados e Passagem por Referência**:
   - Utilizar `readonly struct` para criar tipos de valor imutáveis que não necessitam de alocações na Heap.
