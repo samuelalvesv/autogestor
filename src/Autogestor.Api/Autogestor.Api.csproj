@@ -15,7 +15,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="protobuf-net.Grpc.AspNetCore" />
-    <PackageReference Include="protobuf-net.Grpc.AspNetCore.Reflection" />
   </ItemGroup>
 
   <PropertyGroup>

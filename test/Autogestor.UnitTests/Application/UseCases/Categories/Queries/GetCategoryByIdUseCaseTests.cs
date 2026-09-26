@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Categories.Queries.GetCategoryById;
+using Autogestor.Application.Validators.Categories;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
@@ -9,12 +10,16 @@ namespace Autogestor.UnitTests.Application.UseCases.Categories.Queries;
 
 public sealed class GetCategoryByIdUseCaseTests
 {
+    private readonly GetCategoryByIdRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WhenCategoryExists_ReturnsCategoryResponse()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetCategoryByIdUseCase(categoryRepository: repository);
+        var useCase = new GetCategoryByIdUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var category = Category.Create(
             title: "Alimentação",
@@ -47,11 +52,36 @@ public sealed class GetCategoryByIdUseCaseTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithEmptyId_ThrowsDomainValidationException()
+    {
+        // Arrange
+        var repository = new CategoryRepositoryFake();
+        var useCase = new GetCategoryByIdUseCase(
+            categoryRepository: repository,
+            validator: _validator);
+
+        var request = new GetCategoryByIdRequest
+        {
+            Id = Guid.Empty
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O identificador da categoria é obrigatório.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenCategoryNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetCategoryByIdUseCase(categoryRepository: repository);
+        var useCase = new GetCategoryByIdUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var request = new GetCategoryByIdRequest
         {
@@ -73,7 +103,9 @@ public sealed class GetCategoryByIdUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetCategoryByIdUseCase(categoryRepository: repository);
+        var useCase = new GetCategoryByIdUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var category = Category.Create(
             title: "Educação",
@@ -110,7 +142,9 @@ public sealed class GetCategoryByIdUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetCategoryByIdUseCase(categoryRepository: repository);
+        var useCase = new GetCategoryByIdUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var request = new GetCategoryByIdRequest
         {

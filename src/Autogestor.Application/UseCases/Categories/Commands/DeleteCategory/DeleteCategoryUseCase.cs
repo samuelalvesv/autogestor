@@ -1,21 +1,26 @@
 using Autogestor.Application.Interfaces;
+using Autogestor.Application.Validators;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Exceptions;
 using Autogestor.Domain.Interfaces;
+using FluentValidation;
 
 namespace Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
 
 public sealed class DeleteCategoryUseCase(
     ICategoryRepository categoryRepository,
     ITransactionRepository transactionRepository,
-    IUnitOfWork unitOfWork) : IDeleteCategoryUseCase
+    IUnitOfWork unitOfWork,
+    IValidator<DeleteCategoryRequest> validator) : IDeleteCategoryUseCase
 {
     public async Task<DeleteResponse> ExecuteAsync(
         DeleteCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
+        await validator.ValidateOrThrowAsync(instance: request, cancellationToken: cancellationToken);
+
         Category? category = await categoryRepository.GetByIdAsync(
             id: request.Id,
             cancellationToken: cancellationToken)

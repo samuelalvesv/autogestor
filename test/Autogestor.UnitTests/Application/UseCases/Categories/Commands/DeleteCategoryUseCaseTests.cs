@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Categories.Commands.DeleteCategory;
+using Autogestor.Application.Validators.Categories;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Domain.Entities;
@@ -10,6 +11,8 @@ namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
 
 public sealed class DeleteCategoryUseCaseTests
 {
+    private readonly DeleteCategoryRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WithValidRequest_ReturnsSuccessResponseAndRemovesCategory()
     {
@@ -20,7 +23,8 @@ public sealed class DeleteCategoryUseCaseTests
         var useCase = new DeleteCategoryUseCase(
             categoryRepository: categoryRepository,
             transactionRepository: transactionRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Alimentação",
@@ -47,6 +51,34 @@ public sealed class DeleteCategoryUseCaseTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithEmptyId_ThrowsDomainValidationException()
+    {
+        // Arrange
+        var categoryRepository = new CategoryRepositoryFake();
+        var transactionRepository = new TransactionRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
+        var useCase = new DeleteCategoryUseCase(
+            categoryRepository: categoryRepository,
+            transactionRepository: transactionRepository,
+            unitOfWork: unitOfWork,
+            validator: _validator);
+
+        var request = new DeleteCategoryRequest
+        {
+            Id = Guid.Empty
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O identificador da categoria é obrigatório.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+        Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenCategoryNotFound_ThrowsNotFoundException()
     {
         // Arrange
@@ -56,7 +88,8 @@ public sealed class DeleteCategoryUseCaseTests
         var useCase = new DeleteCategoryUseCase(
             categoryRepository: categoryRepository,
             transactionRepository: transactionRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new DeleteCategoryRequest
         {
@@ -85,7 +118,8 @@ public sealed class DeleteCategoryUseCaseTests
         var useCase = new DeleteCategoryUseCase(
             categoryRepository: categoryRepository,
             transactionRepository: transactionRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Transporte",
@@ -126,7 +160,8 @@ public sealed class DeleteCategoryUseCaseTests
         var useCase = new DeleteCategoryUseCase(
             categoryRepository: categoryRepository,
             transactionRepository: transactionRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var targetCategory = Category.Create(
             title: "Categoria Alvo",
@@ -175,7 +210,8 @@ public sealed class DeleteCategoryUseCaseTests
         var useCase = new DeleteCategoryUseCase(
             categoryRepository: categoryRepository,
             transactionRepository: transactionRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Assinaturas",
@@ -217,7 +253,8 @@ public sealed class DeleteCategoryUseCaseTests
         var useCase = new DeleteCategoryUseCase(
             categoryRepository: categoryRepository,
             transactionRepository: transactionRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Lazer",

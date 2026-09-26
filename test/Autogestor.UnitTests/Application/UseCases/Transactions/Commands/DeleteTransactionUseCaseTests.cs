@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
+using Autogestor.Application.Validators.Transactions;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Domain.Entities;
@@ -10,6 +11,8 @@ namespace Autogestor.UnitTests.Application.UseCases.Transactions.Commands;
 
 public sealed class DeleteTransactionUseCaseTests
 {
+    private readonly DeleteTransactionRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WithValidRequest_ReturnsSuccessResponseAndRemovesTransaction()
     {
@@ -18,7 +21,8 @@ public sealed class DeleteTransactionUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new DeleteTransactionUseCase(
             transactionRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingTransaction = Transaction.Create(
             title: "Supermercado",
@@ -46,6 +50,32 @@ public sealed class DeleteTransactionUseCaseTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithEmptyId_ThrowsDomainValidationException()
+    {
+        // Arrange
+        var repository = new TransactionRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
+        var useCase = new DeleteTransactionUseCase(
+            transactionRepository: repository,
+            unitOfWork: unitOfWork,
+            validator: _validator);
+
+        var request = new DeleteTransactionRequest
+        {
+            Id = Guid.Empty
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O identificador da transação é obrigatório.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+        Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenTransactionNotFound_ThrowsNotFoundException()
     {
         // Arrange
@@ -53,7 +83,8 @@ public sealed class DeleteTransactionUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new DeleteTransactionUseCase(
             transactionRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new DeleteTransactionRequest
         {
@@ -78,7 +109,8 @@ public sealed class DeleteTransactionUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new DeleteTransactionUseCase(
             transactionRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var targetTransaction = Transaction.Create(
             title: "Alvo",
@@ -121,7 +153,8 @@ public sealed class DeleteTransactionUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new DeleteTransactionUseCase(
             transactionRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingTransaction = Transaction.Create(
             title: "Assinatura Streaming",
@@ -162,7 +195,8 @@ public sealed class DeleteTransactionUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new DeleteTransactionUseCase(
             transactionRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingTransaction = Transaction.Create(
             title: "Salário",

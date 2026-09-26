@@ -1,22 +1,27 @@
 using Autogestor.Application.Interfaces;
-using Autogestor.Contract.Enums;
+using Autogestor.Application.Mappers;
+using Autogestor.Application.Validators;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Exceptions;
 using Autogestor.Domain.Interfaces;
+using FluentValidation;
 
 namespace Autogestor.Application.UseCases.Transactions.Commands.CreateTransaction;
 
 public sealed class CreateTransactionUseCase(
     ITransactionRepository transactionRepository,
     ICategoryRepository categoryRepository,
-    IUnitOfWork unitOfWork) : ICreateTransactionUseCase
+    IUnitOfWork unitOfWork,
+    IValidator<CreateTransactionRequest> validator) : ICreateTransactionUseCase
 {
     public async Task<TransactionResponse> ExecuteAsync(
         CreateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
+        await validator.ValidateOrThrowAsync(instance: request, cancellationToken: cancellationToken);
+
         bool categoryExists = await categoryRepository.ExistsAsync(
             id: request.CategoryId,
             cancellationToken: cancellationToken);
@@ -26,26 +31,13 @@ public sealed class CreateTransactionUseCase(
 
         var transaction = Transaction.Create(
             title: request.Title,
-            type: (Domain.Enums.ETransactionType)request.Type,
+            type: TransactionMapper.ToDomain(type: request.Type),
             amount: request.Amount,
             categoryId: request.CategoryId);
 
         transactionRepository.Add(transaction: transaction);
         await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-        return new TransactionResponse
-        {
-            Id = transaction.Id,
-            Active = transaction.Active,
-            CreatedBy = transaction.CreatedBy,
-            CreatedAt = transaction.CreatedAt,
-            UpdatedBy = transaction.UpdatedBy,
-            UpdatedAt = transaction.UpdatedAt,
-            TenantId = transaction.TenantId,
-            Title = transaction.Title,
-            Type = (ETransactionType)transaction.Type,
-            Amount = transaction.Amount,
-            CategoryId = transaction.CategoryId
-        };
+        return TransactionMapper.ToResponse(transaction: transaction);
     }
 }

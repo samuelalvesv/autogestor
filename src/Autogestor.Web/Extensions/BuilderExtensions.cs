@@ -26,11 +26,6 @@ public static class BuilderExtensions
 
         builder.Services.AddMudServices();
 
-        builder.Services.AddScoped(implementationFactory: _ => new HttpClient
-        {
-            BaseAddress = apiAddress
-        });
-
         builder.Services.AddScoped(implementationFactory: _ =>
         {
             var handler = new GrpcWebHandler(mode: GrpcWebMode.GrpcWebText, innerHandler: new HttpClientHandler());

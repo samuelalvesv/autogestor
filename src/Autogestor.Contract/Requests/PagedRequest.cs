@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Autogestor.Contract.Requests;
@@ -10,6 +9,5 @@ public abstract record PagedRequest
     public Guid? Cursor { get; init; }
 
     [DataMember(Order = 2)]
-    [Range(minimum: ContractDefaults.MinPageSize, maximum: ContractDefaults.MaxPageSize)]
     public required int PageSize { get; init; }
 }

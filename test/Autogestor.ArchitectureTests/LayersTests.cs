@@ -41,6 +41,17 @@ public sealed class LayersTests
     }
 
     [Fact]
+    public void Contract_ShouldNotDependOnSystemComponentModelDataAnnotations()
+    {
+        TestResult result = Types.InAssembly(ContractAssembly)
+            .ShouldNot()
+            .HaveDependencyOnAny("System.ComponentModel.DataAnnotations")
+            .GetResult();
+
+        Assert.True(condition: result.IsSuccessful, userMessage: "A camada Contract não deve depender de DataAnnotations.");
+    }
+
+    [Fact]
     public void Application_ShouldNotHaveDependencyOnOuterLayers()
     {
         TestResult result = Types.InAssembly(ApplicationAssembly)
@@ -49,6 +60,17 @@ public sealed class LayersTests
             .GetResult();
 
         Assert.True(condition: result.IsSuccessful, userMessage: "A camada Application não deve depender de Infrastructure, Api ou Web.");
+    }
+
+    [Fact]
+    public void Application_ShouldNotDependOnReflectionBasedScanning()
+    {
+        TestResult result = Types.InAssembly(ApplicationAssembly)
+            .ShouldNot()
+            .HaveDependencyOnAny("FluentValidation.DependencyInjectionExtensions")
+            .GetResult();
+
+        Assert.True(condition: result.IsSuccessful, userMessage: "A camada Application não deve depender de pacotes de scanning reflexivo.");
     }
 
     [Fact]
@@ -81,5 +103,47 @@ public sealed class LayersTests
 
         Assert.True(condition: domainResult.IsSuccessful, userMessage: "As interfaces da camada Domain devem iniciar com 'I'.");
         Assert.True(condition: contractResult.IsSuccessful, userMessage: "As interfaces da camada Contract devem iniciar com 'I'.");
+    }
+
+    [Fact]
+    public void Validators_ShouldBeSealedAndImplementIValidator()
+    {
+        TestResult netArchResult = Types.InAssembly(ApplicationAssembly)
+            .That()
+            .HaveNameEndingWith("Validator")
+            .Should()
+            .BeSealed()
+            .GetResult();
+
+        Assert.True(condition: netArchResult.IsSuccessful, userMessage: "Todos os validadores de request devem ser sealed.");
+
+        Type[] validatorTypes = [.. ApplicationAssembly.GetTypes().Where(static t => t.Name.EndsWith("Validator", StringComparison.Ordinal) && !t.IsNested)];
+
+        Assert.NotEmpty(collection: validatorTypes);
+
+        foreach (Type validatorType in validatorTypes)
+        {
+            Assert.True(
+                condition: typeof(FluentValidation.IValidator).IsAssignableFrom(c: validatorType),
+                userMessage: $"O validador '{validatorType.Name}' deve implementar IValidator.");
+        }
+    }
+
+    [Fact]
+    public void Mappers_ShouldBeStaticClasses()
+    {
+        Type[] mapperTypes = [.. ApplicationAssembly.GetTypes().Where(static t => t.Namespace == "Autogestor.Application.Mappers" && !t.IsNested)];
+
+        Assert.NotEmpty(collection: mapperTypes);
+
+        foreach (Type mapperType in mapperTypes)
+        {
+            Assert.True(
+                condition: mapperType.IsAbstract && mapperType.IsSealed,
+                userMessage: $"O mapper '{mapperType.Name}' deve ser uma classe estática (abstract e sealed).");
+
+            MethodInfo[] methods = mapperType.GetMethods(bindingAttr: BindingFlags.Public | BindingFlags.Static);
+            Assert.NotEmpty(collection: methods);
+        }
     }
 }

@@ -1,6 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Riok.Mapperly">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Autogestor.Contract/Autogestor.Contract.csproj" />
     <ProjectReference Include="../Autogestor.Domain/Autogestor.Domain.csproj" />
   </ItemGroup>

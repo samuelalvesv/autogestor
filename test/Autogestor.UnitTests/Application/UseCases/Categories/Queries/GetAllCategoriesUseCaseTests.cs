@@ -1,20 +1,26 @@
 using Autogestor.Application.UseCases.Categories.Queries.GetAllCategories;
+using Autogestor.Application.Validators.Categories;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 
 namespace Autogestor.UnitTests.Application.UseCases.Categories.Queries;
 
 public sealed class GetAllCategoriesUseCaseTests
 {
+    private readonly GetAllCategoriesRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WhenCategoriesExist_ReturnsPagedResponseWithMappedData()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var category1 = Category.Create(
             title: "Alimentação",
@@ -45,11 +51,36 @@ public sealed class GetAllCategoriesUseCaseTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithInvalidPageSize_ThrowsDomainValidationException()
+    {
+        // Arrange
+        var repository = new CategoryRepositoryFake();
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
+
+        var request = new GetAllCategoriesRequest
+        {
+            PageSize = 0
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O tamanho da página deve estar entre", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenCategoriesExist_MapsAllFieldsCorrectly()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var category = Category.Create(
             title: "Educação",
@@ -85,7 +116,9 @@ public sealed class GetAllCategoriesUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var request = new GetAllCategoriesRequest
         {
@@ -109,7 +142,9 @@ public sealed class GetAllCategoriesUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         for (int i = 0; i < 15; i++)
         {
@@ -139,7 +174,9 @@ public sealed class GetAllCategoriesUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         for (int i = 0; i < 10; i++)
         {
@@ -169,7 +206,9 @@ public sealed class GetAllCategoriesUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
         var cursor = Guid.NewGuid();
 
         var request = new GetAllCategoriesRequest
@@ -193,7 +232,9 @@ public sealed class GetAllCategoriesUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var request = new GetAllCategoriesRequest
         {
@@ -215,7 +256,9 @@ public sealed class GetAllCategoriesUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
         var request = new GetAllCategoriesRequest
         {
@@ -237,9 +280,11 @@ public sealed class GetAllCategoriesUseCaseTests
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
-        var useCase = new GetAllCategoriesUseCase(categoryRepository: repository);
+        var useCase = new GetAllCategoriesUseCase(
+            categoryRepository: repository,
+            validator: _validator);
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 15; i++)
         {
             repository.Add(category: Category.Create(
                 title: $"Cat {i}",
@@ -248,7 +293,7 @@ public sealed class GetAllCategoriesUseCaseTests
 
         var request = new GetAllCategoriesRequest
         {
-            PageSize = 3
+            PageSize = 10
         };
 
         // Act
@@ -257,7 +302,7 @@ public sealed class GetAllCategoriesUseCaseTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.True(condition: response.HasNextPage, userMessage: "Com 5 itens e pageSize 3, deve haver próxima página.");
+        Assert.True(condition: response.HasNextPage, userMessage: "Com 15 itens e pageSize 10, deve haver próxima página.");
         Assert.NotNull(@object: response.NextCursor);
         Assert.Equal(expected: response.Data[^1].Id, actual: response.NextCursor);
     }

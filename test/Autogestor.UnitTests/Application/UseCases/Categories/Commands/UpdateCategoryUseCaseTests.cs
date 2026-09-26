@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Categories.Commands.UpdateCategory;
+using Autogestor.Application.Validators.Categories;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses.Categories;
 using Autogestor.Domain.Entities;
@@ -9,6 +10,8 @@ namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
 
 public sealed class UpdateCategoryUseCaseTests
 {
+    private readonly UpdateCategoryRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WithValidRequest_ReturnsSuccessResponseAndUpdatesCategory()
     {
@@ -17,7 +20,8 @@ public sealed class UpdateCategoryUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new UpdateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Alimentação",
@@ -58,7 +62,8 @@ public sealed class UpdateCategoryUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new UpdateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new UpdateCategoryRequest
         {
@@ -77,18 +82,47 @@ public sealed class UpdateCategoryUseCaseTests
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData(null)]
-    public async Task ExecuteAsync_WithInvalidTitle_ThrowsArgumentException(string? invalidTitle)
+    [Fact]
+    public async Task ExecuteAsync_WithEmptyId_ThrowsDomainValidationException()
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new UpdateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
+
+        var request = new UpdateCategoryRequest
+        {
+            Id = Guid.Empty,
+            Title = "Título válido",
+            Description = "Descrição válida"
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O identificador da categoria é obrigatório.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+        Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData(null)]
+    public async Task ExecuteAsync_WithInvalidTitle_ThrowsDomainValidationException(string? invalidTitle)
+    {
+        // Arrange
+        var repository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
+        var useCase = new UpdateCategoryUseCase(
+            categoryRepository: repository,
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Transporte",
@@ -103,12 +137,12 @@ public sealed class UpdateCategoryUseCaseTests
         };
 
         // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "title", actual: exception.ParamName);
-        Assert.Equal(expected: "O título da categoria não pode ser vazio. (Parameter 'title')", actual: exception.Message);
+
+        Assert.Contains(expectedSubstring: "O título da categoria não pode ser vazio.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
@@ -116,14 +150,15 @@ public sealed class UpdateCategoryUseCaseTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public async Task ExecuteAsync_WithInvalidDescription_ThrowsArgumentException(string? invalidDescription)
+    public async Task ExecuteAsync_WithInvalidDescription_ThrowsDomainValidationException(string? invalidDescription)
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new UpdateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Educação",
@@ -138,12 +173,12 @@ public sealed class UpdateCategoryUseCaseTests
         };
 
         // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "description", actual: exception.ParamName);
-        Assert.Equal(expected: "A descrição da categoria não pode ser vazia. (Parameter 'description')", actual: exception.Message);
+
+        Assert.Contains(expectedSubstring: "A descrição da categoria não pode ser vazia.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 
@@ -155,7 +190,8 @@ public sealed class UpdateCategoryUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new UpdateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var existingCategory = Category.Create(
             title: "Saúde",

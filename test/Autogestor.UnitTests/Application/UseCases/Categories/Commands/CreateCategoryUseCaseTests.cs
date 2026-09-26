@@ -1,12 +1,16 @@
 using Autogestor.Application.UseCases.Categories.Commands.CreateCategory;
+using Autogestor.Application.Validators.Categories;
 using Autogestor.Contract.Requests.Categories;
 using Autogestor.Contract.Responses.Categories;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 
 namespace Autogestor.UnitTests.Application.UseCases.Categories.Commands;
 
 public sealed class CreateCategoryUseCaseTests
 {
+    private readonly CreateCategoryRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WithValidRequest_ReturnsSuccessResponseAndPersistsCategory()
     {
@@ -15,7 +19,8 @@ public sealed class CreateCategoryUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new CreateCategoryRequest
         {
@@ -49,14 +54,15 @@ public sealed class CreateCategoryUseCaseTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public async Task ExecuteAsync_WithInvalidTitle_ThrowsArgumentException(string? invalidTitle)
+    public async Task ExecuteAsync_WithInvalidTitle_ThrowsDomainValidationException(string? invalidTitle)
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new CreateCategoryRequest
         {
@@ -65,12 +71,11 @@ public sealed class CreateCategoryUseCaseTests
         };
 
         // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "title", actual: exception.ParamName);
-        Assert.Equal(expected: "O título da categoria não pode ser vazio. (Parameter 'title')", actual: exception.Message);
+        Assert.Contains(expectedSubstring: "O título da categoria não pode ser vazio.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Empty(collection: repository.Categories);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
@@ -79,14 +84,15 @@ public sealed class CreateCategoryUseCaseTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public async Task ExecuteAsync_WithInvalidDescription_ThrowsArgumentException(string? invalidDescription)
+    public async Task ExecuteAsync_WithInvalidDescription_ThrowsDomainValidationException(string? invalidDescription)
     {
         // Arrange
         var repository = new CategoryRepositoryFake();
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new CreateCategoryRequest
         {
@@ -95,12 +101,11 @@ public sealed class CreateCategoryUseCaseTests
         };
 
         // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "description", actual: exception.ParamName);
-        Assert.Equal(expected: "A descrição da categoria não pode ser vazia. (Parameter 'description')", actual: exception.Message);
+        Assert.Contains(expectedSubstring: "A descrição da categoria não pode ser vazia.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Empty(collection: repository.Categories);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
@@ -113,7 +118,8 @@ public sealed class CreateCategoryUseCaseTests
         var unitOfWork = new UnitOfWorkFake();
         var useCase = new CreateCategoryUseCase(
             categoryRepository: repository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new CreateCategoryRequest
         {

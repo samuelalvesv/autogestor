@@ -1,45 +1,31 @@
-using Autogestor.Contract.Enums;
+using Autogestor.Application.Mappers;
+using Autogestor.Application.Validators;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
 using Autogestor.Domain.Interfaces;
+using FluentValidation;
 
 namespace Autogestor.Application.UseCases.Transactions.Queries.GetAllTransactions;
 
 public sealed class GetAllTransactionsUseCase(
-    ITransactionRepository transactionRepository) : IGetAllTransactionsUseCase
+    ITransactionRepository transactionRepository,
+    IValidator<GetAllTransactionsRequest> validator) : IGetAllTransactionsUseCase
 {
     public async Task<PagedResponse<TransactionResponse>> ExecuteAsync(
         GetAllTransactionsRequest request,
         CancellationToken cancellationToken = default)
     {
+        await validator.ValidateOrThrowAsync(instance: request, cancellationToken: cancellationToken);
+
         (IReadOnlyList<Transaction>? transactions, bool hasNextPage) = await transactionRepository.GetPagedAsync(
             cursor: request.Cursor,
             pageSize: request.PageSize,
             cancellationToken: cancellationToken);
 
-        IReadOnlyList<TransactionResponse> response = [.. transactions
-            .Select(selector: static transaction => new TransactionResponse
-            {
-                Id = transaction.Id,
-                Active = transaction.Active,
-                CreatedBy = transaction.CreatedBy,
-                CreatedAt = transaction.CreatedAt,
-                UpdatedBy = transaction.UpdatedBy,
-                UpdatedAt = transaction.UpdatedAt,
-                TenantId = transaction.TenantId,
-                Title = transaction.Title,
-                Type = (ETransactionType)transaction.Type,
-                Amount = transaction.Amount,
-                CategoryId = transaction.CategoryId
-            })];
-
-        return new PagedResponse<TransactionResponse>
-        {
-            Data = response,
-            HasNextPage = hasNextPage,
-            NextCursor = hasNextPage ? transactions[^1].Id : null
-        };
+        return TransactionMapper.ToPagedResponse(
+            transactions: transactions,
+            hasNextPage: hasNextPage);
     }
 }

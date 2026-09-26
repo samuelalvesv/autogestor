@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Autogestor.Contract;
 using Autogestor.Contract.Requests;
 
@@ -8,78 +7,48 @@ public sealed class PagedRequestTests
 {
     private sealed record TestPagedRequest : PagedRequest;
 
-    private static IList<ValidationResult> ValidateModel(object model)
-    {
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(instance: model, serviceProvider: null, items: null);
-        Validator.TryValidateObject(instance: model, validationContext: validationContext, validationResults: validationResults, validateAllProperties: true);
-        return validationResults;
-    }
-
     [Fact]
-    public void PagedRequest_WithValidValues_PassesValidation()
+    public void PagedRequest_WithValues_SetsPropertiesCorrectly()
     {
-        // Arrange & Act
+        // Arrange
+        var cursor = Guid.NewGuid();
+
+        // Act
         var request = new TestPagedRequest
         {
+            Cursor = cursor,
             PageSize = ContractDefaults.DefaultPageSize
         };
 
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
         // Assert
-        Assert.Empty(collection: errors);
+        Assert.Equal(expected: cursor, actual: request.Cursor);
+        Assert.Equal(expected: ContractDefaults.DefaultPageSize, actual: request.PageSize);
     }
 
     [Fact]
-    public void PagedRequest_WithCursor_PassesValidation()
+    public void PagedRequest_WithNullCursor_SetsCursorToNull()
     {
-        // Arrange & Act
-        var request = new TestPagedRequest
-        {
-            Cursor = Guid.NewGuid(),
-            PageSize = ContractDefaults.DefaultPageSize
-        };
-
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
-        // Assert
-        Assert.Empty(collection: errors);
-    }
-
-    [Fact]
-    public void PagedRequest_WithNullCursor_PassesValidation()
-    {
-        // Arrange & Act
+        // Act
         var request = new TestPagedRequest
         {
             Cursor = null,
-            PageSize = ContractDefaults.DefaultPageSize
+            PageSize = 20
         };
 
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
         // Assert
-        Assert.Empty(collection: errors);
         Assert.Null(@object: request.Cursor);
+        Assert.Equal(expected: 20, actual: request.PageSize);
     }
 
-    [Theory]
-    [InlineData(5)]
-    [InlineData(51)]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void PagedRequest_WithInvalidPageSize_FailsValidation(int pageSize)
+    [Fact]
+    public void PagedRequest_RecordEquality_ReturnsTrueForEqualValues()
     {
-        // Arrange & Act
-        var request = new TestPagedRequest
-        {
-            PageSize = pageSize
-        };
+        // Arrange
+        var cursor = Guid.NewGuid();
+        var request1 = new TestPagedRequest { Cursor = cursor, PageSize = 25 };
+        var request2 = new TestPagedRequest { Cursor = cursor, PageSize = 25 };
 
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
-        // Assert
-        Assert.NotEmpty(collection: errors);
+        // Act & Assert
+        Assert.Equal(expected: request1, actual: request2);
     }
 }

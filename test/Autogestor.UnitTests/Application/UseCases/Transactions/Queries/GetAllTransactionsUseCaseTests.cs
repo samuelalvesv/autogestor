@@ -1,9 +1,11 @@
 using Autogestor.Application.UseCases.Transactions.Queries.GetAllTransactions;
+using Autogestor.Application.Validators.Transactions;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses;
 using Autogestor.Contract.Responses.Transactions;
 using Autogestor.Domain.Entities;
+using Autogestor.Domain.Exceptions;
 using Autogestor.UnitTests.Common.Fakes;
 using DomainTransactionType = Autogestor.Domain.Enums.ETransactionType;
 
@@ -11,12 +13,16 @@ namespace Autogestor.UnitTests.Application.UseCases.Transactions.Queries;
 
 public sealed class GetAllTransactionsUseCaseTests
 {
+    private readonly GetAllTransactionsRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WhenTransactionsExist_ReturnsPagedResponseWithMappedData()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var categoryId = Guid.NewGuid();
         var tx1 = Transaction.Create(
@@ -52,11 +58,36 @@ public sealed class GetAllTransactionsUseCaseTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithInvalidPageSize_ThrowsDomainValidationException()
+    {
+        // Arrange
+        var repository = new TransactionRepositoryFake();
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
+
+        var request = new GetAllTransactionsRequest
+        {
+            PageSize = 0
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O tamanho da página deve estar entre", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenTransactionsExist_MapsAllFieldsCorrectly()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var categoryId = Guid.NewGuid();
         var transaction = Transaction.Create(
@@ -97,7 +128,9 @@ public sealed class GetAllTransactionsUseCaseTests
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var request = new GetAllTransactionsRequest
         {
@@ -121,7 +154,9 @@ public sealed class GetAllTransactionsUseCaseTests
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var categoryId = Guid.NewGuid();
         for (int i = 0; i < 15; i++)
@@ -154,7 +189,9 @@ public sealed class GetAllTransactionsUseCaseTests
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var categoryId = Guid.NewGuid();
         for (int i = 0; i < 10; i++)
@@ -187,7 +224,9 @@ public sealed class GetAllTransactionsUseCaseTests
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
         var cursor = Guid.NewGuid();
 
         var request = new GetAllTransactionsRequest
@@ -207,11 +246,37 @@ public sealed class GetAllTransactionsUseCaseTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithNullCursor_PropagatesNullCursorToRepository()
+    {
+        // Arrange
+        var repository = new TransactionRepositoryFake();
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
+
+        var request = new GetAllTransactionsRequest
+        {
+            PageSize = 10
+        };
+
+        // Act
+        await useCase.ExecuteAsync(
+            request: request,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Null(@object: repository.LastPagedCursor);
+        Assert.Equal(expected: 10, actual: repository.LastPagedPageSize);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_PropagatesCancellationToken()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var request = new GetAllTransactionsRequest
         {
@@ -233,10 +298,12 @@ public sealed class GetAllTransactionsUseCaseTests
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetAllTransactionsUseCase(transactionRepository: repository);
+        var useCase = new GetAllTransactionsUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var categoryId = Guid.NewGuid();
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 15; i++)
         {
             repository.Add(transaction: Transaction.Create(
                 title: $"Tx {i}",
@@ -247,7 +314,7 @@ public sealed class GetAllTransactionsUseCaseTests
 
         var request = new GetAllTransactionsRequest
         {
-            PageSize = 3
+            PageSize = 10
         };
 
         // Act
@@ -256,7 +323,7 @@ public sealed class GetAllTransactionsUseCaseTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.True(condition: response.HasNextPage, userMessage: "Com 5 itens e pageSize 3, deve haver próxima página.");
+        Assert.True(condition: response.HasNextPage, userMessage: "Com 15 itens e pageSize 10, deve haver próxima página.");
         Assert.NotNull(@object: response.NextCursor);
         Assert.Equal(expected: response.Data[^1].Id, actual: response.NextCursor);
     }

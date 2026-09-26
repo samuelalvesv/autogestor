@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Autogestor.Contract.Requests.Categories;
@@ -7,18 +6,11 @@ namespace Autogestor.Contract.Requests.Categories;
 public sealed record UpdateCategoryRequest
 {
     [DataMember(Order = 1)]
-    [Required(ErrorMessage = "Categoria inválida")]
     public required Guid Id { get; init; }
 
     [DataMember(Order = 2)]
-    [Required(ErrorMessage = "Título inválido")]
-    [MinLength(length: 3, ErrorMessage = "O título deve conter no mínimo 3 caracteres")]
-    [MaxLength(length: 80, ErrorMessage = "O título deve conter no máximo 80 caracteres")]
     public required string Title { get; init; }
 
     [DataMember(Order = 3)]
-    [Required(ErrorMessage = "Descrição inválida")]
-    [MinLength(length: 3, ErrorMessage = "A descrição deve conter no mínimo 3 caracteres")]
-    [MaxLength(length: 180, ErrorMessage = "A descrição deve conter no máximo 180 caracteres")]
     public required string Description { get; init; }
 }

@@ -1,30 +1,34 @@
-using System.ComponentModel.DataAnnotations;
 using Autogestor.Contract.Requests.Transactions;
 
 namespace Autogestor.UnitTests.Contract.Requests.Transactions;
 
 public sealed class DeleteTransactionRequestTests
 {
-    private static IList<ValidationResult> ValidateModel(object model)
+    [Fact]
+    public void DeleteTransactionRequest_WithValues_SetsPropertiesCorrectly()
     {
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(instance: model, serviceProvider: null, items: null);
-        Validator.TryValidateObject(instance: model, validationContext: validationContext, validationResults: validationResults, validateAllProperties: true);
-        return validationResults;
+        // Arrange
+        var id = Guid.NewGuid();
+
+        // Act
+        var request = new DeleteTransactionRequest
+        {
+            Id = id
+        };
+
+        // Assert
+        Assert.Equal(expected: id, actual: request.Id);
     }
 
     [Fact]
-    public void DeleteTransactionRequest_WithValidData_PassesValidation()
+    public void DeleteTransactionRequest_RecordEquality_ReturnsTrueForEqualValues()
     {
-        // Arrange & Act
-        var request = new DeleteTransactionRequest
-        {
-            Id = Guid.NewGuid()
-        };
+        // Arrange
+        var id = Guid.NewGuid();
+        var request1 = new DeleteTransactionRequest { Id = id };
+        var request2 = new DeleteTransactionRequest { Id = id };
 
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
-        // Assert
-        Assert.Empty(collection: errors);
+        // Act & Assert
+        Assert.Equal(expected: request1, actual: request2);
     }
 }

@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
+using Autogestor.Application.Validators.Transactions;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses.Transactions;
@@ -10,12 +11,16 @@ namespace Autogestor.UnitTests.Application.UseCases.Transactions.Queries;
 
 public sealed class GetTransactionByIdUseCaseTests
 {
+    private readonly GetTransactionByIdRequestValidator _validator = new();
+
     [Fact]
     public async Task ExecuteAsync_WhenTransactionExists_ReturnsTransactionResponse()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetTransactionByIdUseCase(transactionRepository: repository);
+        var useCase = new GetTransactionByIdUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var transaction = Transaction.Create(
             title: "Salário Mensal",
@@ -52,11 +57,36 @@ public sealed class GetTransactionByIdUseCaseTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithEmptyId_ThrowsDomainValidationException()
+    {
+        // Arrange
+        var repository = new TransactionRepositoryFake();
+        var useCase = new GetTransactionByIdUseCase(
+            transactionRepository: repository,
+            validator: _validator);
+
+        var request = new GetTransactionByIdRequest
+        {
+            Id = Guid.Empty
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O identificador da transação é obrigatório.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenTransactionNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetTransactionByIdUseCase(transactionRepository: repository);
+        var useCase = new GetTransactionByIdUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var request = new GetTransactionByIdRequest
         {
@@ -78,7 +108,9 @@ public sealed class GetTransactionByIdUseCaseTests
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetTransactionByIdUseCase(transactionRepository: repository);
+        var useCase = new GetTransactionByIdUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var transaction = Transaction.Create(
             title: "Consultoria Mensal",
@@ -117,7 +149,9 @@ public sealed class GetTransactionByIdUseCaseTests
     {
         // Arrange
         var repository = new TransactionRepositoryFake();
-        var useCase = new GetTransactionByIdUseCase(transactionRepository: repository);
+        var useCase = new GetTransactionByIdUseCase(
+            transactionRepository: repository,
+            validator: _validator);
 
         var request = new GetTransactionByIdRequest
         {

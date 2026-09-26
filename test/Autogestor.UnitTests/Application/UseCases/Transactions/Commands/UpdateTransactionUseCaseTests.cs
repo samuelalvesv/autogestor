@@ -1,4 +1,5 @@
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
+using Autogestor.Application.Validators.Transactions;
 using Autogestor.Contract.Enums;
 using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Responses.Transactions;
@@ -11,6 +12,8 @@ namespace Autogestor.UnitTests.Application.UseCases.Transactions.Commands;
 
 public sealed class UpdateTransactionUseCaseTests
 {
+    private readonly UpdateTransactionRequestValidator _validator = new();
+
     [Theory]
     [InlineData(ETransactionType.Deposit)]
     [InlineData(ETransactionType.Withdraw)]
@@ -23,7 +26,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var initialCategory = Category.Create(title: "Serviços", description: "Serviços prestados");
         categoryRepository.Add(category: initialCategory);
@@ -81,7 +85,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var request = new UpdateTransactionRequest
         {
@@ -113,7 +118,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var category = Category.Create(title: "Operacional", description: "Despesas operacionais");
         categoryRepository.Add(category: category);
@@ -150,7 +156,7 @@ public sealed class UpdateTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenCategoryDoesNotExistAndDomainFieldsInvalid_ThrowsNotFoundException()
+    public async Task ExecuteAsync_WhenCategoryDoesNotExistAndDomainFieldsInvalid_ThrowsDomainValidationException()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -159,7 +165,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var category = Category.Create(title: "Operacional", description: "Despesas operacionais");
         categoryRepository.Add(category: category);
@@ -181,25 +188,22 @@ public sealed class UpdateTransactionUseCaseTests
         };
 
         // Act & Assert
-        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
 
-        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: exception.Message);
+        Assert.Contains(expectedSubstring: "O título da transação não pode ser vazio.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
-        Assert.Equal(expected: 1, actual: categoryRepository.ExistsCallCount);
+        Assert.Equal(expected: 0, actual: categoryRepository.ExistsCallCount);
         Assert.Equal(expected: "Material de Escritório", actual: transaction.Title);
         Assert.Equal(expected: DomainTransactionType.Withdraw, actual: transaction.Type);
         Assert.Equal(expected: 80.00m, actual: transaction.Amount);
         Assert.Equal(expected: category.Id, actual: transaction.CategoryId);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData(null)]
-    public async Task ExecuteAsync_WithInvalidTitle_ThrowsArgumentException(string? invalidTitle)
+    [Fact]
+    public async Task ExecuteAsync_WithEmptyId_ThrowsDomainValidationException()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -208,7 +212,43 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
+
+        var request = new UpdateTransactionRequest
+        {
+            Id = Guid.Empty,
+            Title = "Título Válido",
+            Type = ETransactionType.Deposit,
+            Amount = 100.00m,
+            CategoryId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
+            testCode: () => useCase.ExecuteAsync(
+                request: request,
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Contains(expectedSubstring: "O identificador da transação é obrigatório.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
+        Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData(null)]
+    public async Task ExecuteAsync_WithInvalidTitle_ThrowsDomainValidationException(string? invalidTitle)
+    {
+        // Arrange
+        var transactionRepository = new TransactionRepositoryFake();
+        var categoryRepository = new CategoryRepositoryFake();
+        var unitOfWork = new UnitOfWorkFake();
+        var useCase = new UpdateTransactionUseCase(
+            transactionRepository: transactionRepository,
+            categoryRepository: categoryRepository,
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var category = Category.Create(title: "Alimentação", description: "Gastos com comida");
         categoryRepository.Add(category: category);
@@ -230,11 +270,10 @@ public sealed class UpdateTransactionUseCaseTests
         };
 
         // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "title", actual: exception.ParamName);
         Assert.Contains(expectedSubstring: "O título da transação não pode ser vazio.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
@@ -243,7 +282,7 @@ public sealed class UpdateTransactionUseCaseTests
     [InlineData(0.00)]
     [InlineData(-1.00)]
     [InlineData(-50.00)]
-    public async Task ExecuteAsync_WithZeroOrNegativeAmount_ThrowsArgumentException(double invalidAmountDouble)
+    public async Task ExecuteAsync_WithZeroOrNegativeAmount_ThrowsDomainValidationException(double invalidAmountDouble)
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -252,7 +291,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var category = Category.Create(title: "Transporte", description: "Combustível");
         categoryRepository.Add(category: category);
@@ -274,11 +314,10 @@ public sealed class UpdateTransactionUseCaseTests
         };
 
         // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "amount", actual: exception.ParamName);
         Assert.Contains(expectedSubstring: "O valor da transação deve ser maior que zero.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
@@ -287,7 +326,7 @@ public sealed class UpdateTransactionUseCaseTests
     [InlineData((ETransactionType)0)]
     [InlineData((ETransactionType)99)]
     [InlineData((ETransactionType)(-1))]
-    public async Task ExecuteAsync_WithInvalidType_ThrowsArgumentException(ETransactionType invalidType)
+    public async Task ExecuteAsync_WithInvalidType_ThrowsDomainValidationException(ETransactionType invalidType)
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -296,7 +335,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var category = Category.Create(title: "Lazer", description: "Cinema e viagens");
         categoryRepository.Add(category: category);
@@ -318,11 +358,10 @@ public sealed class UpdateTransactionUseCaseTests
         };
 
         // Act & Assert
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
-        Assert.Equal(expected: "type", actual: exception.ParamName);
         Assert.Contains(expectedSubstring: "Tipo de transação inválido.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
@@ -337,7 +376,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var category = Category.Create(title: "Salário", description: "Rendimentos mensais");
         categoryRepository.Add(category: category);
@@ -371,7 +411,7 @@ public sealed class UpdateTransactionUseCaseTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithEmptyCategoryId_ThrowsNotFoundException()
+    public async Task ExecuteAsync_WithEmptyCategoryId_ThrowsDomainValidationException()
     {
         // Arrange
         var transactionRepository = new TransactionRepositoryFake();
@@ -380,7 +420,8 @@ public sealed class UpdateTransactionUseCaseTests
         var useCase = new UpdateTransactionUseCase(
             transactionRepository: transactionRepository,
             categoryRepository: categoryRepository,
-            unitOfWork: unitOfWork);
+            unitOfWork: unitOfWork,
+            validator: _validator);
 
         var category = Category.Create(title: "Operacional", description: "Custos operacionais");
         categoryRepository.Add(category: category);
@@ -402,12 +443,12 @@ public sealed class UpdateTransactionUseCaseTests
         };
 
         // Act & Assert
-        NotFoundException exception = await Assert.ThrowsAsync<NotFoundException>(
+        DomainValidationException exception = await Assert.ThrowsAsync<DomainValidationException>(
             testCode: () => useCase.ExecuteAsync(
                 request: request,
                 cancellationToken: TestContext.Current.CancellationToken));
 
-        Assert.Equal(expected: "Categoria não encontrada para o tenant atual.", actual: exception.Message);
+        Assert.Contains(expectedSubstring: "O identificador da categoria é obrigatório.", actualString: exception.Message, comparisonType: StringComparison.Ordinal);
         Assert.Equal(expected: 0, actual: unitOfWork.CommitCount);
     }
 }

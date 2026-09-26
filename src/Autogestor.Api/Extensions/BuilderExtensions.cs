@@ -10,10 +10,15 @@ using Autogestor.Application.UseCases.Transactions.Commands.DeleteTransaction;
 using Autogestor.Application.UseCases.Transactions.Commands.UpdateTransaction;
 using Autogestor.Application.UseCases.Transactions.Queries.GetAllTransactions;
 using Autogestor.Application.UseCases.Transactions.Queries.GetTransactionById;
+using Autogestor.Application.Validators.Categories;
+using Autogestor.Application.Validators.Transactions;
+using Autogestor.Contract.Requests.Categories;
+using Autogestor.Contract.Requests.Transactions;
 using Autogestor.Contract.Services;
 using Autogestor.Infrastructure;
 using Autogestor.Infrastructure.Persistence;
 using Autogestor.Infrastructure.Persistence.Interceptors;
+using FluentValidation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using ProtoBuf.Grpc.Server;
@@ -73,6 +78,18 @@ public static class BuilderExtensions
         builder.Services.AddScoped<IGetTransactionByIdUseCase, GetTransactionByIdUseCase>();
         builder.Services.AddScoped<IUpdateTransactionUseCase, UpdateTransactionUseCase>();
         builder.Services.AddScoped<ITransactionService, TransactionService>();
+
+        builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryRequestValidator>();
+        builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryRequestValidator>();
+        builder.Services.AddScoped<IValidator<DeleteCategoryRequest>, DeleteCategoryRequestValidator>();
+        builder.Services.AddScoped<IValidator<GetCategoryByIdRequest>, GetCategoryByIdRequestValidator>();
+        builder.Services.AddScoped<IValidator<GetAllCategoriesRequest>, GetAllCategoriesRequestValidator>();
+
+        builder.Services.AddScoped<IValidator<CreateTransactionRequest>, CreateTransactionRequestValidator>();
+        builder.Services.AddScoped<IValidator<UpdateTransactionRequest>, UpdateTransactionRequestValidator>();
+        builder.Services.AddScoped<IValidator<DeleteTransactionRequest>, DeleteTransactionRequestValidator>();
+        builder.Services.AddScoped<IValidator<GetTransactionByIdRequest>, GetTransactionByIdRequestValidator>();
+        builder.Services.AddScoped<IValidator<GetAllTransactionsRequest>, GetAllTransactionsRequestValidator>();
 
         return builder;
     }

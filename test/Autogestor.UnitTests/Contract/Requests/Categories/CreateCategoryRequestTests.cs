@@ -1,86 +1,32 @@
-using System.ComponentModel.DataAnnotations;
 using Autogestor.Contract.Requests.Categories;
 
 namespace Autogestor.UnitTests.Contract.Requests.Categories;
 
 public sealed class CreateCategoryRequestTests
 {
-    private static IList<ValidationResult> ValidateModel(object model)
-    {
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(instance: model, serviceProvider: null, items: null);
-        Validator.TryValidateObject(instance: model, validationContext: validationContext, validationResults: validationResults, validateAllProperties: true);
-        return validationResults;
-    }
-
     [Fact]
-    public void CreateCategoryRequest_WithValidData_PassesValidation()
+    public void CreateCategoryRequest_WithValues_SetsPropertiesCorrectly()
     {
-        // Arrange
+        // Act
         var request = new CreateCategoryRequest
         {
             Title = "Investimentos",
             Description = "Categoria para despesas de investimento"
         };
 
-        // Act
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
         // Assert
-        Assert.Empty(collection: errors);
-    }
-
-    [Theory]
-    [InlineData("ab")]
-    [InlineData("123456789012345678901234567890123456789012345678901234567890123456789012345678901")]
-    public void CreateCategoryRequest_WithInvalidTitleLength_FailsValidation(string invalidTitle)
-    {
-        // Arrange
-        var request = new CreateCategoryRequest
-        {
-            Title = invalidTitle,
-            Description = "Descrição válida da categoria"
-        };
-
-        // Act
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
-        // Assert
-        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(value: nameof(CreateCategoryRequest.Title)));
-    }
-
-    [Theory]
-    [InlineData("ab")]
-    public void CreateCategoryRequest_WithShortDescription_FailsValidation(string shortDescription)
-    {
-        // Arrange
-        var request = new CreateCategoryRequest
-        {
-            Title = "Título Válido",
-            Description = shortDescription
-        };
-
-        // Act
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
-        // Assert
-        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(value: nameof(CreateCategoryRequest.Description)));
+        Assert.Equal(expected: "Investimentos", actual: request.Title);
+        Assert.Equal(expected: "Categoria para despesas de investimento", actual: request.Description);
     }
 
     [Fact]
-    public void CreateCategoryRequest_WithDescriptionExceeding180Chars_FailsValidation()
+    public void CreateCategoryRequest_RecordEquality_ReturnsTrueForEqualValues()
     {
         // Arrange
-        var request = new CreateCategoryRequest
-        {
-            Title = "Título Válido",
-            Description = new string(c: 'A', count: 181)
-        };
+        var request1 = new CreateCategoryRequest { Title = "A", Description = "B" };
+        var request2 = new CreateCategoryRequest { Title = "A", Description = "B" };
 
-        // Act
-        IList<ValidationResult> errors = ValidateModel(model: request);
-
-        // Assert
-        Assert.Contains(collection: errors, filter: e => e.MemberNames.Contains(value: nameof(CreateCategoryRequest.Description)));
+        // Act & Assert
+        Assert.Equal(expected: request1, actual: request2);
     }
 }
